@@ -1,3 +1,7 @@
+## <small>1.0.2 (2026-09-01)</small>
+
+* fix(stats): stop Intl.DateTimeFormat crashing the statistics view ([e92ed0d](https://github.com/Memel-SQT/nebula-clock/commit/e92ed0d))
+
 ## <small>1.0.1 (2026-09-01)</small>
 
 * fix(ci): stamp the release version before building the installers ([e4cddce](https://github.com/Memel-SQT/nebula-clock/commit/e4cddce))
