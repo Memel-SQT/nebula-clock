@@ -17,10 +17,51 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Build the installers first so semantic-release has something to attach.
+  # The installers must carry the version they are released under, so the next
+  # version is resolved *before* anything is built. Building first left every
+  # binary and latest.yml advertising the placeholder version, which
+  # electron-updater then compared against the real tag and never matched.
+  prepare:
+    name: Resolve next version
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.semantic.outputs.version }}
+      publish: ${{ steps.semantic.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
+
+      - name: Dry-run semantic-release
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          pnpm exec semantic-release --dry-run | tee semantic.log
+          set -e
+          version=$(grep -oE 'The next release version is [0-9]+\.[0-9]+\.[0-9]+' semantic.log \
+            | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+          if [ -z "$version" ]; then
+            echo "No release is due."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Next version: $version"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
     name: Build installers (${{ matrix.os }})
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    needs: prepare
+    if: needs.prepare.outputs.publish == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -41,6 +82,9 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
+
+      - name: Stamp the version being released
+        run: node scripts/set-version.mjs ${{ needs.prepare.outputs.version }}
 
       - name: Build installers
         run: pnpm build:desktop
@@ -64,7 +108,8 @@ jobs:
 
   release:
     name: semantic-release
-    needs: build
+    needs: [prepare, build]
+    if: needs.prepare.outputs.publish == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
