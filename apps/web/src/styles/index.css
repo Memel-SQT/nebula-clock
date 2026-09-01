@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* The Nebula design tokens must land before Tailwind's utilities so that
+   `bg-card` and friends resolve against the active theme. */
+@import '@nebula-clock/ui/tokens.css';
+
+@layer base {
+  /* Native controls follow the theme (scrollbars, form widgets). */
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+}
+
+@layer components {
+  /* The app chrome is draggable in the Electron frameless window; anything
+     interactive inside it has to opt back out. */
+  .app-drag {
+    -webkit-app-region: drag;
+  }
+  .app-no-drag {
+    -webkit-app-region: no-drag;
+  }
+}

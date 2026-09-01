@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Nebula Clock</title>
+    <meta
+      name="description"
+      content="A privacy-first Pomodoro time manager. Everything stays on your device."
+    />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="nebula-mark.svg" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <meta name="theme-color" content="#0A0A0F" />
+    <meta name="color-scheme" content="dark light" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      /**
+       * Resolve the theme before first paint so the app never flashes the
+       * wrong background. Mirrors the logic in src/hooks/useTheme.ts; kept
+       * inline and dependency-free because it has to run before the bundle.
+       */
+      (function () {
+        try {
+          var raw = localStorage.getItem('nebula-clock-settings');
+          var appearance = raw ? JSON.parse(raw).state.settings.appearance : null;
+          var mode = appearance ? appearance.theme : 'system';
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          var resolved = mode === 'system' ? (prefersLight ? 'light' : 'dark') : mode;
+          var root = document.documentElement;
+          root.setAttribute('data-theme', resolved);
+          if (appearance) {
+            if (appearance.reduceMotion) root.setAttribute('data-reduce-motion', 'true');
+            if (appearance.highContrast) root.setAttribute('data-contrast', 'high');
+            if (appearance.fontScale) root.style.setProperty('--font-scale', appearance.fontScale);
+          }
+        } catch (error) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
