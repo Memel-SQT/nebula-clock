@@ -1,0 +1,122 @@
+{
+  "name": "@nebula-clock/desktop",
+  "version": "0.0.0-development",
+  "private": true,
+  "description": "Nebula Clock desktop shell (Electron).",
+  "license": "MIT",
+  "author": {
+    "name": "Nebula Clock contributors"
+  },
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "compile": "tsup",
+    "dev": "cross-env NODE_ENV=development concurrently -k -n vite,electron -c cyan,magenta \"pnpm --filter @nebula-clock/web dev --port 5273 --strictPort\" \"pnpm run dev:electron\"",
+    "dev:electron": "wait-on tcp:5273 && tsup && cross-env NODE_ENV=development VITE_DEV_SERVER_URL=http://localhost:5273 electron .",
+    "prepare:renderer": "node scripts/prepare-renderer.mjs",
+    "build": "pnpm run prepare:renderer && tsup && electron-builder --publish never",
+    "build:win": "pnpm run prepare:renderer && tsup && electron-builder --win --publish never",
+    "build:mac": "pnpm run prepare:renderer && tsup && electron-builder --mac --publish never",
+    "build:linux": "pnpm run prepare:renderer && tsup && electron-builder --linux --publish never",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Electron shell is covered by the manual test plan in docs/manual-testing-electron.md\" && exit 0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "devDependencies": {
+    "@nebula-clock/core": "workspace:*",
+    "@types/node": "^22.9.0",
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "clock.nebula.desktop",
+    "productName": "Nebula Clock",
+    "copyright": "Copyright (c) 2026 Nebula Clock contributors",
+    "asar": true,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "renderer/**/*",
+      "resources/**/*",
+      "package.json"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Memel-SQT",
+        "repo": "nebula-clock",
+        "releaseType": "release"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Nebula Clock"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "dmg": {
+      "title": "Nebula Clock ${version}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icons",
+      "category": "Utility",
+      "maintainer": "Nebula Clock contributors",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "deb": {
+      "depends": [
+        "libnotify4",
+        "libxtst6",
+        "libnss3"
+      ]
+    }
+  }
+}
