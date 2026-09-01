@@ -99,7 +99,7 @@
       "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
     "dmg": {
-      "title": "Nebula Clock ${version}"
+      "title": "${productName} ${arch}"
     },
     "linux": {
       "target": [
@@ -118,5 +118,10 @@
         "libnss3"
       ]
     }
+  },
+  "homepage": "https://github.com/Memel-SQT/nebula-clock",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Memel-SQT/nebula-clock.git"
   }
 }
