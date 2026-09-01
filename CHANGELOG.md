@@ -1,3 +1,8 @@
+## <small>1.0.1 (2026-09-01)</small>
+
+* fix(ci): stamp the release version before building the installers ([e4cddce](https://github.com/Memel-SQT/nebula-clock/commit/e4cddce))
+* fix(ui): rename the canvas colour token so text-base keeps its size ([ffbd85a](https://github.com/Memel-SQT/nebula-clock/commit/ffbd85a))
+
 ## 1.0.0 (2026-09-01)
 
 * build(desktop): fix the Linux and macOS packaging targets ([80e81bc](https://github.com/Memel-SQT/nebula-clock/commit/80e81bc))
