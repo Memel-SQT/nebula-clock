@@ -1,3 +1,9 @@
+## <small>1.0.3 (2026-09-01)</small>
+
+* fix(ci): trigger the Pages deploy from the Release workflow run ([ecc3201](https://github.com/Memel-SQT/nebula-clock/commit/ecc3201))
+* test(web): make the end-to-end suite match the real DOM ([61e5f85](https://github.com/Memel-SQT/nebula-clock/commit/61e5f85))
+* docs: note that auto-update needs a public repository ([7ffdd7b](https://github.com/Memel-SQT/nebula-clock/commit/7ffdd7b))
+
 ## <small>1.0.2 (2026-09-01)</small>
 
 * fix(stats): stop Intl.DateTimeFormat crashing the statistics view ([e92ed0d](https://github.com/Memel-SQT/nebula-clock/commit/e92ed0d))
