@@ -20,6 +20,10 @@ export const CHANNELS = {
 
   // renderer -> main (fire and forget)
   publishTimer: 'nebula:publish-timer',
+  /** The mini window asking the main window to act; it owns no timer itself. */
+  requestCommand: 'nebula:request-command',
+  /** A freshly opened mirror asking for the current state right away. */
+  requestSnapshot: 'nebula:request-snapshot',
   quitAndInstall: 'nebula:quit-and-install',
 
   // main -> renderer
@@ -32,12 +36,20 @@ export type Phase = 'focus' | 'shortBreak' | 'longBreak';
 
 export type DesktopCommand = 'toggle' | 'start' | 'pause' | 'skip' | 'reset' | 'mini-mode';
 
+/**
+ * Everything a mirror needs to render the timer without running one.
+ * The tray uses `display` and `completedToday`; the mini window uses the rest.
+ */
 export interface DesktopTimerSnapshot {
   phase: Phase;
   status: 'idle' | 'running' | 'paused';
   remainingSeconds: number;
   display: string;
   completedToday: number;
+  /** 0..1 completion of the current phase. */
+  progress: number;
+  completedInCycle: number;
+  cycleTarget: number;
 }
 
 export interface NotificationPayload {

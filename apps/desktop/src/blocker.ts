@@ -165,7 +165,9 @@ export function applyBlocker(config: BlockerConfig, callbacks: BlockerCallbacks)
     return { ok: true, reason: 'whitelist-sites-not-enforced' };
   }
 
-  return config.sites.length > 0 ? applyHosts(config) : { ok: true };
+  // `hostsWritten` matters as much as the current list: emptying the sites
+  // mid-focus has to clear the block that is already in the file.
+  return config.sites.length > 0 || hostsWritten ? applyHosts(config) : { ok: true };
 }
 
 /** Always call this on quit so a crash never leaves the hosts file edited. */

@@ -76,7 +76,21 @@ export function createTray(handlers: TrayHandlers): Tray {
   return tray;
 }
 
-/** Refresh the tooltip, macOS title and menu from the latest snapshot. */
+/** Identifies a menu that would render identically, to avoid rebuilding it. */
+function menuKey(s: DesktopTimerSnapshot): string {
+  return `${s.phase}|${s.status}|${s.display}|${s.completedToday}`;
+}
+
+let lastMenuKey = '';
+
+/**
+ * Refresh the tooltip, the macOS title and, when it would actually differ,
+ * the context menu.
+ *
+ * Snapshots arrive once a second. Rebuilding the menu each time is wasteful
+ * and, on Linux, makes an open tray menu flicker or close under the pointer,
+ * so it is only replaced when one of the values it shows has changed.
+ */
 export function updateTray(next: DesktopTimerSnapshot): void {
   snapshot = next;
   if (!tray || tray.isDestroyed()) return;
@@ -87,12 +101,17 @@ export function updateTray(next: DesktopTimerSnapshot): void {
   if (process.platform === 'darwin') {
     tray.setTitle(next.status === 'running' ? ` ${next.display}` : '');
   }
+
+  const key = menuKey(next);
+  if (key === lastMenuKey) return;
+  lastMenuKey = key;
   tray.setContextMenu(buildMenu());
 }
 
 export function destroyTray(): void {
   tray?.destroy();
   tray = null;
+  lastMenuKey = '';
 }
 
 /** Badge count on the dock/taskbar: pomodoros completed today. */

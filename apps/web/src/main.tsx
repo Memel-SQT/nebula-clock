@@ -6,8 +6,9 @@ import {
   setNotificationAdapter,
 } from '@nebula-clock/core';
 import { App } from './App.js';
+import { MiniApp } from './MiniApp.js';
 import { initI18n } from './lib/i18n.js';
-import { getDesktop } from './lib/platform.js';
+import { getDesktop, isMiniWindow } from './lib/platform.js';
 import { useDataStore } from './store/dataStore.js';
 import { useSettingsStore } from './store/settingsStore.js';
 import './styles/index.css';
@@ -34,9 +35,13 @@ async function bootstrap(): Promise<void> {
   const container = document.getElementById('root');
   if (!container) throw new Error('Root container missing from index.html');
 
+  // The Electron mini window shares this bundle but must not start a second
+  // timer; it gets a root that only mirrors the main window.
+  const Root = isMiniWindow() ? MiniApp : App;
+
   createRoot(container).render(
     <StrictMode>
-      <App />
+      <Root />
     </StrictMode>,
   );
 }

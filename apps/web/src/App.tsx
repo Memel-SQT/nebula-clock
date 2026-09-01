@@ -3,7 +3,6 @@ import { AnimatePresence } from 'framer-motion';
 import { AppShell } from './components/AppShell.js';
 import { BreakReminder } from './components/BreakReminder.js';
 import { FullscreenTimer } from './components/FullscreenTimer.js';
-import { MiniTimer } from './components/MiniTimer.js';
 import { useDesktopSync } from './hooks/useDesktopSync.js';
 import { useDocumentTitle } from './hooks/useDocumentTitle.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
@@ -11,7 +10,6 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
 import { useTheme } from './hooks/useTheme.js';
 import { useTicker } from './hooks/useTicker.js';
 import { changeLanguage } from './lib/i18n.js';
-import { isMiniWindow } from './lib/platform.js';
 import { CalendarView } from './views/CalendarView.js';
 import { TasksView } from './views/TasksView.js';
 import { TimerView } from './views/TimerView.js';
@@ -58,9 +56,6 @@ export function App() {
     if (phase === 'focus' && status === 'running') setFullscreen(true);
     else if (phase !== 'focus') setFullscreen(false);
   }, [fullscreenOnFocus, phase, status]);
-
-  // The Electron mini window shares this bundle but none of the chrome.
-  if (isMiniWindow()) return <MiniTimer />;
 
   return (
     <>

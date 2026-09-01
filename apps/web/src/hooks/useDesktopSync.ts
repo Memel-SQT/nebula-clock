@@ -1,27 +1,28 @@
 import { useEffect } from 'react';
-import { formatDuration } from '@nebula-clock/core';
-import { getRange, filterByRange, isPomodoro } from '@nebula-clock/core';
+import { filterByRange, getRange, isPomodoro } from '@nebula-clock/core';
 import { getDesktop } from '../lib/platform.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
 import { useTimerStore, useTimerView } from '../store/timerStore.js';
-import type { TimerView } from '../store/timerStore.js';
 
 /**
  * Two-way sync with the Electron main process.
  *
- * Out: a snapshot of the timer, so the tray title, the tray menu and the
- * mini window stay current, and so focus mode can drive Do Not Disturb.
- * In: commands from the tray menu and the global accelerators.
+ * Out: a snapshot of the timer, so the tray, the mini window and Do Not
+ * Disturb all follow the one state machine that lives here.
+ * In: commands from the tray menu, the global accelerators and the mini
+ * window's buttons.
  *
- * Every call is a no-op in the browser build, where `getDesktop()` is null.
+ * Only the main window runs this hook - the mini window mounts `MiniApp`,
+ * which mirrors instead of computing. Every call is a no-op in the browser
+ * build, where `getDesktop()` is null.
  */
 export function useDesktopSync(): void {
   const view = useTimerView();
   const sessions = useDataStore((state) => state.sessions);
   const desktopSettings = useSettingsStore((state) => state.settings.desktop);
 
-  // Commands coming in from the tray and the global shortcuts.
+  // Commands coming in from the tray, the global shortcuts and the mini window.
   useEffect(() => {
     const desktop = getDesktop();
     if (!desktop) return;
@@ -45,14 +46,35 @@ export function useDesktopSync(): void {
           timer.reset();
           break;
         case 'mini-mode':
-          void desktop.openMiniMode();
+          // Handled entirely in the main process; nothing to do here.
           break;
       }
     });
   }, []);
 
-  // Snapshot out. Formatting happens here so the main process never has to
-  // duplicate the countdown logic.
+  /**
+   * Push the settings the main process cannot see for itself.
+   *
+   * They live in this renderer's localStorage, so without this the main
+   * process would fall back to its own defaults on every launch and, for
+   * example, re-enable global shortcuts the user had turned off.
+   */
+  useEffect(() => {
+    const desktop = getDesktop();
+    if (!desktop) return;
+    void desktop.setGlobalShortcuts(desktopSettings.globalShortcuts);
+    void desktop.setMinimizeToTray(desktopSettings.minimizeToTray);
+    void desktop.setMiniModeAlwaysOnTop(desktopSettings.miniModeAlwaysOnTop);
+    void desktop.setLaunchAtLogin(desktopSettings.launchAtLogin);
+  }, [
+    desktopSettings.globalShortcuts,
+    desktopSettings.minimizeToTray,
+    desktopSettings.miniModeAlwaysOnTop,
+    desktopSettings.launchAtLogin,
+  ]);
+
+  // Snapshot out. Keyed off `display` rather than the raw seconds so it fires
+  // once per visible second instead of on every 500 ms tick.
   useEffect(() => {
     const desktop = getDesktop();
     if (!desktop) return;
@@ -62,10 +84,16 @@ export function useDesktopSync(): void {
       phase: view.phase,
       status: view.status,
       remainingSeconds: view.remaining,
-      display: formatDuration(view.remaining),
+      display: view.display,
       completedToday: today,
+      progress: view.progress,
+      completedInCycle: view.completedInCycle,
+      cycleTarget: view.cycleTarget,
     });
-  }, [view.phase, view.status, view.remaining, sessions]);
+    // `view` is rebuilt every tick; the listed fields are what actually
+    // changes what the tray and the mini window show.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view.phase, view.status, view.display, view.completedInCycle, view.cycleTarget, sessions]);
 
   // Do Not Disturb follows the focus phase, when the user asked for it.
   useEffect(() => {
@@ -89,25 +117,4 @@ export function useDesktopSync(): void {
       active: blocker.enabled && view.phase === 'focus' && view.status === 'running',
     });
   }, [desktopSettings.blocker, view.phase, view.status]);
-}
-
-/**
- * The mini window is a pure mirror: it renders whatever the main window
- * publishes rather than running a second copy of the machine.
- */
-export function useMiniWindowSnapshot(): TimerView {
-  const view = useTimerView();
-  useEffect(() => {
-    const desktop = getDesktop();
-    if (!desktop?.isMiniWindow) return;
-    return desktop.onTimerSnapshot((snapshot) => {
-      // Fold the published snapshot into the local store so the shared
-      // components can render it unchanged.
-      useTimerStore.setState((state) => ({
-        machine: { ...state.machine, phase: snapshot.phase, status: snapshot.status },
-        now: Date.now(),
-      }));
-    });
-  }, []);
-  return view;
 }

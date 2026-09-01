@@ -40,6 +40,14 @@ const bridge = {
     ipcRenderer.send(CHANNELS.publishTimer, snapshot);
   },
 
+  requestCommand: (command: DesktopCommand): void => {
+    ipcRenderer.send(CHANNELS.requestCommand, command);
+  },
+
+  requestSnapshot: (): void => {
+    ipcRenderer.send(CHANNELS.requestSnapshot);
+  },
+
   onCommand: (handler: (command: DesktopCommand) => void): (() => void) =>
     subscribe<DesktopCommand>(CHANNELS.command, handler),
 

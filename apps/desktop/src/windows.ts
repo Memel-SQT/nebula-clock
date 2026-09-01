@@ -84,6 +84,11 @@ export async function createMainWindow(): Promise<BrowserWindow> {
       nodeIntegration: false,
       sandbox: false,
       spellcheck: false,
+      // This window owns the timer. Chromium throttles timers in hidden
+      // windows, and this one is hidden whenever the app is in the tray or
+      // the mini window is up - which would delay every phase-change
+      // notification by up to a minute.
+      backgroundThrottling: false,
     },
   });
 

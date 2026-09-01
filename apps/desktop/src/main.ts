@@ -45,6 +45,14 @@ let doNotDisturb = false;
 let powerBlockerId: number | null = null;
 let miniAlwaysOnTop = true;
 
+/**
+ * The most recent state the main window published.
+ *
+ * A mirror that opens while the timer is idle would otherwise wait forever
+ * for a change that never comes, so it can ask for this on mount.
+ */
+let lastSnapshot: DesktopTimerSnapshot | null = null;
+
 function setDoNotDisturb(enabled: boolean): void {
   doNotDisturb = enabled;
 
@@ -56,13 +64,19 @@ function setDoNotDisturb(enabled: boolean): void {
   }
 }
 
-/** Send a command to every live renderer (main window and mini window). */
+/**
+ * Route a command to the main window, which owns the only state machine.
+ *
+ * It deliberately does *not* reach the mini window: that one is a mirror, and
+ * delivering the same command to both would complete phases twice and record
+ * every session twice over.
+ */
 function broadcastCommand(command: DesktopCommand): void {
   if (command === 'mini-mode') {
     void (getMiniWindow() ? closeMiniWindow() : openMiniWindow(miniAlwaysOnTop));
     return;
   }
-  for (const window of allWindows()) window.webContents.send(CHANNELS.command, command);
+  getMainWindow()?.webContents.send(CHANNELS.command, command);
 }
 
 function broadcastUpdate(event: UpdateEvent): void {
@@ -88,9 +102,20 @@ function registerIpc(): void {
     const sender = BrowserWindow.fromWebContents(event.sender);
     if (sender && sender === getMiniWindow()) return;
 
+    lastSnapshot = snapshot;
     updateTray(snapshot);
     updateBadge(snapshot.completedToday);
     getMiniWindow()?.webContents.send(CHANNELS.timerSnapshot, snapshot);
+  });
+
+  // A button in the mini window: forward it to the window that owns the timer.
+  ipcMain.on(CHANNELS.requestCommand, (_event, command: DesktopCommand) => {
+    broadcastCommand(command);
+  });
+
+  // A mirror has just mounted and needs the current state, not the next change.
+  ipcMain.on(CHANNELS.requestSnapshot, (event) => {
+    if (lastSnapshot) event.sender.send(CHANNELS.timerSnapshot, lastSnapshot);
   });
 
   ipcMain.handle(CHANNELS.setLaunchAtLogin, (_event, enabled: boolean) => {
