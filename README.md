@@ -191,8 +191,10 @@ These are deliberate, and the UI never claims otherwise:
   check returns 404 and the app logs it and carries on. Making the repository
   public, or shipping a token, is what turns auto-update on.
 - **GitHub Pages needs the repository to be public.** Pages is unavailable on
-  private repositories outside a paid plan, so the deploy workflow is wired up
-  but has nothing to publish to yet.
+  private repositories outside a paid plan. The deploy workflow is wired up but
+  gated behind the repository variable `DEPLOY_PAGES`; set it to `true` once the
+  repository is public and Pages is set to build from GitHub Actions, and the
+  PWA will deploy on every release.
 - **Installers are unsigned.** No code-signing certificate is configured, so
   Windows SmartScreen and macOS Gatekeeper will warn on first launch.
 

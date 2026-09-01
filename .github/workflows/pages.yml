@@ -25,11 +25,18 @@ concurrency:
 jobs:
   deploy:
     name: Build & deploy
-    # Only after a Release run that actually succeeded; a manual dispatch has
-    # no triggering run to inspect.
+    # Two gates:
+    #   - only after a Release run that actually succeeded (a manual dispatch
+    #     has no triggering run to inspect);
+    #   - only once Pages is actually available. GitHub Pages does not exist
+    #     on a private repository outside a paid plan, and without this the
+    #     job would fail on every release forever. Set the repository variable
+    #     DEPLOY_PAGES to `true` once the repo is public and Pages is set to
+    #     build from GitHub Actions.
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+      vars.DEPLOY_PAGES == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
