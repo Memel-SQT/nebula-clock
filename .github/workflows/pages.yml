@@ -1,8 +1,14 @@
 name: Deploy PWA to GitHub Pages
 
+# Deliberately keyed off the Release workflow rather than `on: release`.
+# GitHub does not start workflows for events raised with GITHUB_TOKEN, and
+# semantic-release publishes the release with exactly that token, so an
+# `on: release` trigger would never once fire.
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ['Release']
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -19,6 +25,11 @@ concurrency:
 jobs:
   deploy:
     name: Build & deploy
+    # Only after a Release run that actually succeeded; a manual dispatch has
+    # no triggering run to inspect.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

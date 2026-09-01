@@ -190,6 +190,9 @@ These are deliberate, and the UI never claims otherwise:
   releases feed anonymously, so while this repository is private the update
   check returns 404 and the app logs it and carries on. Making the repository
   public, or shipping a token, is what turns auto-update on.
+- **GitHub Pages needs the repository to be public.** Pages is unavailable on
+  private repositories outside a paid plan, so the deploy workflow is wired up
+  but has nothing to publish to yet.
 - **Installers are unsigned.** No code-signing certificate is configured, so
   Windows SmartScreen and macOS Gatekeeper will warn on first launch.
 
