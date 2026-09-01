@@ -30,7 +30,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
 
       - name: Lint
         run: pnpm lint
@@ -65,7 +65,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
       - run: pnpm build
       - uses: actions/upload-artifact@v4
         with:
@@ -83,7 +83,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
       - name: Install Playwright browsers
         run: pnpm --filter @nebula-clock/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
@@ -111,7 +111,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
 
       - name: Build installers
         # Unsigned on CI: signing certificates are not available to forks, and

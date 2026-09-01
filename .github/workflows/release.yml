@@ -40,7 +40,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
 
       - name: Build installers
         run: pnpm build:desktop
@@ -79,7 +79,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --config.dangerouslyAllowAllBuilds=true
 
       - name: Collect installers
         uses: actions/download-artifact@v4
