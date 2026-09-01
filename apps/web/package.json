@@ -1,6 +1,6 @@
 {
   "name": "@nebula-clock/web",
-  "version": "0.0.0-development",
+  "version": "1.0.0",
   "private": true,
   "description": "Nebula Clock PWA.",
   "license": "MIT",

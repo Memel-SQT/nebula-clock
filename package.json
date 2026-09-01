@@ -1,6 +1,6 @@
 {
   "name": "nebula-clock",
-  "version": "0.0.0-development",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Nebula Clock - a privacy-first Pomodoro time manager for web (PWA) and desktop (Electron).",
