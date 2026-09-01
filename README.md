@@ -36,7 +36,7 @@ node apps/web/scripts/capture-screenshots.mjs http://localhost:4173
 | ---------------------------------------------------- | ------------------------------------------------- |
 | `packages/core` — timer engine, storage, stats, i18n | ✅ 164 unit tests, 98.7 % coverage                |
 | `packages/ui` — Nebula design system                 | ✅ Complete                                       |
-| `apps/web` — PWA renderer                            | ✅ Builds, 23 tests, Playwright suite             |
+| `apps/web` — PWA renderer                            | ✅ 23 store tests + 32 Playwright end-to-end      |
 | `apps/desktop` — Electron shell                      | ✅ Tray, global shortcuts, mini mode, auto-update |
 | CI/CD                                                | ✅ Build matrix, semantic-release, Pages          |
 

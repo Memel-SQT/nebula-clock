@@ -35,6 +35,10 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
 
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      {/* Every view needs a level-1 heading; here the countdown itself is the
+          title, so the heading is for assistive technology only. */}
+      <h1 className="sr-only">{t('common:nav.timer')}</h1>
+
       {/* Phase changes are announced here rather than by moving focus. */}
       <LiveRegion assertive>{announcement}</LiveRegion>
 

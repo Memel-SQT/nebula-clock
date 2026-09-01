@@ -49,6 +49,9 @@ export function TimerDisplay({
         </span>
 
         <motion.span
+          // The countdown sits beside the SVG rather than inside it, so it
+          // needs its own hook for the end-to-end tests.
+          data-testid="countdown"
           // A gentle pulse on the whole readout each time the second changes
           // reads as "alive" without animating 60 times a second.
           key={display}
