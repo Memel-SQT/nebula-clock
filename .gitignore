@@ -1,0 +1,32 @@
+node_modules/
+dist/
+dist-electron/
+release/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# Test / tooling output
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+dev-dist/
+
+# Editors & OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local env
+.env
+.env.local
+.env.*.local
+
+# Electron renderer, produced by apps/desktop/scripts/prepare-renderer.mjs
+renderer/
+
+# husky internals
+.husky/_/
