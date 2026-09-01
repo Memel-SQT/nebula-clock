@@ -9,6 +9,7 @@
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 import {
   createId,
   createInitialState,
@@ -172,7 +173,14 @@ export interface TimerView {
   cycleTarget: number;
 }
 
-/** Everything the timer UI needs, derived from the machine and the clock. */
+/**
+ * Everything the timer UI needs, derived from the machine and the clock.
+ *
+ * This builds a fresh object on every call, so components must subscribe
+ * through `useTimerView()` rather than passing it to `useTimerStore`
+ * directly: Zustand compares selector results by reference, and a new object
+ * each render is an infinite render loop.
+ */
 export function selectTimerView(state: TimerStore): TimerView {
   const timerConfig = config();
   const { machine, now } = state;
@@ -187,4 +195,14 @@ export function selectTimerView(state: TimerStore): TimerView {
     completedInCycle: machine.completedInCycle,
     cycleTarget: timerConfig.cyclesBeforeLongBreak,
   };
+}
+
+/**
+ * Subscribe to the derived timer view.
+ *
+ * `useShallow` compares the returned fields one by one, so a re-render only
+ * happens when a value the UI actually shows has changed.
+ */
+export function useTimerView(): TimerView {
+  return useTimerStore(useShallow(selectTimerView));
 }

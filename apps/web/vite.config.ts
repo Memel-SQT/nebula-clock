@@ -89,17 +89,11 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        // Recharts and jsPDF are large and only needed on two screens; keeping
-        // them out of the entry chunk keeps first paint fast.
-        manualChunks: {
-          charts: ['recharts'],
-          pdf: ['jspdf', 'jspdf-autotable'],
-          vendor: ['react', 'react-dom', 'framer-motion'],
-        },
-      },
-    },
+    // No manualChunks here on purpose: hand-splitting react away from
+    // recharts produced a circular chunk graph, which left React
+    // uninitialised at recharts' import time and rendered a blank page in the
+    // production build. Recharts and jsPDF are kept out of the entry chunk by
+    // lazy-loading the views that use them (see App.tsx) instead.
   },
   test: {
     globals: true,

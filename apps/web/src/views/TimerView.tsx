@@ -16,7 +16,7 @@ import { TimerDisplay } from '../components/TimerDisplay.js';
 import { getDesktop } from '../lib/platform.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
-import { selectTimerView, useTimerStore } from '../store/timerStore.js';
+import { useTimerStore, useTimerView } from '../store/timerStore.js';
 
 export interface TimerViewProps {
   onEnterFullscreen: () => void;
@@ -24,7 +24,7 @@ export interface TimerViewProps {
 
 export function TimerView({ onEnterFullscreen }: TimerViewProps) {
   const { t } = useTranslation(['timer', 'stats', 'common']);
-  const view = useTimerStore(selectTimerView);
+  const view = useTimerView();
   const announcement = useTimerStore((state) => state.announcement);
   const sessions = useDataStore((state) => state.sessions);
   const goals = useSettingsStore((state) => state.settings.goals);

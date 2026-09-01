@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTimerStore, selectTimerView } from '../store/timerStore.js';
+import { useTimerView } from '../store/timerStore.js';
 import { updateFavicon } from '../lib/favicon.js';
 
 /**
@@ -9,7 +9,7 @@ import { updateFavicon } from '../lib/favicon.js';
  */
 export function useDocumentTitle(): void {
   const { t } = useTranslation(['timer', 'common']);
-  const view = useTimerStore(selectTimerView);
+  const view = useTimerView();
 
   useEffect(() => {
     const appName = t('common:app.name');

@@ -1,10 +1,11 @@
+/* The Nebula design tokens must be imported first: a CSS @import is only
+   valid at the top of a stylesheet, and anywhere else it is dropped, which
+   leaves every var() undefined and the app unstyled. */
+@import '@nebula-clock/ui/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* The Nebula design tokens must land before Tailwind's utilities so that
-   `bg-card` and friends resolve against the active theme. */
-@import '@nebula-clock/ui/tokens.css';
 
 @layer base {
   /* Native controls follow the theme (scrollbars, form widgets). */

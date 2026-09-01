@@ -4,7 +4,8 @@ import { getRange, filterByRange, isPomodoro } from '@nebula-clock/core';
 import { getDesktop } from '../lib/platform.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
-import { selectTimerView, useTimerStore } from '../store/timerStore.js';
+import { useTimerStore, useTimerView } from '../store/timerStore.js';
+import type { TimerView } from '../store/timerStore.js';
 
 /**
  * Two-way sync with the Electron main process.
@@ -16,7 +17,7 @@ import { selectTimerView, useTimerStore } from '../store/timerStore.js';
  * Every call is a no-op in the browser build, where `getDesktop()` is null.
  */
 export function useDesktopSync(): void {
-  const view = useTimerStore(selectTimerView);
+  const view = useTimerView();
   const sessions = useDataStore((state) => state.sessions);
   const desktopSettings = useSettingsStore((state) => state.settings.desktop);
 
@@ -94,8 +95,8 @@ export function useDesktopSync(): void {
  * The mini window is a pure mirror: it renders whatever the main window
  * publishes rather than running a second copy of the machine.
  */
-export function useMiniWindowSnapshot(): ReturnType<typeof selectTimerView> | null {
-  const view = useTimerStore(selectTimerView);
+export function useMiniWindowSnapshot(): TimerView {
+  const view = useTimerView();
   useEffect(() => {
     const desktop = getDesktop();
     if (!desktop?.isMiniWindow) return;

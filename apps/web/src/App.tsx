@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { AppShell } from './components/AppShell.js';
 import { BreakReminder } from './components/BreakReminder.js';
@@ -13,12 +13,19 @@ import { useTicker } from './hooks/useTicker.js';
 import { changeLanguage } from './lib/i18n.js';
 import { isMiniWindow } from './lib/platform.js';
 import { CalendarView } from './views/CalendarView.js';
-import { SettingsView } from './views/SettingsView.js';
-import { StatsView } from './views/StatsView.js';
 import { TasksView } from './views/TasksView.js';
 import { TimerView } from './views/TimerView.js';
 import { useSettingsStore } from './store/settingsStore.js';
 import { useTimerStore } from './store/timerStore.js';
+
+// Recharts and jsPDF together are larger than the rest of the app; loading
+// them only when their screen is opened keeps the timer's first paint fast.
+const StatsView = lazy(() =>
+  import('./views/StatsView.js').then((m) => ({ default: m.StatsView })),
+);
+const SettingsView = lazy(() =>
+  import('./views/SettingsView.js').then((m) => ({ default: m.SettingsView })),
+);
 
 export function App() {
   const [route, navigate] = useHashRoute();
@@ -58,11 +65,13 @@ export function App() {
   return (
     <>
       <AppShell route={route} onNavigate={navigate}>
-        {route === 'timer' ? <TimerView onEnterFullscreen={enterFullscreen} /> : null}
-        {route === 'tasks' ? <TasksView /> : null}
-        {route === 'stats' ? <StatsView /> : null}
-        {route === 'calendar' ? <CalendarView /> : null}
-        {route === 'settings' ? <SettingsView /> : null}
+        <Suspense fallback={<div className="p-8 text-sm text-text-secondary">…</div>}>
+          {route === 'timer' ? <TimerView onEnterFullscreen={enterFullscreen} /> : null}
+          {route === 'tasks' ? <TasksView /> : null}
+          {route === 'stats' ? <StatsView /> : null}
+          {route === 'calendar' ? <CalendarView /> : null}
+          {route === 'settings' ? <SettingsView /> : null}
+        </Suspense>
       </AppShell>
 
       <BreakReminder />

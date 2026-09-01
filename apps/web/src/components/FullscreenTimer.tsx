@@ -6,7 +6,7 @@ import { Button, GlowBackground } from '@nebula-clock/ui';
 import { TimerControls } from './TimerControls.js';
 import { TimerDisplay } from './TimerDisplay.js';
 import { getDesktop } from '../lib/platform.js';
-import { selectTimerView, useTimerStore } from '../store/timerStore.js';
+import { useTimerView } from '../store/timerStore.js';
 
 /**
  * Immersive focus mode: nothing on screen but the ring and the controls.
@@ -15,7 +15,7 @@ import { selectTimerView, useTimerStore } from '../store/timerStore.js';
  */
 export function FullscreenTimer({ onExit }: { onExit: () => void }) {
   const { t } = useTranslation(['timer']);
-  const view = useTimerStore(selectTimerView);
+  const view = useTimerView();
 
   useEffect(() => {
     const desktop = getDesktop();

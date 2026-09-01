@@ -3,7 +3,7 @@ import { Pause, Play, SkipForward, X } from 'lucide-react';
 import { IconButton } from '@nebula-clock/ui';
 import { TimerDisplay } from './TimerDisplay.js';
 import { getDesktop } from '../lib/platform.js';
-import { selectTimerView, useTimerStore } from '../store/timerStore.js';
+import { useTimerStore, useTimerView } from '../store/timerStore.js';
 
 /**
  * The compact always-on-top window (Electron only).
@@ -13,7 +13,7 @@ import { selectTimerView, useTimerStore } from '../store/timerStore.js';
  */
 export function MiniTimer() {
   const { t } = useTranslation(['timer']);
-  const view = useTimerStore(selectTimerView);
+  const view = useTimerView();
   const toggle = useTimerStore((state) => state.toggle);
   const skip = useTimerStore((state) => state.skip);
   const desktop = getDesktop();
