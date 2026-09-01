@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { Session } from '../types.js';
+import Dexie from 'dexie';
 import { NebulaClockDatabase, setDb } from './db.js';
 import {
   addSession,
@@ -223,5 +224,52 @@ describe('clearAllData', () => {
     expect(await listTags()).toHaveLength(0);
     expect(await listSessions()).toHaveLength(0);
     expect(await readMeta('k')).toBeUndefined();
+  });
+});
+
+describe('schema migration', () => {
+  it('upgrades a version 1 database without losing anything', async () => {
+    const name = `nebula-clock-migration-${counter}-legacy`;
+
+    // A database created before the boolean indexes were dropped.
+    const legacy = new Dexie(name);
+    legacy.version(1).stores({
+      sessions: 'id, startedAt, endedAt, phase, taskId, completed',
+      tasks: 'id, order, done, createdAt',
+      tags: 'id, name',
+      presets: 'id, name',
+      meta: 'key',
+    });
+    await legacy.open();
+    await legacy.table('sessions').put(session({ id: 'old', startedAt: 42 }));
+    await legacy.table('tasks').put({
+      id: 'task-old',
+      title: 'Legacy task',
+      notes: '',
+      estimatedPomodoros: 2,
+      completedPomodoros: 1,
+      done: true,
+      tagIds: [],
+      order: 0,
+      createdAt: 1,
+      updatedAt: 1,
+      completedAt: 2,
+    });
+    legacy.close();
+
+    const upgraded = new NebulaClockDatabase(name);
+    setDb(upgraded);
+    await upgraded.open();
+
+    expect(upgraded.verno).toBe(2);
+    expect((await listSessions()).map((s) => s.id)).toEqual(['old']);
+    const tasks = await listTasks();
+    expect(tasks[0]).toMatchObject({ title: 'Legacy task', done: true });
+
+    // The rows still work through the surviving indexes.
+    expect(await listSessionsBetween(0, 100)).toHaveLength(1);
+
+    upgraded.close();
+    await upgraded.delete();
   });
 });

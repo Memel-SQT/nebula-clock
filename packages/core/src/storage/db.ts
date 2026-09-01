@@ -29,6 +29,16 @@ export class NebulaClockDatabase extends Dexie {
       presets: 'id, name',
       meta: 'key',
     });
+
+    // `completed` and `done` are booleans, and IndexedDB has no boolean key
+    // type: records were silently left out of those indexes, so a query like
+    // `where('completed').equals(true)` would have returned nothing at all.
+    // They are dropped rather than left as a trap; both fields are filtered
+    // in memory, which is what the code already does.
+    this.version(2).stores({
+      sessions: 'id, startedAt, endedAt, phase, taskId',
+      tasks: 'id, order, createdAt',
+    });
   }
 }
 
