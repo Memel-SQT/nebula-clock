@@ -78,11 +78,17 @@ export function StatsView() {
   const taskTitles = useMemo(() => new Map(tasks.map((task) => [task.id, task.title])), [tasks]);
   const timeline = useMemo(() => buildTimeline(inRange, taskTitles, 40), [inRange, taskTitles]);
 
-  const periodLabel = new Intl.DateTimeFormat(i18n.language, {
-    dateStyle: range === 'year' ? undefined : 'medium',
-    year: 'numeric',
-    ...(range === 'month' ? { month: 'long', day: undefined } : {}),
-  }).format(new Date(period.start));
+  // Intl.DateTimeFormat throws if `dateStyle` is combined with individual
+  // component options, so each range picks one shape or the other.
+  const periodFormat: Intl.DateTimeFormatOptions =
+    range === 'year'
+      ? { year: 'numeric' }
+      : range === 'month'
+        ? { year: 'numeric', month: 'long' }
+        : { dateStyle: 'medium' };
+  const periodLabel = new Intl.DateTimeFormat(i18n.language, periodFormat).format(
+    new Date(period.start),
+  );
 
   const exportPdf = () => {
     const doc = buildStatsReport({

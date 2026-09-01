@@ -12,6 +12,24 @@ two products look like siblings.
 
 ---
 
+## Screenshots
+
+| Timer (dark)                                                                | Statistics                                         |
+| --------------------------------------------------------------------------- | -------------------------------------------------- |
+| ![The timer view in the dark Nebula theme](docs/screenshots/timer-dark.png) | ![The statistics view](docs/screenshots/stats.png) |
+
+| Tasks                                                                | Timer (light)                                                                 |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![The task list with pomodoro estimates](docs/screenshots/tasks.png) | ![The timer view in the light Nebula theme](docs/screenshots/timer-light.png) |
+
+Regenerate them with a preview server running:
+
+```bash
+node apps/web/scripts/capture-screenshots.mjs http://localhost:4173
+```
+
+---
+
 ## Status
 
 | Area                                                 | State                                             |

@@ -6,9 +6,18 @@
       {
         "preset": "conventionalcommits",
         "releaseRules": [
-          { "type": "refactor", "release": "patch" },
-          { "type": "perf", "release": "patch" },
-          { "type": "build", "release": "patch" }
+          {
+            "type": "refactor",
+            "release": "patch"
+          },
+          {
+            "type": "perf",
+            "release": "patch"
+          },
+          {
+            "type": "build",
+            "release": "patch"
+          }
         ]
       }
     ],
@@ -18,16 +27,47 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            { "type": "feat", "section": "Features" },
-            { "type": "fix", "section": "Bug Fixes" },
-            { "type": "perf", "section": "Performance" },
-            { "type": "refactor", "section": "Refactoring" },
-            { "type": "docs", "section": "Documentation" },
-            { "type": "build", "section": "Build System" },
-            { "type": "ci", "section": "CI/CD", "hidden": true },
-            { "type": "chore", "hidden": true },
-            { "type": "test", "hidden": true },
-            { "type": "style", "hidden": true }
+            {
+              "type": "feat",
+              "section": "Features"
+            },
+            {
+              "type": "fix",
+              "section": "Bug Fixes"
+            },
+            {
+              "type": "perf",
+              "section": "Performance"
+            },
+            {
+              "type": "refactor",
+              "section": "Refactoring"
+            },
+            {
+              "type": "docs",
+              "section": "Documentation"
+            },
+            {
+              "type": "build",
+              "section": "Build System"
+            },
+            {
+              "type": "ci",
+              "section": "CI/CD",
+              "hidden": true
+            },
+            {
+              "type": "chore",
+              "hidden": true
+            },
+            {
+              "type": "test",
+              "hidden": true
+            },
+            {
+              "type": "style",
+              "hidden": true
+            }
           ]
         }
       }
@@ -57,12 +97,32 @@
       "@semantic-release/github",
       {
         "assets": [
-          { "path": "artifacts/**/*.exe", "label": "Nebula Clock Setup (Windows)" },
-          { "path": "artifacts/**/*.dmg", "label": "Nebula Clock (macOS)" },
-          { "path": "artifacts/**/*.AppImage", "label": "Nebula Clock (Linux AppImage)" },
-          { "path": "artifacts/**/*.deb", "label": "Nebula Clock (Debian/Ubuntu)" },
-          { "path": "artifacts/**/*.blockmap" },
-          { "path": "artifacts/**/latest*.yml" }
+          {
+            "path": "artifacts/**/*.exe",
+            "label": "Nebula Clock Setup (Windows)"
+          },
+          {
+            "path": "artifacts/**/*.dmg",
+            "label": "Nebula Clock (macOS)"
+          },
+          {
+            "path": "artifacts/**/*.AppImage",
+            "label": "Nebula Clock (Linux AppImage)"
+          },
+          {
+            "path": "artifacts/**/*.zip",
+            "label": "Nebula Clock (macOS, auto-update archive)"
+          },
+          {
+            "path": "artifacts/**/*.deb",
+            "label": "Nebula Clock (Debian/Ubuntu)"
+          },
+          {
+            "path": "artifacts/**/*.blockmap"
+          },
+          {
+            "path": "artifacts/**/latest*.yml"
+          }
         ],
         "successComment": false,
         "failComment": false
