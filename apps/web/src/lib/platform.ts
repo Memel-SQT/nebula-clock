@@ -11,7 +11,10 @@ import type { BlockerMode, Phase } from '@nebula-clock/core';
 /** Commands the tray menu and the global shortcuts can send in. */
 export type DesktopCommand = 'toggle' | 'start' | 'pause' | 'skip' | 'reset' | 'mini-mode';
 
-/** Snapshot the main process needs to render the tray title and menu. */
+/**
+ * What the main process needs for the tray, and what the mini window needs to
+ * mirror the timer without running a second copy of the state machine.
+ */
 export interface DesktopTimerSnapshot {
   phase: Phase;
   status: 'idle' | 'running' | 'paused';
@@ -19,6 +22,10 @@ export interface DesktopTimerSnapshot {
   /** Pre-formatted `mm:ss`, so the main process never duplicates the logic. */
   display: string;
   completedToday: number;
+  /** 0..1 completion of the current phase. */
+  progress: number;
+  completedInCycle: number;
+  cycleTarget: number;
 }
 
 export interface BlockerConfig {
@@ -54,6 +61,16 @@ export interface DesktopBridge {
   onCommand(handler: (command: DesktopCommand) => void): () => void;
   /** The mini window mirrors the main window's state through the main process. */
   onTimerSnapshot(handler: (snapshot: DesktopTimerSnapshot) => void): () => void;
+  /**
+   * Sent by the mini window, which owns no timer: the main process forwards
+   * it to the main window so there is only ever one state machine running.
+   */
+  requestCommand(command: DesktopCommand): void;
+  /**
+   * Ask for the current state immediately. Without it a mirror opened while
+   * the timer is idle would wait forever for a change that never comes.
+   */
+  requestSnapshot(): void;
 
   setLaunchAtLogin(enabled: boolean): Promise<boolean>;
   setGlobalShortcuts(enabled: boolean): Promise<boolean>;
