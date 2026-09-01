@@ -1,0 +1,57 @@
+{
+  "title": "Tasks",
+  "subtitle": "Plan the work, then let the timer count it",
+  "empty": {
+    "title": "No tasks yet",
+    "body": "Add your first task and estimate how many pomodoros it needs."
+  },
+  "form": {
+    "titlePlaceholder": "What are you working on?",
+    "notesPlaceholder": "Notes (optional)",
+    "estimate": "Estimate",
+    "estimateAria": "Estimated pomodoros",
+    "add": "Add task",
+    "update": "Update task"
+  },
+  "item": {
+    "progress": "{{done}} / {{estimated}}",
+    "progressAria": "{{done}} of {{estimated}} pomodoros done",
+    "overrun": "Over estimate",
+    "markDone": "Mark as done",
+    "markUndone": "Mark as not done",
+    "select": "Focus on this task",
+    "selected": "Currently selected",
+    "dragHandle": "Reorder task",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
+  },
+  "filters": {
+    "all": "All",
+    "active": "Active",
+    "done": "Done",
+    "byTag": "Filter by tag",
+    "clearFilter": "Clear filter"
+  },
+  "summary": {
+    "remaining": "{{count}} pomodoros left",
+    "completed": "{{done}} of {{total}} tasks done"
+  },
+  "clearCompleted": "Clear completed",
+  "clearedCompleted": "Removed {{count}} finished tasks",
+  "tags": {
+    "title": "Tags & projects",
+    "add": "New tag",
+    "namePlaceholder": "Tag name",
+    "color": "Colour",
+    "colorAria": "Pick the colour {{color}}",
+    "empty": "No tags yet",
+    "assign": "Assign tags",
+    "manage": "Manage tags"
+  },
+  "reorder": {
+    "instructions": "Press space to pick up a task, arrow keys to move it, space to drop it.",
+    "picked": "Picked up {{title}}",
+    "moved": "Moved {{title}} to position {{position}}",
+    "dropped": "Dropped {{title}}"
+  }
+}

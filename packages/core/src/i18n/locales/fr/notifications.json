@@ -1,0 +1,37 @@
+{
+  "focus": {
+    "title": "C'est parti",
+    "body": "{{minutes}} minutes de concentration. On y va."
+  },
+  "shortBreak": {
+    "title": "Pause courte",
+    "body": "Éloigne-toi {{minutes}} minutes."
+  },
+  "longBreak": {
+    "title": "Pause longue",
+    "body": "Cycle terminé — prends {{minutes}} minutes."
+  },
+  "completed": {
+    "focus": "Pomodoro terminé",
+    "shortBreak": "Fin de la pause",
+    "longBreak": "Fin de la pause longue"
+  },
+  "goal": {
+    "dailyReached": "Objectif quotidien atteint",
+    "dailyReachedBody": "{{count}} pomodoros aujourd'hui. Bien joué.",
+    "weeklyReached": "Objectif hebdomadaire atteint",
+    "weeklyReachedBody": "{{count}} pomodoros cette semaine."
+  },
+  "streak": {
+    "extended": "Série prolongée",
+    "extendedBody": "{{count}} jours d'affilée."
+  },
+  "badge": {
+    "unlocked": "Jalon débloqué",
+    "unlockedBody": "{{name}}"
+  },
+  "blocker": {
+    "blocked": "Bloqué pendant la concentration",
+    "blockedBody": "{{name}} figure dans ta liste de blocage."
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "phase": {
+    "focus": "Focus",
+    "shortBreak": "Short break",
+    "longBreak": "Long break"
+  },
+  "phaseShort": {
+    "focus": "Focus",
+    "shortBreak": "Break",
+    "longBreak": "Long break"
+  },
+  "status": {
+    "idle": "Ready",
+    "running": "Running",
+    "paused": "Paused"
+  },
+  "controls": {
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "skip": "Skip",
+    "reset": "Reset",
+    "startAria": "Start the {{phase}} phase",
+    "pauseAria": "Pause the timer",
+    "resumeAria": "Resume the timer",
+    "skipAria": "Skip to the next phase",
+    "resetAria": "Reset the current phase"
+  },
+  "cycle": {
+    "label": "Cycle",
+    "progress": "{{done}} of {{total}} before the long break",
+    "sessionsToday": "{{count}} today"
+  },
+  "presets": {
+    "title": "Presets",
+    "custom": "Custom",
+    "savePreset": "Save as preset",
+    "namePlaceholder": "Preset name",
+    "deletePreset": "Delete preset",
+    "applied": "Preset applied",
+    "classic": "Classic 25/5/15",
+    "deepWork": "Deep Work 50/10/30",
+    "sprint": "Sprint 15/3/10",
+    "ultradian": "Ultradian 90/20/30"
+  },
+  "activeTask": {
+    "label": "Working on",
+    "none": "No task selected",
+    "choose": "Choose a task",
+    "clear": "Clear selection"
+  },
+  "fullscreen": {
+    "enter": "Immersive mode",
+    "exit": "Exit immersive mode",
+    "hint": "Press Esc to leave"
+  },
+  "miniMode": {
+    "enter": "Mini mode",
+    "exit": "Back to full window",
+    "title": "Floating timer"
+  },
+  "reminders": {
+    "title": "Break reminder"
+  },
+  "ambient": {
+    "title": "Ambient sounds",
+    "master": "Master volume",
+    "rain": "Rain",
+    "forest": "Forest",
+    "cafe": "Café",
+    "whiteNoise": "White noise",
+    "enable": "Enable ambient sounds",
+    "muted": "Muted"
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "toggle": "Start / pause",
+    "skip": "Skip phase",
+    "reset": "Reset phase",
+    "fullscreen": "Immersive mode",
+    "settings": "Open settings"
+  },
+  "progressAria": "{{remaining}} left in the {{phase}} phase"
+}

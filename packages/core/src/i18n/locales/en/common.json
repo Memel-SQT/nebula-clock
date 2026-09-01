@@ -1,0 +1,93 @@
+{
+  "app": {
+    "name": "Nebula Clock",
+    "tagline": "Focus, one orbit at a time"
+  },
+  "nav": {
+    "timer": "Timer",
+    "tasks": "Tasks",
+    "stats": "Statistics",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "label": "Main navigation"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "import": "Import",
+    "export": "Export",
+    "reset": "Reset",
+    "apply": "Apply",
+    "retry": "Retry",
+    "dismiss": "Dismiss",
+    "back": "Back",
+    "done": "Done",
+    "clear": "Clear"
+  },
+  "state": {
+    "loading": "Loading…",
+    "empty": "Nothing here yet",
+    "error": "Something went wrong",
+    "saved": "Saved",
+    "offline": "Offline — everything still works"
+  },
+  "units": {
+    "minutes": "min",
+    "seconds": "s",
+    "hours": "h",
+    "pomodoro_one": "{{count}} pomodoro",
+    "pomodoro_other": "{{count}} pomodoros",
+    "session_one": "{{count}} session",
+    "session_other": "{{count}} sessions",
+    "day_one": "{{count}} day",
+    "day_other": "{{count}} days"
+  },
+  "weekdaysShort": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  "months": [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ],
+  "monthsShort": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "themeToggle": "Switch theme",
+    "languageSelect": "Choose language",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "confirm": {
+    "title": "Are you sure?",
+    "deleteTask": "This task will be deleted. Its logged sessions are kept.",
+    "deleteTag": "This tag will be removed from every task.",
+    "clearData": "This permanently deletes every task, tag and session on this device.",
+    "importReplace": "Importing replaces all current data on this device."
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "title": "Settings",
+  "sections": {
+    "timer": "Timer",
+    "goals": "Goals",
+    "notifications": "Notifications & sound",
+    "ambient": "Ambient sounds",
+    "breaks": "Break reminders",
+    "appearance": "Appearance",
+    "accessibility": "Accessibility",
+    "language": "Language",
+    "desktop": "Desktop",
+    "data": "Your data",
+    "about": "About"
+  },
+  "timer": {
+    "focus": "Focus duration",
+    "shortBreak": "Short break",
+    "longBreak": "Long break",
+    "cycles": "Sessions before a long break",
+    "autoStartBreaks": "Start breaks automatically",
+    "autoStartFocus": "Start the next focus automatically",
+    "fullscreenOnFocus": "Enter immersive mode when focus starts",
+    "minutesSuffix": "min"
+  },
+  "goals": {
+    "daily": "Pomodoros per day",
+    "weekly": "Pomodoros per week"
+  },
+  "notifications": {
+    "system": "System notifications",
+    "systemHint": "Shown by your operating system at every phase change.",
+    "permissionPrompt": "Allow notifications",
+    "permissionDenied": "Notifications are blocked in your browser settings.",
+    "sound": "Play a sound",
+    "soundChoice": "Notification sound",
+    "preview": "Preview",
+    "volume": "Notification volume",
+    "customSound": "Custom sound",
+    "importSound": "Import a sound file",
+    "removeCustom": "Remove custom sound",
+    "customSoundActive": "Using {{name}}",
+    "sounds": {
+      "chime": "Chime",
+      "bell": "Bell",
+      "digital": "Digital",
+      "marimba": "Marimba"
+    }
+  },
+  "ambient": {
+    "enable": "Play ambient sounds during focus",
+    "master": "Master volume",
+    "pauseOnBreak": "Pause ambient sounds during breaks",
+    "hint": "Each track has its own volume, independent of the notification sound."
+  },
+  "breaks": {
+    "enable": "Show stretch & hydration reminders",
+    "interval": "Every",
+    "intervalSuffix": "seconds",
+    "messages": "Reminder messages",
+    "messagesHint": "One per line. Leave empty to use the built-in list.",
+    "resetMessages": "Restore default messages"
+  },
+  "appearance": {
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "Follow system",
+    "accent": "Accent colour",
+    "accentCustom": "Custom accent",
+    "accents": {
+      "nebula": "Nebula",
+      "blue": "Blue giant",
+      "aurora": "Aurora",
+      "ember": "Ember",
+      "rose": "Rose",
+      "mint": "Mint"
+    }
+  },
+  "accessibility": {
+    "fontScale": "Text size",
+    "fontScaleHint": "Scales the whole interface.",
+    "reduceMotion": "Reduce animations",
+    "reduceMotionHint": "Removes the drifting glow and transition animations.",
+    "highContrast": "Stronger contrast",
+    "highContrastHint": "Increases text and border contrast."
+  },
+  "language": {
+    "label": "Interface language",
+    "system": "Follow system",
+    "fr": "Français",
+    "en": "English"
+  },
+  "desktop": {
+    "unavailable": "These settings are only available in the desktop app.",
+    "minimizeToTray": "Keep running in the system tray when closed",
+    "launchAtLogin": "Start Nebula Clock when I log in",
+    "globalShortcuts": "Global keyboard shortcuts",
+    "globalShortcutsHint": "Work even when the app is in the background.",
+    "doNotDisturb": "Turn on Do Not Disturb during focus",
+    "doNotDisturbHint": "Asks the operating system to silence other notifications.",
+    "miniMode": "Keep mini mode always on top",
+    "blocker": {
+      "title": "Distraction blocker",
+      "enable": "Block distractions during focus",
+      "mode": "Mode",
+      "blacklist": "Block this list",
+      "whitelist": "Allow only this list",
+      "sites": "Websites",
+      "sitesPlaceholder": "example.com",
+      "sitesHint": "One hostname per line. Applied while a focus phase is running.",
+      "apps": "Applications",
+      "appsPlaceholder": "Discord.exe",
+      "appsHint": "One executable name per line.",
+      "permission": "Website blocking edits your hosts file and needs administrator rights.",
+      "active": "Blocking is active"
+    }
+  },
+  "data": {
+    "exportJson": "Export everything (JSON)",
+    "exportCsvSessions": "Export sessions (CSV)",
+    "exportCsvTasks": "Export tasks (CSV)",
+    "import": "Import a backup",
+    "importSuccess": "Imported {{sessions}} sessions and {{tasks}} tasks",
+    "importFailed": "Import failed: {{reason}}",
+    "reasons": {
+      "invalidJson": "the file is not valid JSON",
+      "notNebulaClock": "this is not a Nebula Clock export",
+      "unknown": "unexpected file contents"
+    },
+    "warnings": {
+      "newerFormat": "This backup comes from a newer version; some fields were ignored."
+    },
+    "clear": "Delete all my data",
+    "cleared": "All local data deleted",
+    "privacy": "Nebula Clock never sends anything to a server. Everything you see lives in this device's local storage."
+  },
+  "about": {
+    "version": "Version {{version}}",
+    "checkUpdates": "Check for updates",
+    "updateAvailable": "Version {{version}} is available",
+    "updateDownloading": "Downloading update… {{percent}}%",
+    "updateReady": "Update ready — restart to install",
+    "restartNow": "Restart now",
+    "upToDate": "You are up to date",
+    "source": "Source code",
+    "license": "MIT licence"
+  }
+}

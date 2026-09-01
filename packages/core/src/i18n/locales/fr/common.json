@@ -1,0 +1,93 @@
+{
+  "app": {
+    "name": "Nebula Clock",
+    "tagline": "La concentration, une orbite à la fois"
+  },
+  "nav": {
+    "timer": "Minuteur",
+    "tasks": "Tâches",
+    "stats": "Statistiques",
+    "calendar": "Calendrier",
+    "settings": "Réglages",
+    "label": "Navigation principale"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "import": "Importer",
+    "export": "Exporter",
+    "reset": "Réinitialiser",
+    "apply": "Appliquer",
+    "retry": "Réessayer",
+    "dismiss": "Ignorer",
+    "back": "Retour",
+    "done": "Terminé",
+    "clear": "Effacer"
+  },
+  "state": {
+    "loading": "Chargement…",
+    "empty": "Rien pour le moment",
+    "error": "Une erreur est survenue",
+    "saved": "Enregistré",
+    "offline": "Hors ligne — tout continue de fonctionner"
+  },
+  "units": {
+    "minutes": "min",
+    "seconds": "s",
+    "hours": "h",
+    "pomodoro_one": "{{count}} pomodoro",
+    "pomodoro_other": "{{count}} pomodoros",
+    "session_one": "{{count}} session",
+    "session_other": "{{count}} sessions",
+    "day_one": "{{count}} jour",
+    "day_other": "{{count}} jours"
+  },
+  "weekdaysShort": ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+  "months": [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre"
+  ],
+  "monthsShort": [
+    "Janv.",
+    "Févr.",
+    "Mars",
+    "Avr.",
+    "Mai",
+    "Juin",
+    "Juil.",
+    "Août",
+    "Sept.",
+    "Oct.",
+    "Nov.",
+    "Déc."
+  ],
+  "a11y": {
+    "skipToContent": "Aller au contenu principal",
+    "themeToggle": "Changer de thème",
+    "languageSelect": "Choisir la langue",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "confirm": {
+    "title": "Confirmer ?",
+    "deleteTask": "Cette tâche sera supprimée. Les sessions enregistrées sont conservées.",
+    "deleteTag": "Ce tag sera retiré de toutes les tâches.",
+    "clearData": "Supprime définitivement toutes les tâches, tags et sessions de cet appareil.",
+    "importReplace": "L'import remplace toutes les données actuelles de cet appareil."
+  }
+}

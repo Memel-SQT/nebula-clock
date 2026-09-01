@@ -1,0 +1,57 @@
+{
+  "title": "Tâches",
+  "subtitle": "Planifie le travail, le minuteur le comptabilise",
+  "empty": {
+    "title": "Aucune tâche",
+    "body": "Ajoute ta première tâche et estime le nombre de pomodoros nécessaires."
+  },
+  "form": {
+    "titlePlaceholder": "Sur quoi travailles-tu ?",
+    "notesPlaceholder": "Notes (facultatif)",
+    "estimate": "Estimation",
+    "estimateAria": "Pomodoros estimés",
+    "add": "Ajouter la tâche",
+    "update": "Mettre à jour la tâche"
+  },
+  "item": {
+    "progress": "{{done}} / {{estimated}}",
+    "progressAria": "{{done}} pomodoros sur {{estimated}} effectués",
+    "overrun": "Estimation dépassée",
+    "markDone": "Marquer comme terminée",
+    "markUndone": "Marquer comme non terminée",
+    "select": "Travailler sur cette tâche",
+    "selected": "Sélectionnée",
+    "dragHandle": "Réorganiser la tâche",
+    "moveUp": "Monter",
+    "moveDown": "Descendre"
+  },
+  "filters": {
+    "all": "Toutes",
+    "active": "En cours",
+    "done": "Terminées",
+    "byTag": "Filtrer par tag",
+    "clearFilter": "Retirer le filtre"
+  },
+  "summary": {
+    "remaining": "{{count}} pomodoros restants",
+    "completed": "{{done}} tâches sur {{total}} terminées"
+  },
+  "clearCompleted": "Supprimer les terminées",
+  "clearedCompleted": "{{count}} tâches terminées supprimées",
+  "tags": {
+    "title": "Tags & projets",
+    "add": "Nouveau tag",
+    "namePlaceholder": "Nom du tag",
+    "color": "Couleur",
+    "colorAria": "Choisir la couleur {{color}}",
+    "empty": "Aucun tag",
+    "assign": "Attribuer des tags",
+    "manage": "Gérer les tags"
+  },
+  "reorder": {
+    "instructions": "Espace pour saisir une tâche, flèches pour la déplacer, espace pour la déposer.",
+    "picked": "{{title}} saisie",
+    "moved": "{{title}} déplacée en position {{position}}",
+    "dropped": "{{title}} déposée"
+  }
+}

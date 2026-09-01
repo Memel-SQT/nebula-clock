@@ -1,0 +1,92 @@
+{
+  "title": "Statistics",
+  "subtitle": "Everything stays on this device",
+  "range": {
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "label": "Time range",
+    "previous": "Previous period",
+    "next": "Next period",
+    "today": "Today"
+  },
+  "metrics": {
+    "focusTime": "Focus time",
+    "pomodoros": "Pomodoros",
+    "completionRate": "Completion rate",
+    "averageSession": "Average session",
+    "activeDays": "Active days",
+    "breakTime": "Break time"
+  },
+  "chart": {
+    "focusByPeriod": "Focus over time",
+    "pomodorosByPeriod": "Pomodoros",
+    "noData": "No sessions in this period yet",
+    "hourAxis": "Hour",
+    "dayAxis": "Day",
+    "monthAxis": "Month",
+    "minutes": "minutes"
+  },
+  "goals": {
+    "title": "Goals",
+    "daily": "Daily goal",
+    "weekly": "Weekly goal",
+    "progress": "{{done}} / {{target}}",
+    "reached": "Goal reached",
+    "remaining": "{{count}} to go"
+  },
+  "streak": {
+    "title": "Streak",
+    "current": "Current",
+    "longest": "Longest",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "todayPending": "Hit today's goal to extend it",
+    "todayDone": "Today is in the bag"
+  },
+  "badges": {
+    "title": "Milestones",
+    "locked": "Locked",
+    "earned": "Earned",
+    "firstFocus": "First light",
+    "tenSessions": "Ten orbits",
+    "fiftySessions": "Fifty orbits",
+    "hundredSessions": "Centurion",
+    "streak3": "Three in a row",
+    "streak7": "Full week",
+    "streak30": "Thirty days",
+    "tenHours": "Ten hours deep",
+    "fiftyHours": "Fifty hours deep",
+    "hundredHours": "Hundred hours deep"
+  },
+  "timeline": {
+    "title": "Session history",
+    "empty": "No sessions recorded yet",
+    "completed": "Completed",
+    "aborted": "Interrupted",
+    "noTask": "No task",
+    "at": "at {{time}}"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "legendLess": "Less",
+    "legendMore": "More",
+    "cellAria": "{{date}}: {{count}} pomodoros",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
+  "report": {
+    "export": "Export PDF report",
+    "title": "Nebula Clock report",
+    "generated": "Generated on {{date}}",
+    "period": "Period",
+    "summary": "Summary",
+    "topTasks": "Top tasks",
+    "dailyBreakdown": "Daily breakdown",
+    "task": "Task",
+    "date": "Date",
+    "privacy": "Generated locally — no data left this device.",
+    "done": "Report saved"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "title": "Réglages",
+  "sections": {
+    "timer": "Minuteur",
+    "goals": "Objectifs",
+    "notifications": "Notifications & son",
+    "ambient": "Sons d'ambiance",
+    "breaks": "Rappels de pause",
+    "appearance": "Apparence",
+    "accessibility": "Accessibilité",
+    "language": "Langue",
+    "desktop": "Application desktop",
+    "data": "Tes données",
+    "about": "À propos"
+  },
+  "timer": {
+    "focus": "Durée de concentration",
+    "shortBreak": "Pause courte",
+    "longBreak": "Pause longue",
+    "cycles": "Sessions avant une pause longue",
+    "autoStartBreaks": "Démarrer les pauses automatiquement",
+    "autoStartFocus": "Démarrer la concentration suivante automatiquement",
+    "fullscreenOnFocus": "Passer en mode immersif au démarrage de la concentration",
+    "minutesSuffix": "min"
+  },
+  "goals": {
+    "daily": "Pomodoros par jour",
+    "weekly": "Pomodoros par semaine"
+  },
+  "notifications": {
+    "system": "Notifications système",
+    "systemHint": "Affichées par ton système d'exploitation à chaque changement de phase.",
+    "permissionPrompt": "Autoriser les notifications",
+    "permissionDenied": "Les notifications sont bloquées dans les réglages de ton navigateur.",
+    "sound": "Jouer un son",
+    "soundChoice": "Son de notification",
+    "preview": "Écouter",
+    "volume": "Volume des notifications",
+    "customSound": "Son personnalisé",
+    "importSound": "Importer un fichier audio",
+    "removeCustom": "Retirer le son personnalisé",
+    "customSoundActive": "Utilise {{name}}",
+    "sounds": {
+      "chime": "Carillon",
+      "bell": "Cloche",
+      "digital": "Numérique",
+      "marimba": "Marimba"
+    }
+  },
+  "ambient": {
+    "enable": "Jouer des sons d'ambiance pendant la concentration",
+    "master": "Volume général",
+    "pauseOnBreak": "Couper les sons d'ambiance pendant les pauses",
+    "hint": "Chaque piste a son propre volume, indépendant du son de notification."
+  },
+  "breaks": {
+    "enable": "Afficher les rappels d'étirement et d'hydratation",
+    "interval": "Toutes les",
+    "intervalSuffix": "secondes",
+    "messages": "Messages de rappel",
+    "messagesHint": "Un par ligne. Laisse vide pour utiliser la liste intégrée.",
+    "resetMessages": "Restaurer les messages par défaut"
+  },
+  "appearance": {
+    "theme": "Thème",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeSystem": "Suivre le système",
+    "accent": "Couleur d'accent",
+    "accentCustom": "Accent personnalisé",
+    "accents": {
+      "nebula": "Nebula",
+      "blue": "Géante bleue",
+      "aurora": "Aurore",
+      "ember": "Braise",
+      "rose": "Rose",
+      "mint": "Menthe"
+    }
+  },
+  "accessibility": {
+    "fontScale": "Taille du texte",
+    "fontScaleHint": "Met à l'échelle toute l'interface.",
+    "reduceMotion": "Réduire les animations",
+    "reduceMotionHint": "Supprime la dérive lumineuse et les animations de transition.",
+    "highContrast": "Contraste renforcé",
+    "highContrastHint": "Augmente le contraste du texte et des bordures."
+  },
+  "language": {
+    "label": "Langue de l'interface",
+    "system": "Suivre le système",
+    "fr": "Français",
+    "en": "English"
+  },
+  "desktop": {
+    "unavailable": "Ces réglages ne sont disponibles que dans l'application desktop.",
+    "minimizeToTray": "Continuer en arrière-plan dans la barre système à la fermeture",
+    "launchAtLogin": "Lancer Nebula Clock à l'ouverture de session",
+    "globalShortcuts": "Raccourcis clavier globaux",
+    "globalShortcutsHint": "Fonctionnent même quand l'application est en arrière-plan.",
+    "doNotDisturb": "Activer « Ne pas déranger » pendant la concentration",
+    "doNotDisturbHint": "Demande au système d'exploitation de couper les autres notifications.",
+    "miniMode": "Garder le mini-mode au premier plan",
+    "blocker": {
+      "title": "Blocage des distractions",
+      "enable": "Bloquer les distractions pendant la concentration",
+      "mode": "Mode",
+      "blacklist": "Bloquer cette liste",
+      "whitelist": "N'autoriser que cette liste",
+      "sites": "Sites web",
+      "sitesPlaceholder": "exemple.com",
+      "sitesHint": "Un nom de domaine par ligne. Appliqué pendant une phase de concentration.",
+      "apps": "Applications",
+      "appsPlaceholder": "Discord.exe",
+      "appsHint": "Un nom d'exécutable par ligne.",
+      "permission": "Le blocage de sites modifie le fichier hosts et nécessite les droits administrateur.",
+      "active": "Le blocage est actif"
+    }
+  },
+  "data": {
+    "exportJson": "Tout exporter (JSON)",
+    "exportCsvSessions": "Exporter les sessions (CSV)",
+    "exportCsvTasks": "Exporter les tâches (CSV)",
+    "import": "Importer une sauvegarde",
+    "importSuccess": "{{sessions}} sessions et {{tasks}} tâches importées",
+    "importFailed": "Échec de l'import : {{reason}}",
+    "reasons": {
+      "invalidJson": "le fichier n'est pas un JSON valide",
+      "notNebulaClock": "ce n'est pas un export Nebula Clock",
+      "unknown": "contenu de fichier inattendu"
+    },
+    "warnings": {
+      "newerFormat": "Cette sauvegarde vient d'une version plus récente ; certains champs ont été ignorés."
+    },
+    "clear": "Supprimer toutes mes données",
+    "cleared": "Toutes les données locales ont été supprimées",
+    "privacy": "Nebula Clock n'envoie jamais rien à un serveur. Tout ce que tu vois vit dans le stockage local de cet appareil."
+  },
+  "about": {
+    "version": "Version {{version}}",
+    "checkUpdates": "Rechercher des mises à jour",
+    "updateAvailable": "La version {{version}} est disponible",
+    "updateDownloading": "Téléchargement de la mise à jour… {{percent}} %",
+    "updateReady": "Mise à jour prête — redémarre pour l'installer",
+    "restartNow": "Redémarrer maintenant",
+    "upToDate": "Tu es à jour",
+    "source": "Code source",
+    "license": "Licence MIT"
+  }
+}

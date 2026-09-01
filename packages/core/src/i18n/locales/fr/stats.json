@@ -1,0 +1,92 @@
+{
+  "title": "Statistiques",
+  "subtitle": "Tout reste sur cet appareil",
+  "range": {
+    "day": "Jour",
+    "week": "Semaine",
+    "month": "Mois",
+    "year": "Année",
+    "label": "Période",
+    "previous": "Période précédente",
+    "next": "Période suivante",
+    "today": "Aujourd'hui"
+  },
+  "metrics": {
+    "focusTime": "Temps de concentration",
+    "pomodoros": "Pomodoros",
+    "completionRate": "Taux de complétion",
+    "averageSession": "Session moyenne",
+    "activeDays": "Jours actifs",
+    "breakTime": "Temps de pause"
+  },
+  "chart": {
+    "focusByPeriod": "Concentration dans le temps",
+    "pomodorosByPeriod": "Pomodoros",
+    "noData": "Aucune session sur cette période",
+    "hourAxis": "Heure",
+    "dayAxis": "Jour",
+    "monthAxis": "Mois",
+    "minutes": "minutes"
+  },
+  "goals": {
+    "title": "Objectifs",
+    "daily": "Objectif quotidien",
+    "weekly": "Objectif hebdomadaire",
+    "progress": "{{done}} / {{target}}",
+    "reached": "Objectif atteint",
+    "remaining": "Encore {{count}}"
+  },
+  "streak": {
+    "title": "Série",
+    "current": "En cours",
+    "longest": "Record",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "todayPending": "Atteins l'objectif du jour pour la prolonger",
+    "todayDone": "Objectif du jour atteint"
+  },
+  "badges": {
+    "title": "Jalons",
+    "locked": "Verrouillé",
+    "earned": "Obtenu",
+    "firstFocus": "Première lumière",
+    "tenSessions": "Dix orbites",
+    "fiftySessions": "Cinquante orbites",
+    "hundredSessions": "Centurion",
+    "streak3": "Trois d'affilée",
+    "streak7": "Semaine complète",
+    "streak30": "Trente jours",
+    "tenHours": "Dix heures de fond",
+    "fiftyHours": "Cinquante heures de fond",
+    "hundredHours": "Cent heures de fond"
+  },
+  "timeline": {
+    "title": "Historique des sessions",
+    "empty": "Aucune session enregistrée",
+    "completed": "Terminée",
+    "aborted": "Interrompue",
+    "noTask": "Sans tâche",
+    "at": "à {{time}}"
+  },
+  "calendar": {
+    "title": "Calendrier",
+    "legendLess": "Moins",
+    "legendMore": "Plus",
+    "cellAria": "{{date}} : {{count}} pomodoros",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant"
+  },
+  "report": {
+    "export": "Exporter le rapport PDF",
+    "title": "Rapport Nebula Clock",
+    "generated": "Généré le {{date}}",
+    "period": "Période",
+    "summary": "Synthèse",
+    "topTasks": "Principales tâches",
+    "dailyBreakdown": "Détail par jour",
+    "task": "Tâche",
+    "date": "Date",
+    "privacy": "Généré localement — aucune donnée n'a quitté cet appareil.",
+    "done": "Rapport enregistré"
+  }
+}

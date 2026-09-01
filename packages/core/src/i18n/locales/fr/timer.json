@@ -1,0 +1,84 @@
+{
+  "phase": {
+    "focus": "Concentration",
+    "shortBreak": "Pause courte",
+    "longBreak": "Pause longue"
+  },
+  "phaseShort": {
+    "focus": "Focus",
+    "shortBreak": "Pause",
+    "longBreak": "Pause longue"
+  },
+  "status": {
+    "idle": "Prêt",
+    "running": "En cours",
+    "paused": "En pause"
+  },
+  "controls": {
+    "start": "Démarrer",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "skip": "Passer",
+    "reset": "Réinitialiser",
+    "startAria": "Démarrer la phase {{phase}}",
+    "pauseAria": "Mettre le minuteur en pause",
+    "resumeAria": "Reprendre le minuteur",
+    "skipAria": "Passer à la phase suivante",
+    "resetAria": "Réinitialiser la phase en cours"
+  },
+  "cycle": {
+    "label": "Cycle",
+    "progress": "{{done}} sur {{total}} avant la pause longue",
+    "sessionsToday": "{{count}} aujourd'hui"
+  },
+  "presets": {
+    "title": "Presets",
+    "custom": "Personnalisé",
+    "savePreset": "Enregistrer comme preset",
+    "namePlaceholder": "Nom du preset",
+    "deletePreset": "Supprimer le preset",
+    "applied": "Preset appliqué",
+    "classic": "Classique 25/5/15",
+    "deepWork": "Deep Work 50/10/30",
+    "sprint": "Sprint 15/3/10",
+    "ultradian": "Ultradien 90/20/30"
+  },
+  "activeTask": {
+    "label": "En cours",
+    "none": "Aucune tâche sélectionnée",
+    "choose": "Choisir une tâche",
+    "clear": "Retirer la sélection"
+  },
+  "fullscreen": {
+    "enter": "Mode immersif",
+    "exit": "Quitter le mode immersif",
+    "hint": "Appuie sur Échap pour sortir"
+  },
+  "miniMode": {
+    "enter": "Mini-mode",
+    "exit": "Revenir à la fenêtre complète",
+    "title": "Minuteur flottant"
+  },
+  "reminders": {
+    "title": "Rappel de pause"
+  },
+  "ambient": {
+    "title": "Sons d'ambiance",
+    "master": "Volume général",
+    "rain": "Pluie",
+    "forest": "Forêt",
+    "cafe": "Café",
+    "whiteNoise": "Bruit blanc",
+    "enable": "Activer les sons d'ambiance",
+    "muted": "Coupé"
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "toggle": "Démarrer / pause",
+    "skip": "Passer la phase",
+    "reset": "Réinitialiser la phase",
+    "fullscreen": "Mode immersif",
+    "settings": "Ouvrir les réglages"
+  },
+  "progressAria": "{{remaining}} restant dans la phase {{phase}}"
+}

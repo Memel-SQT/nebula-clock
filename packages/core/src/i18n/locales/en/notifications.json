@@ -1,0 +1,37 @@
+{
+  "focus": {
+    "title": "Focus time",
+    "body": "{{minutes}} minutes of deep work. Let's go."
+  },
+  "shortBreak": {
+    "title": "Short break",
+    "body": "Step away for {{minutes}} minutes."
+  },
+  "longBreak": {
+    "title": "Long break",
+    "body": "Cycle complete — take {{minutes}} minutes."
+  },
+  "completed": {
+    "focus": "Pomodoro complete",
+    "shortBreak": "Break over",
+    "longBreak": "Long break over"
+  },
+  "goal": {
+    "dailyReached": "Daily goal reached",
+    "dailyReachedBody": "{{count}} pomodoros today. Nice work.",
+    "weeklyReached": "Weekly goal reached",
+    "weeklyReachedBody": "{{count}} pomodoros this week."
+  },
+  "streak": {
+    "extended": "Streak extended",
+    "extendedBody": "{{count}} days in a row."
+  },
+  "badge": {
+    "unlocked": "Milestone unlocked",
+    "unlockedBody": "{{name}}"
+  },
+  "blocker": {
+    "blocked": "Blocked during focus",
+    "blockedBody": "{{name}} is on your block list."
+  }
+}
