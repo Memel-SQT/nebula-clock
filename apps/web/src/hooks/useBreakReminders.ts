@@ -31,16 +31,24 @@ export function useBreakReminders(): string | null {
       customMessages.length > 0 ? customMessages : (DEFAULT_BREAK_REMINDERS[language] ?? []);
     if (pool.length === 0) return;
 
+    // The auto-dismiss timer is tracked so it can be cancelled: an
+    // un-cleared one would fire after the break ended and blank a prompt
+    // belonging to the next one.
+    let hideTimer = 0;
+
     const show = () => {
       const next = pool[Math.floor(Math.random() * pool.length)] ?? null;
       setMessage(next);
-      // Each prompt lingers briefly, then clears itself.
-      window.setTimeout(() => setMessage(null), 12_000);
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(() => setMessage(null), 12_000);
     };
 
     show();
     const interval = window.setInterval(show, intervalSeconds * 1000);
-    return () => window.clearInterval(interval);
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(hideTimer);
+    };
   }, [enabled, onBreak, intervalSeconds, customMessages, settings.language, i18n.language]);
 
   return message;

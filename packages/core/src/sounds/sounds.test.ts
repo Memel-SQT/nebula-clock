@@ -57,7 +57,7 @@ vi.mock('howler', () => {
   return { Howl, Howler: { ctx } };
 });
 
-const { SoundEngine } = await import('./index.js');
+const { SoundEngine, dataUrlFormat } = await import('./index.js');
 
 function engine() {
   return new SoundEngine({
@@ -220,5 +220,34 @@ describe('lifecycle', () => {
     sound.dispose();
     expect(created).toHaveLength(2);
     for (const howl of created) expect(howl.unload).toHaveBeenCalled();
+  });
+});
+
+describe('dataUrlFormat', () => {
+  it('reads the extension off the data URL MIME type', () => {
+    expect(dataUrlFormat('data:audio/wav;base64,AAAA')).toBe('wav');
+    expect(dataUrlFormat('data:audio/x-wav;base64,AAAA')).toBe('wav');
+    expect(dataUrlFormat('data:audio/mpeg;base64,AAAA')).toBe('mp3');
+    expect(dataUrlFormat('data:audio/ogg;base64,AAAA')).toBe('ogg');
+    expect(dataUrlFormat('data:audio/x-m4a;base64,AAAA')).toBe('m4a');
+    expect(dataUrlFormat('data:audio/flac;base64,AAAA')).toBe('flac');
+  });
+
+  it('is case-insensitive and tolerates a missing charset', () => {
+    expect(dataUrlFormat('data:AUDIO/MPEG,AAAA')).toBe('mp3');
+  });
+
+  it('falls back to mp3 for anything it does not recognise', () => {
+    expect(dataUrlFormat('data:audio/weird;base64,AAAA')).toBe('mp3');
+    expect(dataUrlFormat('not-a-data-url')).toBe('mp3');
+    expect(dataUrlFormat('')).toBe('mp3');
+  });
+});
+
+describe('custom notification sounds', () => {
+  it('tells Howler the real format of an imported file', () => {
+    const sound = engine();
+    sound.playNotification('chime', 'data:audio/mpeg;base64,AAAA');
+    expect(created[0]?.src).toEqual(['data:audio/mpeg;base64,AAAA']);
   });
 });

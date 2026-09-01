@@ -56,10 +56,16 @@ export default tseslint.config(
     },
   },
   {
+    // Custom hooks live in plain .ts files too, so the hook rules have to
+    // cover both extensions or half of them go unchecked.
+    files: ['**/*.ts', '**/*.tsx'],
+    plugins: { 'react-hooks': reactHooks },
+    rules: reactHooks.configs.recommended.rules,
+  },
+  {
     files: ['**/*.tsx'],
-    plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
+    plugins: { 'react-refresh': reactRefresh },
     rules: {
-      ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },

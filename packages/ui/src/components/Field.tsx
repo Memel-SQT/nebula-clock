@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useId,
+  useState,
   type InputHTMLAttributes,
   type ReactNode,
   type SelectHTMLAttributes,
@@ -84,6 +85,17 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
   ref,
 ) {
   const id = useId();
+
+  /**
+   * The field keeps its own text while it is being edited.
+   *
+   * A fully controlled numeric input cannot be cleared: an empty string
+   * parses to 0, the caller clamps that to its minimum, and the value snaps
+   * back before the user can type the number they wanted. Holding the raw
+   * text lets the field be emptied, and only real numbers are committed.
+   */
+  const [draft, setDraft] = useState<string | null>(null);
+
   return (
     <FieldShell id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
       <div className="relative">
@@ -92,14 +104,21 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
           id={id}
           type="number"
           inputMode="numeric"
-          value={value}
+          value={draft ?? String(value)}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
           onChange={(event) => {
-            const next = Number(event.target.value);
-            // An empty field parses to NaN; keep the last valid value instead
-            // of propagating it into the settings store.
-            if (!Number.isNaN(next)) onChange(next);
+            const text = event.target.value;
+            setDraft(text);
+            if (text.trim() === '') return;
+            const next = Number(text);
+            if (Number.isFinite(next)) onChange(next);
+          }}
+          onBlur={(event) => {
+            // Whatever the field is left holding, fall back to the committed
+            // value so it never sits empty or half-typed.
+            setDraft(null);
+            rest.onBlur?.(event);
           }}
           className={cn(control, 'h-10 tabular-nums', suffix && 'pr-12', className)}
           {...rest}

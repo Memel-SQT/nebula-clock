@@ -44,8 +44,10 @@ export function useTheme(): void {
     root.style.setProperty('--accent-to', to);
     root.style.setProperty('--font-scale', String(appearance.fontScale));
 
-    root.toggleAttribute('data-reduce-motion', appearance.reduceMotion);
+    // The stylesheet matches on the literal value, so these are set rather
+    // than toggled: toggleAttribute would leave an empty string behind.
     if (appearance.reduceMotion) root.setAttribute('data-reduce-motion', 'true');
+    else root.removeAttribute('data-reduce-motion');
 
     if (appearance.highContrast) root.setAttribute('data-contrast', 'high');
     else root.removeAttribute('data-contrast');

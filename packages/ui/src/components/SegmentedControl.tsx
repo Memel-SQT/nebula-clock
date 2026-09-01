@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { cn } from '../lib/cn.js';
 
 export interface SegmentedOption<T extends string> {
@@ -19,7 +20,8 @@ export interface SegmentedControlProps<T extends string> {
 
 /**
  * A radio group styled as a pill switcher (theme, stats range, task filter).
- * Uses `role="radiogroup"` so arrow keys and the selected state are announced.
+ * Follows the ARIA radiogroup pattern: one tab stop for the whole group, and
+ * arrow keys move both the selection and the focus.
  */
 export function SegmentedControl<T extends string>({
   value,
@@ -29,6 +31,18 @@ export function SegmentedControl<T extends string>({
   size = 'md',
   className,
 }: SegmentedControlProps<T>) {
+  const buttons = useRef(new Map<string, HTMLButtonElement>());
+
+  const move = (delta: number) => {
+    const index = options.findIndex((option) => option.value === value);
+    const next = options[(index + delta + options.length) % options.length];
+    if (!next) return;
+    onChange(next.value);
+    // Focus has to follow the selection, otherwise it is left on a button
+    // that just dropped out of the tab order.
+    buttons.current.get(next.value)?.focus();
+  };
+
   return (
     <div
       role="radiogroup"
@@ -43,6 +57,10 @@ export function SegmentedControl<T extends string>({
         return (
           <button
             key={option.value}
+            ref={(element) => {
+              if (element) buttons.current.set(option.value, element);
+              else buttons.current.delete(option.value);
+            }}
             type="button"
             role="radio"
             aria-checked={selected}
@@ -52,12 +70,20 @@ export function SegmentedControl<T extends string>({
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(option.value)}
             onKeyDown={(event) => {
-              if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-              event.preventDefault();
-              const index = options.findIndex((o) => o.value === value);
-              const delta = event.key === 'ArrowRight' ? 1 : -1;
-              const next = options[(index + delta + options.length) % options.length];
-              if (next) onChange(next.value);
+              switch (event.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                  event.preventDefault();
+                  move(1);
+                  break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                  event.preventDefault();
+                  move(-1);
+                  break;
+                default:
+                  break;
+              }
             }}
             className={cn(
               'rounded-pill font-medium transition-colors duration-fast ease-nebula',

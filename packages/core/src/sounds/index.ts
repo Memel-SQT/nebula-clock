@@ -15,6 +15,29 @@ import { clamp } from '../utils/index.js';
 /** Maps a bare filename from the config to a loadable URL. */
 export type AssetResolver = (file: string) => string;
 
+/** MIME types a browser file picker produces for audio, mapped to Howler's
+ * extension names. Anything unrecognised falls back to `mp3`, which is the
+ * most common import. */
+const MIME_FORMATS: Record<string, string> = {
+  'audio/wav': 'wav',
+  'audio/wave': 'wav',
+  'audio/x-wav': 'wav',
+  'audio/mpeg': 'mp3',
+  'audio/mp3': 'mp3',
+  'audio/ogg': 'ogg',
+  'audio/webm': 'webm',
+  'audio/aac': 'aac',
+  'audio/mp4': 'm4a',
+  'audio/x-m4a': 'm4a',
+  'audio/flac': 'flac',
+};
+
+/** `data:audio/mpeg;base64,...` -> `mp3`. */
+export function dataUrlFormat(dataUrl: string): string {
+  const mime = /^data:([^;,]+)/.exec(dataUrl)?.[1]?.toLowerCase();
+  return (mime && MIME_FORMATS[mime]) ?? 'mp3';
+}
+
 export interface SoundEngineOptions {
   resolveNotification: AssetResolver;
   resolveAmbient: AssetResolver;
@@ -57,8 +80,9 @@ export class SoundEngine {
     if (!howl) {
       howl = new Howl({
         src: [source],
-        // A data URL carries no extension for Howler to sniff.
-        format: customDataUrl ? ['wav', 'mp3', 'ogg'] : undefined,
+        // A data URL has no extension for Howler to sniff, so the format is
+        // read off its MIME type instead of guessing.
+        format: customDataUrl ? [dataUrlFormat(customDataUrl)] : undefined,
         preload: true,
         html5: false,
       });
