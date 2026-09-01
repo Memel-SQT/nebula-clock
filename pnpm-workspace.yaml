@@ -2,13 +2,14 @@ packages:
   - 'apps/*'
   - 'packages/*'
 
-allowBuilds:
-  core-js: set this to true or false
-  electron: set this to true or false
-  esbuild: set this to true or false
-
-# These need their postinstall to run: electron downloads its binary,
-# esbuild unpacks the platform-native executable.
+# pnpm requires every package with a build script to be classified, and
+# treats anything left unclassified as an error in CI.
 onlyBuiltDependencies:
+  # Downloads its own binary.
   - electron
+  # Unpacks the platform-native executable.
   - esbuild
+
+ignoredBuiltDependencies:
+  # Its postinstall only prints a funding message.
+  - core-js
