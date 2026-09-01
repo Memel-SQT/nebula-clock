@@ -1,6 +1,6 @@
 {
   "name": "@nebula-clock/core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "description": "Framework-free business logic for Nebula Clock: timer state machine, storage, stats, i18n, notifications.",
   "license": "MIT",

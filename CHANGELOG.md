@@ -1,3 +1,10 @@
+## <small>1.0.4 (2026-09-01)</small>
+
+* fix(core): drop the boolean IndexedDB indexes that never held anything ([fee9c4a](https://github.com/Memel-SQT/nebula-clock/commit/fee9c4a))
+* fix(desktop): stop the mini window running a second timer ([1ea8136](https://github.com/Memel-SQT/nebula-clock/commit/1ea8136))
+* fix(ui): repair the number field, segmented control and reminder timers ([bff94ae](https://github.com/Memel-SQT/nebula-clock/commit/bff94ae))
+* chore: tidy remaining audit leftovers ([02183bd](https://github.com/Memel-SQT/nebula-clock/commit/02183bd))
+
 ## <small>1.0.3 (2026-09-01)</small>
 
 * fix(ci): trigger the Pages deploy from the Release workflow run ([ecc3201](https://github.com/Memel-SQT/nebula-clock/commit/ecc3201))
