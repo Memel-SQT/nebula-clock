@@ -50,7 +50,7 @@ export function FullscreenTimer({ onExit }: { onExit: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 grid place-items-center bg-base"
+      className="fixed inset-0 z-50 grid place-items-center bg-canvas"
     >
       <GlowBackground />
 

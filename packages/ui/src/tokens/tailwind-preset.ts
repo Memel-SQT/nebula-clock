@@ -15,7 +15,9 @@ export const nebulaPreset = {
   theme: {
     extend: {
       colors: {
-        base: 'var(--bg-base)',
+        // Deliberately not called `base`: Tailwind would then generate
+        // `.text-base` as a colour and clobber the font-size utility.
+        canvas: 'var(--bg-base)',
         surface: 'var(--bg-surface)',
         card: 'var(--card)',
         'card-alt': 'var(--card-alt)',
