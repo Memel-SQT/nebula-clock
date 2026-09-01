@@ -186,6 +186,10 @@ These are deliberate, and the UI never claims otherwise:
   domain except a handful would break the machine.
 - **Application blocking** notifies rather than terminates. Killing another
   process on the user's behalf is not a line this app crosses.
+- **Auto-update needs a public repository.** electron-updater reads the
+  releases feed anonymously, so while this repository is private the update
+  check returns 404 and the app logs it and carries on. Making the repository
+  public, or shipping a token, is what turns auto-update on.
 - **Installers are unsigned.** No code-signing certificate is configured, so
   Windows SmartScreen and macOS Gatekeeper will warn on first launch.
 
