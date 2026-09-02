@@ -1,3 +1,10 @@
+## 1.1.0 (2026-09-02)
+
+* fix(web): stop the launch screen swallowing the first keypress ([bd9a710](https://github.com/Memel-SQT/nebula-clock/commit/bd9a710))
+* feat(ui): give Nebula Clock a logo of its own ([615ed44](https://github.com/Memel-SQT/nebula-clock/commit/615ed44)), closes [#1A1A2E](https://github.com/Memel-SQT/nebula-clock/issues/1A1A2E)
+* feat(web): animate the launch and smooth out the interface ([6765b1a](https://github.com/Memel-SQT/nebula-clock/commit/6765b1a))
+* ci: gate the Pages deploy behind an opt-in repository variable ([cdc66f9](https://github.com/Memel-SQT/nebula-clock/commit/cdc66f9))
+
 ## <small>1.0.4 (2026-09-01)</small>
 
 * fix(core): drop the boolean IndexedDB indexes that never held anything ([fee9c4a](https://github.com/Memel-SQT/nebula-clock/commit/fee9c4a))
