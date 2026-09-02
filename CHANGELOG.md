@@ -1,3 +1,7 @@
+## <small>1.1.1 (2026-09-02)</small>
+
+* fix(ui): bundle Inter instead of fetching it from Google Fonts ([8e5f45f](https://github.com/Memel-SQT/nebula-clock/commit/8e5f45f))
+
 ## 1.1.0 (2026-09-02)
 
 * fix(web): stop the launch screen swallowing the first keypress ([bd9a710](https://github.com/Memel-SQT/nebula-clock/commit/bd9a710))
