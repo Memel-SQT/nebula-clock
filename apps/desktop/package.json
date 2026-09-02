@@ -75,7 +75,8 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Nebula Clock"
+      "shortcutName": "Nebula Clock",
+      "disableWebInstaller": true
     },
     "mac": {
       "target": [
