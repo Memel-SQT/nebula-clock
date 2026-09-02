@@ -1,3 +1,7 @@
+## <small>1.1.2 (2026-09-02)</small>
+
+* fix(desktop): repair auto-update downloads broken by a space in the filename ([c2f7c18](https://github.com/Memel-SQT/nebula-clock/commit/c2f7c18))
+
 ## <small>1.1.1 (2026-09-02)</small>
 
 * fix(ui): bundle Inter instead of fetching it from Google Fonts ([8e5f45f](https://github.com/Memel-SQT/nebula-clock/commit/8e5f45f))
