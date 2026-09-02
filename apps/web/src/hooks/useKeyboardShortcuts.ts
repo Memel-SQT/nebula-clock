@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { KEYBOARD_SHORTCUTS } from '@nebula-clock/core';
 import { useTimerStore } from '../store/timerStore.js';
 
@@ -17,11 +17,17 @@ function isEditing(target: EventTarget | null): boolean {
 /**
  * In-window shortcuts. The desktop app additionally registers OS-level
  * accelerators, which work when the window is not focused at all.
+ *
+ * The listener is attached exactly once and reads its callbacks through a
+ * ref. Re-subscribing on every render is not merely wasteful: if anything
+ * else re-renders the app from inside a keydown listener, the DOM removes
+ * this listener mid-dispatch and the keypress is silently swallowed - which
+ * is what the launch screen used to do to the very first key pressed.
  */
-export function useKeyboardShortcuts({
-  onToggleFullscreen,
-  onOpenSettings,
-}: ShortcutHandlers): void {
+export function useKeyboardShortcuts(handlers: ShortcutHandlers): void {
+  const latest = useRef(handlers);
+  latest.current = handlers;
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditing(event.target)) return;
@@ -46,11 +52,11 @@ export function useKeyboardShortcuts({
           break;
         case KEYBOARD_SHORTCUTS.fullscreen:
           event.preventDefault();
-          onToggleFullscreen();
+          latest.current.onToggleFullscreen();
           break;
         case KEYBOARD_SHORTCUTS.settings:
           event.preventDefault();
-          onOpenSettings();
+          latest.current.onOpenSettings();
           break;
         default:
           break;
@@ -59,5 +65,5 @@ export function useKeyboardShortcuts({
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onToggleFullscreen, onOpenSettings]);
+  }, []);
 }
