@@ -67,7 +67,7 @@
         }
       ],
       "icon": "build/icon.ico",
-      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+      "artifactName": "NebulaClock-Setup-${version}-${arch}.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -96,7 +96,7 @@
       ],
       "icon": "build/icon.icns",
       "category": "public.app-category.productivity",
-      "artifactName": "${productName}-${version}-${arch}.${ext}"
+      "artifactName": "NebulaClock-${version}-${arch}.${ext}"
     },
     "dmg": {
       "title": "${productName} ${arch}"
@@ -109,7 +109,7 @@
       "icon": "build/icons",
       "category": "Utility",
       "maintainer": "Nebula Clock contributors",
-      "artifactName": "${productName}-${version}-${arch}.${ext}"
+      "artifactName": "NebulaClock-${version}-${arch}.${ext}"
     },
     "deb": {
       "depends": [
