@@ -3,9 +3,9 @@
 A privacy-first Pomodoro time manager, shipped as an installable **PWA** and as
 a native **desktop app** (Windows / macOS / Linux) from a single codebase.
 
-Part of the **Nebula** family — the design tokens, the logo and the dark
-blue-to-violet identity are taken verbatim from the Nebula desktop app, so the
-two products look like siblings.
+Part of the **Nebula** family — the design tokens and the dark blue-to-violet
+identity come straight from the Nebula design system, with a clock mark of its
+own. See [`docs/brand`](docs/brand) for the standalone logo files.
 
 > **Everything stays on your device.** No account, no server, no telemetry.
 > Data lives in IndexedDB and only ever leaves through an export _you_ trigger.
@@ -155,6 +155,12 @@ shortcuts that work while the app is in the background, launch at login, a
 focus mode that silences the app's notifications and keeps the display awake,
 optional distraction blocking, and auto-updates from GitHub Releases. See
 [Known limitations](#known-limitations) for what the last two do and do not do.
+
+**Motion** — a launch animation that draws the mark, transitions between
+screens, staggered entrances for lists and cards, a sliding navigation
+indicator and a flourish on the ring at every phase change. All of it is
+driven by one switch: turning on "reduce animations", or setting the
+preference at OS level, silences the lot.
 
 **Accessibility & i18n** — French and English with automatic detection, light
 and dark themes (both fully Nebula-branded) plus "follow system", custom accent

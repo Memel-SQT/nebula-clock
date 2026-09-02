@@ -93,7 +93,8 @@ await page.waitForTimeout(400);
 await seedSessions(page);
 await page.goto(`${baseUrl}/#/timer`);
 await page.reload();
-await page.waitForTimeout(1200);
+// Long enough for the launch animation to finish and get out of the way.
+await page.waitForTimeout(2600);
 
 await shot('timer-dark');
 
@@ -111,7 +112,7 @@ for (const [title, estimate] of [
 await shot('tasks');
 
 await page.goto(`${baseUrl}/#/stats`);
-await page.waitForTimeout(1500);
+await page.waitForTimeout(1800);
 await shot('stats');
 
 await page.emulateMedia({ colorScheme: 'light' });
@@ -119,7 +120,7 @@ await page.goto(`${baseUrl}/#/settings`);
 await page.getByRole('radio', { name: /^light$/i }).click();
 await page.waitForTimeout(600);
 await page.goto(`${baseUrl}/#/timer`);
-await page.waitForTimeout(900);
+await page.waitForTimeout(1200);
 await shot('timer-light');
 
 await browser.close();

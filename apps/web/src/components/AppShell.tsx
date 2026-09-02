@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { BarChart3, CalendarDays, ListTodo, Moon, Settings, Sun, Timer } from 'lucide-react';
 import { GlowBackground, IconButton, Logo, cn } from '@nebula-clock/ui';
@@ -81,13 +82,21 @@ export function AppShell({ route, onNavigate, children }: AppShellProps) {
                   aria-current={active ? 'page' : undefined}
                   onClick={() => onNavigate(item)}
                   className={cn(
-                    'flex items-center gap-2.5 rounded px-3 py-2 text-left text-sm font-medium',
-                    'transition-[background,box-shadow,color] duration-fast ease-nebula',
-                    active
-                      ? 'bg-card-alt text-text shadow-ring-soft'
-                      : 'text-text-secondary hover:bg-card-alt hover:text-text',
+                    'relative flex items-center gap-2.5 rounded px-3 py-2 text-left text-sm font-medium',
+                    'transition-colors duration-fast ease-nebula',
+                    active ? 'text-text' : 'text-text-secondary hover:bg-card-alt hover:text-text',
                   )}
                 >
+                  {/* One shared element slides between items instead of each
+                      one fading its own background in and out. */}
+                  {active ? (
+                    <motion.span
+                      layoutId="nav-active"
+                      aria-hidden="true"
+                      transition={{ type: 'spring', stiffness: 480, damping: 38 }}
+                      className="absolute inset-0 -z-10 rounded bg-card-alt shadow-ring-soft"
+                    />
+                  ) : null}
                   <Icon size={16} aria-hidden="true" />
                   {t(`common:nav.${item}`)}
                 </button>
@@ -127,10 +136,21 @@ export function AppShell({ route, onNavigate, children }: AppShellProps) {
                 aria-current={active ? 'page' : undefined}
                 onClick={() => onNavigate(item)}
                 className={cn(
-                  'flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors duration-fast',
+                  'relative flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors duration-fast',
                   active ? 'text-accent' : 'text-text-secondary',
                 )}
               >
+                {/* Its own layoutId: the two navigation bars never share the
+                    screen, and one shared id across both would animate
+                    between elements that are display:none to each other. */}
+                {active ? (
+                  <motion.span
+                    layoutId="nav-active-mobile"
+                    aria-hidden="true"
+                    transition={{ type: 'spring', stiffness: 480, damping: 38 }}
+                    className="absolute inset-x-5 top-0 h-0.5 rounded-pill bg-nebula-gradient"
+                  />
+                ) : null}
                 <Icon size={18} aria-hidden="true" />
                 {t(`common:nav.${item}`)}
               </button>

@@ -6,6 +6,7 @@ import { Check, GripVertical, Play, Trash2 } from 'lucide-react';
 import { taskProgress } from '@nebula-clock/core';
 import type { Tag, Task } from '@nebula-clock/core';
 import { Chip, IconButton, ProgressBar, cn } from '@nebula-clock/ui';
+import { revealDelay } from '../lib/reveal.js';
 
 export interface TaskItemProps {
   task: Task;
@@ -15,6 +16,8 @@ export interface TaskItemProps {
   onToggleDone: (done: boolean) => void;
   onDelete: () => void;
   onRename: (title: string) => void;
+  /** Position in the list, used to stagger the entrance. */
+  index?: number;
 }
 
 /**
@@ -29,6 +32,7 @@ export function TaskItem({
   onToggleDone,
   onDelete,
   onRename,
+  index = 0,
 }: TaskItemProps) {
   const { t } = useTranslation(['tasks', 'common']);
   const [editing, setEditing] = useState(false);
@@ -49,8 +53,15 @@ export function TaskItem({
   return (
     <li
       ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        ...revealDelay(index),
+      }}
       className={cn(
+        // The reveal animates `translate`, which composes with the
+        // `transform` dnd-kit writes here rather than fighting it.
+        'nebula-reveal',
         'flex items-center gap-3 rounded-md border bg-card px-3 py-2.5',
         'transition-[border-color,box-shadow,opacity] duration-fast ease-nebula',
         selected ? 'border-accent/50 shadow-ring-soft' : 'border-border',

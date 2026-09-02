@@ -36,6 +36,7 @@ import {
   pickTextFile,
   timestampedFilename,
 } from '../lib/download.js';
+import { revealDelay } from '../lib/reveal.js';
 import { getSoundEngine } from '../lib/sound.js';
 import { getDesktop, type UpdateEvent } from '../lib/platform.js';
 import { useDataStore } from '../store/dataStore.js';
@@ -137,7 +138,7 @@ export function SettingsView() {
       ) : null}
 
       {/* ------------------------------------------------------------ timer */}
-      <Card title={t('settings:sections.timer')}>
+      <Card title={t('settings:sections.timer')} className="nebula-reveal" style={revealDelay(0)}>
         <div className="grid gap-3 sm:grid-cols-2">
           <NumberField
             label={t('settings:timer.focus')}
@@ -201,7 +202,7 @@ export function SettingsView() {
       </Card>
 
       {/* ------------------------------------------------------------ goals */}
-      <Card title={t('settings:sections.goals')}>
+      <Card title={t('settings:sections.goals')} className="nebula-reveal" style={revealDelay(1)}>
         <div className="grid gap-3 sm:grid-cols-2">
           <NumberField
             label={t('settings:goals.daily')}
@@ -221,7 +222,11 @@ export function SettingsView() {
       </Card>
 
       {/* ---------------------------------------------------- notifications */}
-      <Card title={t('settings:sections.notifications')}>
+      <Card
+        title={t('settings:sections.notifications')}
+        className="nebula-reveal"
+        style={revealDelay(2)}
+      >
         <div className="divide-y divide-border">
           <Toggle
             checked={settings.notifications.system}
@@ -342,7 +347,7 @@ export function SettingsView() {
       </Card>
 
       {/* ----------------------------------------------------------- breaks */}
-      <Card title={t('settings:sections.breaks')}>
+      <Card title={t('settings:sections.breaks')} className="nebula-reveal" style={revealDelay(3)}>
         <Toggle
           checked={settings.breakReminders.enabled}
           onChange={(enabled) => updateBreakReminders({ enabled })}
@@ -379,7 +384,11 @@ export function SettingsView() {
       </Card>
 
       {/* ------------------------------------------------------- appearance */}
-      <Card title={t('settings:sections.appearance')}>
+      <Card
+        title={t('settings:sections.appearance')}
+        className="nebula-reveal"
+        style={revealDelay(4)}
+      >
         <div className="space-y-4">
           <div>
             <span className="mb-1.5 block text-sm font-medium">
@@ -437,7 +446,11 @@ export function SettingsView() {
       </Card>
 
       {/* ---------------------------------------------------- accessibility */}
-      <Card title={t('settings:sections.accessibility')}>
+      <Card
+        title={t('settings:sections.accessibility')}
+        className="nebula-reveal"
+        style={revealDelay(5)}
+      >
         <Slider
           label={t('settings:accessibility.fontScale')}
           value={settings.appearance.fontScale}
@@ -465,7 +478,11 @@ export function SettingsView() {
       </Card>
 
       {/* --------------------------------------------------------- language */}
-      <Card title={t('settings:sections.language')}>
+      <Card
+        title={t('settings:sections.language')}
+        className="nebula-reveal"
+        style={revealDelay(6)}
+      >
         <SelectField
           label={t('settings:language.label')}
           value={settings.language}
@@ -634,7 +651,7 @@ export function SettingsView() {
       </Card>
 
       {/* ------------------------------------------------------------ about */}
-      <Card title={t('settings:sections.about')}>
+      <Card title={t('settings:sections.about')} className="nebula-reveal" style={revealDelay(7)}>
         <p className="text-sm text-text-secondary">
           {t('settings:about.version', { version: APP_VERSION })} · {t('settings:about.license')}
         </p>

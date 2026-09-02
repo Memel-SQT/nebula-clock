@@ -8,6 +8,7 @@ import {
   isPomodoro,
   summarize,
 } from '@nebula-clock/core';
+import { revealDelay } from '../lib/reveal.js';
 import { ActiveTaskPicker } from '../components/ActiveTaskPicker.js';
 import { AmbientMixer } from '../components/AmbientMixer.js';
 import { PresetPicker } from '../components/PresetPicker.js';
@@ -42,7 +43,10 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
       {/* Phase changes are announced here rather than by moving focus. */}
       <LiveRegion assertive>{announcement}</LiveRegion>
 
-      <section className="flex flex-col items-center gap-7 rounded-lg border border-border bg-card p-6 shadow-card sm:p-10">
+      <section
+        className="nebula-reveal flex flex-col items-center gap-7 rounded-lg border border-border bg-card p-6 shadow-card sm:p-10"
+        style={revealDelay(0)}
+      >
         <PresetPicker />
 
         <TimerDisplay
@@ -81,7 +85,8 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
       </section>
 
       <aside className="space-y-4">
-        <Card title={t('stats:range.today')}>
+        {/* Each card arrives just after the one above it. */}
+        <Card title={t('stats:range.today')} className="nebula-reveal" style={revealDelay(1)}>
           <dl className="grid grid-cols-2 gap-3">
             <div>
               <dt className="text-xs uppercase tracking-wide text-text-secondary">
@@ -106,9 +111,11 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
           </p>
         </Card>
 
-        <AmbientMixer />
+        <div className="nebula-reveal" style={revealDelay(2)}>
+          <AmbientMixer />
+        </div>
 
-        <Card title={t('timer:shortcuts.title')}>
+        <Card title={t('timer:shortcuts.title')} className="nebula-reveal" style={revealDelay(3)}>
           <dl className="space-y-1.5 text-sm">
             {[
               ['Space', t('timer:shortcuts.toggle')],

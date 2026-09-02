@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { buildCalendar, formatFocusTime } from '@nebula-clock/core';
 import { Card, IconButton, cn } from '@nebula-clock/ui';
+import { revealDelay } from '../lib/reveal.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
 
@@ -76,7 +77,7 @@ export function CalendarView() {
           </div>
 
           <div className="grid grid-cols-7 gap-1.5">
-            {cells.map((cell) => (
+            {cells.map((cell, index) => (
               <div
                 key={cell.day}
                 role="gridcell"
@@ -86,7 +87,9 @@ export function CalendarView() {
                   count: cell.pomodoros,
                 })}
                 title={`${dayFormatter.format(new Date(cell.date))} — ${cell.pomodoros} · ${formatFocusTime(cell.focusSeconds)}`}
+                style={revealDelay(index, 10)}
                 className={cn(
+                  'nebula-reveal',
                   'grid aspect-square place-items-center rounded text-xs font-medium tabular-nums',
                   'transition-transform duration-fast ease-nebula hover:scale-105',
                   LEVELS[cell.level],

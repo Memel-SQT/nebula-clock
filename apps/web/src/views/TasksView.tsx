@@ -183,9 +183,10 @@ export function TasksView() {
               strategy={verticalListSortingStrategy}
             >
               <ul className="space-y-2">
-                {visible.map((task) => (
+                {visible.map((task, index) => (
                   <TaskItem
                     key={task.id}
+                    index={index}
                     task={task}
                     tags={tags}
                     selected={task.id === activeTaskId}

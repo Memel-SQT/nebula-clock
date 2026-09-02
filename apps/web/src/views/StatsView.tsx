@@ -34,6 +34,7 @@ import {
   Stat,
   cn,
 } from '@nebula-clock/ui';
+import { revealDelay } from '../lib/reveal.js';
 import { StatsCharts } from '../components/StatsCharts.js';
 import { buildStatsReport, reportFilename } from '../lib/pdfReport.js';
 import { useDataStore } from '../store/dataStore.js';
@@ -155,21 +156,29 @@ export function StatsView() {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
+          className="nebula-reveal"
+          style={revealDelay(0)}
           icon={<Clock size={14} />}
           label={t('stats:metrics.focusTime')}
           value={formatFocusTime(summary.focusSeconds)}
         />
         <Stat
+          className="nebula-reveal"
+          style={revealDelay(1)}
           icon={<Timer size={14} />}
           label={t('stats:metrics.pomodoros')}
           value={summary.pomodoros}
         />
         <Stat
+          className="nebula-reveal"
+          style={revealDelay(2)}
           icon={<Percent size={14} />}
           label={t('stats:metrics.completionRate')}
           value={`${Math.round(summary.completionRate * 100)}%`}
         />
         <Stat
+          className="nebula-reveal"
+          style={revealDelay(3)}
           icon={<Target size={14} />}
           label={t('stats:metrics.averageSession')}
           value={formatFocusTime(summary.averagePomodoroSeconds)}
@@ -242,10 +251,12 @@ export function StatsView() {
 
       <Card title={t('stats:badges.title')}>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {badges.map((badge) => (
+          {badges.map((badge, index) => (
             <li
               key={badge.id}
+              style={revealDelay(index, 30)}
               className={cn(
+                'nebula-reveal',
                 'flex items-center gap-3 rounded-md border p-3 transition-colors duration-base',
                 badge.earned ? 'border-accent/40 bg-accent/5' : 'border-border opacity-70',
               )}
