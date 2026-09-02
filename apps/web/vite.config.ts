@@ -68,19 +68,8 @@ export default defineConfig({
               maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
               navigateFallback: `${base}index.html`,
               cleanupOutdatedCaches: true,
-              runtimeCaching: [
-                {
-                  // Google Fonts is the only external origin the app touches,
-                  // and only for the Inter webfont.
-                  urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
-                  handler: 'CacheFirst',
-                  options: {
-                    cacheName: 'nebula-fonts',
-                    expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-                    cacheableResponse: { statuses: [0, 200] },
-                  },
-                },
-              ],
+              // No runtimeCaching: the app fetches nothing from anywhere
+              // else, so everything it needs is in the precache above.
             },
             devOptions: { enabled: false },
           }),

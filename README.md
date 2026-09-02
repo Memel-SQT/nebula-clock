@@ -171,10 +171,13 @@ ARIA throughout, and complete offline support.
 
 ## Privacy
 
-There is no backend. No analytics, no crash reporting, no account. The only
-outbound request the app can make is fetching the Inter webfont from Google
-Fonts, which the service worker caches on first load. Export and import are
-manual, local, and file-based.
+There is no backend. No analytics, no crash reporting, no account, and no
+third-party request of any kind — the Inter webfont is bundled rather than
+fetched from Google Fonts, so the app renders correctly with the network
+unplugged. Export and import are manual, local, and file-based.
+
+The desktop build additionally contacts GitHub Releases, and only to check
+for an update.
 
 ---
 
