@@ -11,7 +11,7 @@
     ".": "./src/index.ts",
     "./tokens.css": "./src/tokens/tokens.css",
     "./tailwind-preset": "./src/tokens/tailwind-preset.ts",
-    "./nebula-mark.svg": "./src/nebula-mark.svg"
+    "./nebula-clock-mark.svg": "./src/nebula-clock-mark.svg"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

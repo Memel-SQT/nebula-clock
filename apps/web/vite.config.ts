@@ -29,7 +29,7 @@ export default defineConfig({
       : [
           VitePWA({
             registerType: 'autoUpdate',
-            includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'nebula-mark.svg'],
+            includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'nebula-clock-mark.svg'],
             manifest: {
               name: 'Nebula Clock',
               short_name: 'Nebula Clock',

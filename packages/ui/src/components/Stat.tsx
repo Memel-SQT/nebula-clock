@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '../lib/cn.js';
 
 export interface StatProps {
@@ -7,12 +7,15 @@ export interface StatProps {
   hint?: ReactNode;
   icon?: ReactNode;
   className?: string;
+  /** Allows callers to stagger a grid of these on entrance. */
+  style?: CSSProperties;
 }
 
 /** A single headline metric on the statistics page. */
-export function Stat({ label, value, hint, icon, className }: StatProps) {
+export function Stat({ label, value, hint, icon, className, style }: StatProps) {
   return (
     <div
+      style={style}
       className={cn(
         'rounded-md border border-border bg-card p-4',
         'transition-colors duration-base ease-nebula hover:border-accent/40',

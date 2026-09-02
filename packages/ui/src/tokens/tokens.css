@@ -334,6 +334,91 @@ body {
   box-shadow: var(--focus-ring);
 }
 
+/**
+ * Logo animation, used by the launch screen.
+ *
+ * The ring draws itself from twelve o'clock and the hands sweep into place
+ * behind it. Both animations are `forwards`, so when the reduced-motion rules
+ * above collapse the duration to nothing the mark simply appears finished
+ * rather than disappearing.
+ */
+.nebula-logo-animated .nebula-logo-ring {
+  /* 2 * pi * r, with r = 32 in the 0..100 viewBox. */
+  stroke-dasharray: 201.06;
+  stroke-dashoffset: 201.06;
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  transform: rotate(-90deg);
+  animation: nebula-logo-draw 900ms var(--ease) forwards;
+}
+
+.nebula-logo-animated .nebula-logo-hands {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  opacity: 0;
+  animation: nebula-logo-hands 620ms var(--ease) 460ms forwards;
+}
+
+@keyframes nebula-logo-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nebula-logo-hands {
+  from {
+    opacity: 0;
+    transform: rotate(-150deg) scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/**
+ * Entrance for lists and card grids.
+ *
+ * A CSS animation rather than a JS one because these elements are also
+ * dragged by dnd-kit, which owns their transform; a library animating the
+ * same property would fight it. Stagger by setting `animation-delay` inline.
+ */
+.nebula-reveal {
+  opacity: 0;
+  animation: nebula-reveal var(--motion-slow) var(--ease) forwards;
+}
+
+@keyframes nebula-reveal {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+/* A short flourish on the progress ring when the phase changes. */
+.nebula-phase-flourish {
+  animation: nebula-phase-flourish 620ms var(--ease);
+}
+
+@keyframes nebula-phase-flourish {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: scale(1.035);
+    filter: brightness(1.25);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
 /* Screen-reader-only, kept here so it is available without a component. */
 .sr-only {
   position: absolute;
