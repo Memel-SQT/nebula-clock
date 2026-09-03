@@ -1,3 +1,8 @@
+## <small>1.1.3 (2026-09-03)</small>
+
+* fix(desktop): silence the font preload and web-installer warnings ([b838c33](https://github.com/Memel-SQT/nebula-clock/commit/b838c33))
+* fix(desktop): silence the font preload and web-installer warnings ([416aa9d](https://github.com/Memel-SQT/nebula-clock/commit/416aa9d))
+
 ## <small>1.1.2 (2026-09-02)</small>
 
 * fix(desktop): repair auto-update downloads broken by a space in the filename ([c2f7c18](https://github.com/Memel-SQT/nebula-clock/commit/c2f7c18))
