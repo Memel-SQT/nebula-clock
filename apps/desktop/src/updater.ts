@@ -50,6 +50,14 @@ export async function initUpdater(emit: Emit): Promise<void> {
   autoUpdater.autoDownload = true;
   autoUpdater.autoInstallOnAppQuit = true;
 
+  // NsisUpdater-only, and set here rather than in the electron-builder config
+  // because it is an updater setting, not a packaging one: the app ships a
+  // full installer, so the web-installer path is never used. Without it
+  // electron-updater warns on every launch.
+  if (process.platform === 'win32') {
+    (autoUpdater as AppUpdater & { disableWebInstaller?: boolean }).disableWebInstaller = true;
+  }
+
   autoUpdater.on('checking-for-update', () => emit({ type: 'checking' }));
   autoUpdater.on('update-available', (info) => emit({ type: 'available', version: info.version }));
   autoUpdater.on('update-not-available', () => emit({ type: 'not-available' }));
