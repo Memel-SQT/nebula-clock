@@ -70,6 +70,15 @@ describe('tasks', () => {
     expect(second.estimatedPomodoros).toBe(4);
   });
 
+  it('appends after the last task even once one was deleted', async () => {
+    const a = await createTask({ title: 'A' });
+    await createTask({ title: 'B' });
+    await deleteTask(a.id);
+    const c = await createTask({ title: 'C' });
+    expect(c.order).toBe(2);
+    expect((await listTasks()).map((t) => t.title)).toEqual(['B', 'C']);
+  });
+
   it('forces the estimate to at least one pomodoro', async () => {
     const task = await createTask({ title: 'x', estimatedPomodoros: 0 });
     expect(task.estimatedPomodoros).toBe(1);

@@ -22,7 +22,9 @@ export async function listTasks(): Promise<Task[]> {
 
 export async function createTask(input: NewTask): Promise<Task> {
   const now = Date.now();
-  const existing = await getDb().tasks.count();
+  // After the last one, not at `count()`: once a task is deleted, the count lands on an order
+  // that is still taken and the new task jumps around the list.
+  const last = await getDb().tasks.orderBy('order').last();
   const task: Task = {
     id: createId(),
     title: input.title.trim(),
@@ -31,7 +33,7 @@ export async function createTask(input: NewTask): Promise<Task> {
     completedPomodoros: 0,
     done: false,
     tagIds: input.tagIds ?? [],
-    order: existing,
+    order: last ? last.order + 1 : 0,
     createdAt: now,
     updatedAt: now,
     completedAt: null,

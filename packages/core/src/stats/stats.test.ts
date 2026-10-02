@@ -133,6 +133,14 @@ describe('bucketize', () => {
     expect(buckets[10]?.pomodoros).toBe(0);
   });
 
+  it('keeps wall-clock hours on the day the clocks go back (25 hours in Europe)', () => {
+    const late = at(2026, 10, 25, 23, 30);
+    const buckets = bucketize([session(late)], 'day', late);
+    expect(buckets).toHaveLength(24);
+    expect(buckets[23]?.pomodoros).toBe(1);
+    expect(buckets[23]?.end).toBe(at(2026, 10, 26, 0));
+  });
+
   it('produces seven daily buckets for a week', () => {
     const reference = at(2026, 3, 14);
     const buckets = bucketize([session(at(2026, 3, 11))], 'week', reference);

@@ -53,11 +53,14 @@ export function createWebNotificationAdapter(): NotificationAdapter {
       // A registered service worker gives notifications that survive the tab
       // being backgrounded on mobile; fall back to the constructor otherwise.
       const registration = await navigator.serviceWorker?.getRegistration();
+      // Relative to the document: the PWA is also served from a GitHub Pages sub-path, where
+      // `/icon-192.png` points outside the app.
+      const asset = (file: string) => new URL(file, document.baseURI).href;
       const options: NotificationOptions = {
         body: payload.body,
         tag: payload.tag ?? 'nebula-clock',
-        icon: '/icon-192.png',
-        badge: '/icon-64.png',
+        icon: asset('icon-192.png'),
+        badge: asset('icon-64.png'),
         silent: payload.silent ?? false,
       };
       if (registration) {

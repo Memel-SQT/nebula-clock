@@ -132,12 +132,19 @@ export function bucketize(
   const buckets: Bucket[] = [];
 
   if (kind === 'day') {
+    // Wall-clock hours, not 3 600 000 ms steps: a daylight-saving day has 23 or 25 hours, and
+    // fixed steps would shift every label and drop the evening's sessions.
+    const day = new Date(range.start);
     for (let hour = 0; hour < 24; hour += 1) {
-      const start = range.start + hour * 3_600_000;
+      const start = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour).getTime();
+      const end =
+        hour === 23
+          ? range.end
+          : new Date(day.getFullYear(), day.getMonth(), day.getDate(), hour + 1).getTime();
       buckets.push({
         key: `${hour}`.padStart(2, '0'),
         start,
-        end: start + 3_600_000,
+        end,
         focusSeconds: 0,
         pomodoros: 0,
       });
