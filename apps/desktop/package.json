@@ -103,6 +103,7 @@
       "title": "${productName} ${arch}"
     },
     "linux": {
+      "executableName": "nebula-clock",
       "target": [
         "AppImage",
         "deb"
