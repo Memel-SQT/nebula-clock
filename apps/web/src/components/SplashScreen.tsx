@@ -1,72 +1,92 @@
-import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GlowBackground, Logo } from '@nebula-clock/ui';
-
-/** Long enough for the mark to finish drawing, short enough not to annoy. */
-const DURATION_MS = 1500;
+import type { MotionLevel } from '@nebula-clock/core';
+import { Splash } from '@nebula-clock/ui';
 
 export interface SplashScreenProps {
+  motion: MotionLevel;
   onDone: () => void;
 }
 
 /**
- * The launch screen: the Nebula Clock mark draws itself over the ambient
- * glow, then hands over to the app.
- *
- * The app is already mounted underneath, and this overlay never takes pointer
- * events, so nothing is actually blocked while it plays - it can be dismissed
- * early by any key or click, and it is skipped entirely under reduced motion.
+ * The family opening sequence (`Splash`, Nebula Hub) with the Nebula Clock mark: the plate
+ * scales in, the halo breathes, the ring draws itself, the hands pop in. The app is already
+ * mounted underneath and this overlay takes no pointer events, so nothing is blocked; any key
+ * or click dismisses it early.
  */
-export function SplashScreen({ onDone }: SplashScreenProps) {
+export function SplashScreen({ motion, onDone }: SplashScreenProps) {
   const { t } = useTranslation(['common']);
+  const gradientId = `splash-gradient-${useId()}`;
 
   useEffect(() => {
-    const timer = window.setTimeout(onDone, DURATION_MS);
     const skip = () => onDone();
     window.addEventListener('keydown', skip, { once: true });
     window.addEventListener('pointerdown', skip, { once: true });
-
     return () => {
-      window.clearTimeout(timer);
       window.removeEventListener('keydown', skip);
       window.removeEventListener('pointerdown', skip);
     };
   }, [onDone]);
 
+  // The mark comes from packages/ui/src/nebula-clock-mark.svg (viewBox 100: transform origins
+  // in viewBox units, see splash.css).
+  const mark = (
+    <svg className="splash-mark" viewBox="0 0 100 100" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="var(--gold)" />
+          <stop offset="1" stopColor="var(--accent)" />
+        </linearGradient>
+      </defs>
+      <circle
+        className="splash-mark-halo"
+        style={{ transformOrigin: '50px 50px' }}
+        cx="50"
+        cy="50"
+        r="48"
+        fill="var(--accent-glow)"
+      />
+      <rect
+        className="splash-mark-plate splash-plate"
+        style={{ transformOrigin: '50px 50px' }}
+        width="100"
+        height="100"
+        rx="24"
+      />
+      <circle
+        className="splash-mark-draw"
+        pathLength={100}
+        cx="50"
+        cy="50"
+        r="32"
+        fill="none"
+        stroke={`url(#${gradientId})`}
+        strokeWidth="8"
+        transform="rotate(-90 50 50)"
+      />
+      <path
+        className="splash-mark-star"
+        style={{ transformOrigin: '50px 50px' }}
+        d="M50 50V32.5M50 50l10.83 6.25"
+        stroke={`url(#${gradientId})`}
+        strokeWidth="7.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+
   return (
-    <motion.div
-      // Decorative: the real UI is behind it and already reachable.
-      aria-hidden="true"
-      initial={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 1.04 }}
-      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      className="pointer-events-none fixed inset-0 z-[60] grid place-items-center bg-canvas"
-    >
-      <GlowBackground />
-
-      <div className="relative z-10 flex flex-col items-center gap-5">
-        <Logo size={104} animated />
-
-        <div className="overflow-hidden text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.62, duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
-            className="text-xl font-bold tracking-tight"
-          >
-            {t('common:app.name')}
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.78, duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
-            className="mt-1 text-sm text-text-secondary"
-          >
-            {t('common:app.tagline')}
-          </motion.p>
-        </div>
-      </div>
-    </motion.div>
+    // Decorative: the real UI is behind it and already reachable.
+    <div className="splash-overlay" aria-hidden="true">
+      <Splash
+        title={t('common:app.name')}
+        tagline={t('common:app.tagline')}
+        mark={mark}
+        motion={motion}
+        onFinish={onDone}
+      />
+    </div>
   );
 }

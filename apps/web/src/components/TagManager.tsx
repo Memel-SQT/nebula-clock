@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2 } from 'lucide-react';
 import { TAG_COLORS } from '@nebula-clock/core';
-import { Button, Card, Chip, IconButton, TextField, cn } from '@nebula-clock/ui';
+import { Button, Card, Chip, EmptyState, IconButton, TextField, cn } from '@nebula-clock/ui';
 import { useDataStore } from '../store/dataStore.js';
 
 /** Create, recolour and delete the tags that group tasks into projects. */
@@ -19,70 +18,63 @@ export function TagManager() {
   const submit = () => {
     const trimmed = name.trim();
     if (!trimmed) return;
-    void addTag(trimmed, color);
+    void addTag(trimmed.slice(0, 80), color);
     setName('');
   };
 
   return (
-    <Card title={t('tasks:tags.title')}>
-      <div className="flex flex-wrap items-end gap-2">
+    <Card title={t('tasks:tags.title')} count={tags.length}>
+      <div className="tag-form">
         <TextField
           value={name}
+          maxLength={80}
           onChange={(event) => setName(event.target.value)}
           onKeyDown={(event) => event.key === 'Enter' && submit()}
           placeholder={t('tasks:tags.namePlaceholder')}
           aria-label={t('tasks:tags.namePlaceholder')}
-          wrapperClassName="flex-1 min-w-[10rem]"
+          wrapperClassName="flex-1"
         />
-        <Button
-          variant="primary"
-          size="sm"
-          icon={<Plus size={14} />}
-          onClick={submit}
-          className="mb-1"
-        >
+        {/* Secondary: the screen's primary action is "Add the task". */}
+        <Button variant="secondary" icon="plus" onClick={submit}>
           {t('tasks:tags.add')}
         </Button>
       </div>
 
-      <fieldset className="mt-2">
-        <legend className="mb-1.5 text-xs font-medium text-text-secondary">
-          {t('tasks:tags.color')}
-        </legend>
-        <div className="flex flex-wrap gap-1.5">
-          {TAG_COLORS.map((candidate) => (
+      <fieldset className="tag-colors">
+        <legend className="field-label">{t('tasks:tags.color')}</legend>
+        <div className="tag-color-row">
+          {TAG_COLORS.map((candidate, index) => (
             <button
               key={candidate}
               type="button"
-              aria-label={t('tasks:tags.colorAria', { color: candidate })}
+              aria-label={t('tasks:tags.colorAria', { color: index + 1 })}
               aria-pressed={candidate === color}
+              data-sound="toggle"
               onClick={() => setColor(candidate)}
-              style={{ backgroundColor: candidate }}
-              className={cn(
-                'h-6 w-6 rounded-pill transition-transform duration-fast ease-nebula',
-                candidate === color ? 'scale-110 ring-2 ring-text' : 'hover:scale-105',
-              )}
+              style={{ '--chip': candidate } as CSSProperties}
+              className={cn('tag-color', candidate === color && 'active')}
             />
           ))}
         </div>
       </fieldset>
 
       {tags.length > 0 ? (
-        <ul className="mt-4 space-y-1.5 border-t border-border pt-3">
+        <ul className="tag-list">
           {tags.map((tag) => (
-            <li key={tag.id} className="flex items-center gap-2">
+            <li key={tag.id}>
               <Chip color={tag.color}>{tag.name}</Chip>
               <input
                 type="color"
                 value={tag.color}
                 aria-label={`${tag.name} — ${t('tasks:tags.color')}`}
                 onChange={(event) => void editTag(tag.id, { color: event.target.value })}
-                className="h-6 w-8 cursor-pointer rounded border border-border bg-transparent"
+                className="tag-color-input"
               />
               <IconButton
-                label={t('common:actions.delete')}
-                icon={<Trash2 size={14} />}
+                label={`${t('common:actions.delete')} : ${tag.name}`}
+                icon="trash"
                 size="sm"
+                sound="none"
                 className="ml-auto"
                 onClick={() => void removeTag(tag.id)}
               />
@@ -90,7 +82,7 @@ export function TagManager() {
           ))}
         </ul>
       ) : (
-        <p className="mt-3 text-sm text-text-secondary">{t('tasks:tags.empty')}</p>
+        <EmptyState icon="tag" title={t('tasks:tags.empty')} />
       )}
     </Card>
   );

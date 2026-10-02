@@ -15,8 +15,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Plus } from 'lucide-react';
 import {
+  LIMITS,
   filterTasksByTag,
   moveItem,
   sortTasks,
@@ -29,6 +29,7 @@ import {
   Chip,
   EmptyState,
   NumberField,
+  PageHeader,
   SegmentedControl,
   TextField,
   cn,
@@ -60,8 +61,8 @@ export function TasksView() {
   const [tagFilter, setTagFilter] = useState<string | null>(null);
 
   const sensors = useSensors(
-    // A small activation distance keeps a click on the handle from being
-    // swallowed as the start of a drag.
+    // A small activation distance keeps a click on the handle from being swallowed as the
+    // start of a drag.
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
@@ -80,7 +81,7 @@ export function TasksView() {
     const trimmed = title.trim();
     if (!trimmed) return;
     void addTask({
-      title: trimmed,
+      title: trimmed.slice(0, 200),
       estimatedPomodoros: estimate,
       tagIds: tagFilter ? [tagFilter] : [],
     });
@@ -99,127 +100,147 @@ export function TasksView() {
   };
 
   return (
-    <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
-      <section>
-        <header className="mb-4">
-          <h1 className="text-xl font-semibold tracking-tight">{t('tasks:title')}</h1>
-          <p className="text-sm text-text-secondary">{t('tasks:subtitle')}</p>
-        </header>
+    <>
+      <PageHeader
+        eyebrow={t('common:pages.tasks.eyebrow')}
+        title={t('tasks:title')}
+        intro={t('tasks:subtitle')}
+      />
 
-        <Card className="mb-4">
-          <div className="flex flex-wrap items-end gap-2">
-            <TextField
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              onKeyDown={(event) => event.key === 'Enter' && submit()}
-              placeholder={t('tasks:form.titlePlaceholder')}
-              aria-label={t('tasks:form.titlePlaceholder')}
-              wrapperClassName="flex-1 min-w-[12rem]"
-            />
-            <NumberField
-              value={estimate}
-              onChange={setEstimate}
-              min={1}
-              max={20}
-              label={t('tasks:form.estimate')}
-              aria-label={t('tasks:form.estimateAria')}
-              wrapperClassName="w-24"
-            />
-            <Button variant="primary" icon={<Plus size={16} />} onClick={submit} className="mb-1">
-              {t('tasks:form.add')}
-            </Button>
-          </div>
-        </Card>
-
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <SegmentedControl
-            size="sm"
-            label={t('tasks:filters.all')}
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { value: 'all', label: t('tasks:filters.all') },
-              { value: 'active', label: t('tasks:filters.active') },
-              { value: 'done', label: t('tasks:filters.done') },
-            ]}
-          />
-
-          {tags.length > 0 ? (
-            <div className="flex flex-wrap items-center gap-1.5">
-              {tags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  aria-pressed={tagFilter === tag.id}
-                  onClick={() => setTagFilter(tagFilter === tag.id ? null : tag.id)}
-                  className={cn(
-                    'rounded-pill transition-opacity duration-fast',
-                    tagFilter && tagFilter !== tag.id && 'opacity-45',
-                  )}
-                >
-                  <Chip color={tag.color} size="sm">
-                    {tag.name}
-                  </Chip>
-                </button>
-              ))}
+      <div className="tasks-layout">
+        <div className="tasks-main">
+          <Card>
+            <div className="task-form">
+              <TextField
+                value={title}
+                maxLength={200}
+                onChange={(event) => setTitle(event.target.value)}
+                onKeyDown={(event) => event.key === 'Enter' && submit()}
+                placeholder={t('tasks:form.titlePlaceholder')}
+                aria-label={t('tasks:form.titlePlaceholder')}
+                wrapperClassName="task-form-title"
+              />
+              <NumberField
+                value={estimate}
+                onChange={(value) =>
+                  setEstimate(
+                    Math.min(
+                      LIMITS.estimatedPomodoros.max,
+                      Math.max(LIMITS.estimatedPomodoros.min, Math.round(value)),
+                    ),
+                  )
+                }
+                min={LIMITS.estimatedPomodoros.min}
+                max={LIMITS.estimatedPomodoros.max}
+                aria-label={t('tasks:form.estimateAria')}
+                title={t('tasks:form.estimate')}
+                wrapperClassName="task-form-estimate"
+              />
+              <Button variant="primary" icon="plus" onClick={submit}>
+                {t('tasks:form.add')}
+              </Button>
             </div>
-          ) : null}
-        </div>
+          </Card>
 
-        {visible.length === 0 ? (
-          <EmptyState title={t('tasks:empty.title')} description={t('tasks:empty.body')} />
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={onDragEnd}
-            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            accessibility={{
-              screenReaderInstructions: { draggable: t('tasks:reorder.instructions') },
-            }}
-          >
-            <SortableContext
-              items={visible.map((task) => task.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <ul className="space-y-2">
-                {visible.map((task, index) => (
-                  <TaskItem
-                    key={task.id}
-                    index={index}
-                    task={task}
-                    tags={tags}
-                    selected={task.id === activeTaskId}
-                    onSelect={() => setActiveTask(task.id === activeTaskId ? null : task.id)}
-                    onToggleDone={(done) => void toggleTaskDone(task.id, done)}
-                    onDelete={() => {
-                      if (task.id === activeTaskId) setActiveTask(null);
-                      void removeTask(task.id);
-                    }}
-                    onRename={(next) => void editTask(task.id, { title: next })}
-                  />
+          <div className="task-filters">
+            <SegmentedControl
+              label={t('tasks:title')}
+              value={filter}
+              onChange={setFilter}
+              options={[
+                { value: 'all', label: t('tasks:filters.all') },
+                { value: 'active', label: t('tasks:filters.active') },
+                { value: 'done', label: t('tasks:filters.done') },
+              ]}
+            />
+
+            {tags.length > 0 ? (
+              <div className="tag-filter" role="group" aria-label={t('tasks:filters.byTag')}>
+                {tags.map((tag) => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    aria-pressed={tagFilter === tag.id}
+                    data-sound="toggle"
+                    onClick={() => setTagFilter(tagFilter === tag.id ? null : tag.id)}
+                    className={cn(
+                      'tag-filter-button',
+                      tagFilter && tagFilter !== tag.id && 'is-dimmed',
+                    )}
+                  >
+                    <Chip color={tag.color}>{tag.name}</Chip>
+                  </button>
                 ))}
-              </ul>
-            </SortableContext>
-          </DndContext>
-        )}
+              </div>
+            ) : null}
+          </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-text-secondary">
-          <span>
-            {t('tasks:summary.completed', { done: totals.completed, total: totals.total })} ·{' '}
-            {t('tasks:summary.remaining', { count: remainingPomodoros(tasks) })}
-          </span>
-          {totals.completed > 0 ? (
-            <Button size="sm" variant="ghost" onClick={() => void clearDoneTasks()}>
-              {t('tasks:clearCompleted')}
-            </Button>
-          ) : null}
+          {visible.length === 0 ? (
+            <EmptyState
+              compact={false}
+              icon="tasks"
+              title={t('tasks:empty.title')}
+              description={t('tasks:empty.body')}
+            />
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={onDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+              accessibility={{
+                screenReaderInstructions: { draggable: t('tasks:reorder.instructions') },
+              }}
+            >
+              <SortableContext
+                items={visible.map((task) => task.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <ul className="task-list">
+                  {visible.map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      tags={tags}
+                      selected={task.id === activeTaskId}
+                      onSelect={() => {
+                        if (task.done) return;
+                        setActiveTask(task.id === activeTaskId ? null : task.id);
+                      }}
+                      onToggleDone={(done) => {
+                        // A finished task cannot keep collecting pomodoros.
+                        if (done && task.id === activeTaskId) setActiveTask(null);
+                        void toggleTaskDone(task.id, done);
+                      }}
+                      onDelete={() => {
+                        if (task.id === activeTaskId) setActiveTask(null);
+                        void removeTask(task.id);
+                      }}
+                      onRename={(next) => void editTask(task.id, { title: next.slice(0, 200) })}
+                    />
+                  ))}
+                </ul>
+              </SortableContext>
+            </DndContext>
+          )}
+
+          <div className="task-summary">
+            <span>
+              {t('tasks:summary.completed', { done: totals.completed, total: totals.total })} ·{' '}
+              {t('tasks:summary.remaining', { count: remainingPomodoros(tasks) })}
+            </span>
+            {totals.completed > 0 ? (
+              <Button size="sm" variant="ghost" icon="trash" onClick={() => void clearDoneTasks()}>
+                {t('tasks:clearCompleted')}
+              </Button>
+            ) : null}
+          </div>
         </div>
-      </section>
 
-      <aside>
-        <TagManager />
-      </aside>
-    </div>
+        <aside className="tasks-side">
+          <TagManager />
+        </aside>
+      </div>
+    </>
   );
 }

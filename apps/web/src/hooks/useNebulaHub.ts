@@ -57,20 +57,16 @@ export function useNebulaHubSync(): void {
     });
   }, [sessions, goal, t, i18n.language]);
 
-  // The Nebula appearance: theme, accent, language — only while the user follows it.
+  // The Nebula appearance, 1 for 1 (same model): theme, accents, background, motion, sounds
+  // and language — only while the user follows it. Accessibility settings stay local.
   useEffect(() => {
     const desktop = getDesktop();
     if (!desktop?.onNebulaAppearance) return undefined;
     return desktop.onNebulaAppearance((payload) => {
       if (!readFollow()) return;
-      const patch = clockAppearanceFromHub(payload);
-      if (patch.theme || patch.accent) {
-        updateAppearance({
-          ...(patch.theme ? { theme: patch.theme } : {}),
-          ...(patch.accent ? { accent: patch.accent } : {}),
-        });
-      }
-      if (patch.language) setLanguage(patch.language);
+      const { appearance, language } = clockAppearanceFromHub(payload);
+      if (Object.keys(appearance).length > 0) updateAppearance(appearance);
+      if (language) setLanguage(language);
     });
   }, [updateAppearance, setLanguage]);
 }

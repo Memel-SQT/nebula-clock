@@ -117,6 +117,30 @@ export interface DesktopBridge {
   setUpdatesByHub?(enabled: boolean): Promise<HubState>;
   openHub?(): Promise<'opened' | 'not-installed'>;
   detachFromHub?(): Promise<void>;
+
+  /** Page and ink colours of the theme, for the native window controls (frameless window). */
+  setWindowTheme?(chrome: { page: string; ink: string }): Promise<void>;
+  /** Translated labels for the tray menu and the main process notifications. */
+  setShellLabels?(labels: ShellLabels): void;
+}
+
+/** Texts the main process shows (it has no i18n of its own); `{{…}}` are filled in there. */
+export interface ShellLabels {
+  phase: Record<Phase, string>;
+  start: string;
+  pause: string;
+  resume: string;
+  skip: string;
+  reset: string;
+  miniMode: string;
+  open: string;
+  quit: string;
+  /** Plural forms already chosen: `one` and `other` with `{{count}}`. */
+  todayOne: string;
+  todayOther: string;
+  blockedTitle: string;
+  /** With `{{name}}`. */
+  blockedBody: string;
 }
 
 declare global {

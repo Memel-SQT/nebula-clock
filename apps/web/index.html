@@ -23,26 +23,40 @@
 
     <script>
       /**
-       * Resolve the theme before first paint so the app never flashes the
-       * wrong background. Mirrors the logic in src/hooks/useTheme.ts; kept
-       * inline and dependency-free because it has to run before the bundle.
+       * Paint the right theme, accent, motion level and text size before the
+       * first frame (no flash). Mirrors src/hooks/useAppearance.ts; kept inline
+       * and dependency-free because it runs before the bundle. Reads the 1.2
+       * shape too (light / dark, reduceMotion) until the store migrates it.
        */
       (function () {
+        var root = document.documentElement;
         try {
           var raw = localStorage.getItem('nebula-clock-settings');
-          var appearance = raw ? JSON.parse(raw).state.settings.appearance : null;
-          var mode = appearance ? appearance.theme : 'system';
-          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-          var resolved = mode === 'system' ? (prefersLight ? 'light' : 'dark') : mode;
-          var root = document.documentElement;
+          var a = (raw && JSON.parse(raw).state.settings.appearance) || {};
+          var legacy = { light: 'nebula-light', dark: 'nebula-dark' };
+          var themes = ['nebula-dark', 'nebula-light', 'glass-dark', 'glass-light'];
+          var mode = legacy[a.theme] || a.theme;
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var resolved =
+            themes.indexOf(mode) >= 0 ? mode : prefersDark ? 'nebula-dark' : 'nebula-light';
           root.setAttribute('data-theme', resolved);
-          if (appearance) {
-            if (appearance.reduceMotion) root.setAttribute('data-reduce-motion', 'true');
-            if (appearance.highContrast) root.setAttribute('data-contrast', 'high');
-            if (appearance.fontScale) root.style.setProperty('--font-scale', appearance.fontScale);
+          var motion = a.motion || (a.reduceMotion ? 'reduced' : 'full');
+          if (['full', 'reduced', 'off'].indexOf(motion) >= 0)
+            root.setAttribute('data-motion', motion);
+          if (typeof a.background === 'string') root.setAttribute('data-background', a.background);
+          if (a.highContrast === true) root.setAttribute('data-contrast', 'high');
+          if (typeof a.fontScale === 'number')
+            root.style.setProperty('--font-scale', String(a.fontScale));
+          if (window.nebula) root.setAttribute('data-desktop', 'true');
+          var paint = JSON.parse(localStorage.getItem('nebula-clock-paint') || 'null');
+          if (paint && paint.theme === resolved && paint.variables) {
+            for (var name in paint.variables) {
+              if (/^--[a-z0-9-]+$/.test(name))
+                root.style.setProperty(name, String(paint.variables[name]));
+            }
           }
         } catch (error) {
-          document.documentElement.setAttribute('data-theme', 'dark');
+          root.setAttribute('data-theme', 'nebula-dark');
         }
       })();
     </script>

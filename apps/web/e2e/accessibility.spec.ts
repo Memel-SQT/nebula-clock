@@ -35,6 +35,17 @@ test('the timer is fully operable from the keyboard', async ({ page }) => {
   await expect(countdown(page)).toHaveText('05:00');
 });
 
+test('Space activates a focused button instead of starting the timer', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+
+  await page.getByRole('button', { name: /deep work/i }).focus();
+  await page.keyboard.press('Space');
+  // The preset applied, and the timer did not start.
+  await expect(countdown(page)).toHaveText('50:00');
+  await expect(page.getByRole('button', { name: /start the .* phase/i })).toBeVisible();
+});
+
 test('shortcuts stay out of the way while typing', async ({ page }) => {
   await page.goto('/#/tasks');
   await ready(page);
@@ -67,12 +78,12 @@ test('the progress ring exposes its value to assistive technology', async ({ pag
   await expect(ring).toHaveAttribute('aria-label', /left in the focus phase/i);
 });
 
-test('reduced motion and high contrast reach the document root', async ({ page }) => {
+test('the motion level and high contrast reach the document root', async ({ page }) => {
   await page.goto('/#/settings');
   await ready(page);
 
-  await page.getByRole('switch', { name: /reduce animations/i }).check();
-  await expect(page.locator('html')).toHaveAttribute('data-reduce-motion', 'true');
+  await page.getByRole('radio', { name: 'Reduced', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
 
   await page.getByRole('switch', { name: /stronger contrast/i }).check();
   await expect(page.locator('html')).toHaveAttribute('data-contrast', 'high');

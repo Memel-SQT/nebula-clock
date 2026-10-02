@@ -84,9 +84,52 @@ describe('appearance', () => {
   });
 
   it('stores the accent without touching anything else', () => {
-    store().updateAppearance({ accent: '#22D3EE' });
-    expect(store().settings.appearance.accent).toBe('#22D3EE');
+    store().updateAppearance({ accentPreset: 'ocean' });
+    expect(store().settings.appearance.accentPreset).toBe('ocean');
     expect(store().settings.appearance.theme).toBe(DEFAULT_SETTINGS.appearance.theme);
+  });
+
+  it('rejects an invalid value instead of storing it', () => {
+    store().updateAppearance({ customPrimary: 'red', background: 'stars' });
+    expect(store().settings.appearance.customPrimary).toBe(
+      DEFAULT_SETTINGS.appearance.customPrimary,
+    );
+    expect(store().settings.appearance.background).toBe('stars');
+  });
+});
+
+describe('persistence', () => {
+  it('migrates a 1.2 localStorage entry field by field', async () => {
+    window.localStorage.setItem(
+      'nebula-clock-settings',
+      JSON.stringify({
+        version: 1,
+        state: {
+          settings: {
+            ...DEFAULT_SETTINGS,
+            timer: { ...DEFAULT_SETTINGS.timer, focusMinutes: 40 },
+            appearance: {
+              theme: 'light',
+              accent: '#FBBF24',
+              fontScale: 1.25,
+              reduceMotion: true,
+              highContrast: true,
+            },
+          },
+        },
+      }),
+    );
+    await useSettingsStore.persist.rehydrate();
+    expect(store().settings.timer.focusMinutes).toBe(40);
+    expect(store().settings.appearance).toMatchObject({
+      theme: 'nebula-light',
+      accentPreset: 'ember',
+      motion: 'reduced',
+      fontScale: 1.25,
+      highContrast: true,
+      soundEnabled: false,
+    });
+    window.localStorage.removeItem('nebula-clock-settings');
   });
 });
 
@@ -112,6 +155,15 @@ describe('desktop settings', () => {
       apps: [],
     });
     expect(store().settings.desktop.minimizeToTray).toBe(true);
+  });
+
+  it('keeps only plain hostnames and executable names in the block lists', () => {
+    store().updateBlocker({
+      sites: ['https://www.YouTube.com/feed', 'evil.com 1.2.3.4 bank.com'],
+      apps: ['Discord.exe', 'C:\\x.exe'],
+    });
+    expect(store().settings.desktop.blocker.sites).toEqual(['youtube.com']);
+    expect(store().settings.desktop.blocker.apps).toEqual(['Discord.exe']);
   });
 });
 

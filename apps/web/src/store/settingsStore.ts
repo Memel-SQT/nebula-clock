@@ -7,7 +7,17 @@
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DEFAULT_SETTINGS, LIMITS, clamp } from '@nebula-clock/core';
+import {
+  DEFAULT_SETTINGS,
+  LIMITS,
+  SETTINGS_VERSION,
+  clamp,
+  migrateAppearance,
+  normalizeAppName,
+  normalizeList,
+  normalizeSettings,
+  normalizeSite,
+} from '@nebula-clock/core';
 import type {
   AmbientSettings,
   AppearanceSettings,
@@ -158,19 +168,13 @@ export const useSettingsStore = create<SettingsStore>()(
           },
         })),
 
+      // Through the same field-by-field rules as a stored value: a patch from the Hub or a
+      // colour picker can never leave an invalid appearance behind.
       updateAppearance: (patch) =>
         set((state) => ({
           settings: {
             ...state.settings,
-            appearance: {
-              ...state.settings.appearance,
-              ...patch,
-              fontScale: clamp(
-                patch.fontScale ?? state.settings.appearance.fontScale,
-                LIMITS.fontScale.min,
-                LIMITS.fontScale.max,
-              ),
-            },
+            appearance: migrateAppearance({ ...state.settings.appearance, ...patch }),
           },
         })),
 
@@ -185,7 +189,19 @@ export const useSettingsStore = create<SettingsStore>()(
             ...state.settings,
             desktop: {
               ...state.settings.desktop,
-              blocker: { ...state.settings.desktop.blocker, ...patch },
+              blocker: {
+                ...state.settings.desktop.blocker,
+                ...patch,
+                // The main process writes these into the hosts file: plain hostnames only.
+                sites: normalizeList(
+                  patch.sites ?? state.settings.desktop.blocker.sites,
+                  normalizeSite,
+                ),
+                apps: normalizeList(
+                  patch.apps ?? state.settings.desktop.blocker.apps,
+                  normalizeAppName,
+                ),
+              },
             },
           },
         })),
@@ -210,13 +226,25 @@ export const useSettingsStore = create<SettingsStore>()(
           },
         })),
 
-      replaceAll: (settings) => set({ settings }),
+      replaceAll: (settings) => set({ settings: normalizeSettings(settings) }),
       resetAll: () => set({ settings: DEFAULT_SETTINGS }),
     }),
     {
       name: SETTINGS_STORAGE_KEY,
-      version: 1,
+      // 2: the Nebula family appearance model (1.3). Older versions are migrated field by
+      // field (`normalizeSettings` reads the 1.2 appearance too), never reset.
+      version: SETTINGS_VERSION,
       partialize: (state) => ({ settings: state.settings }),
+      migrate: (persisted) => ({
+        settings: normalizeSettings((persisted as { settings?: unknown } | null)?.settings),
+      }),
+      // Every load goes through the normalizer, not only version bumps: the default shallow
+      // merge would replace the whole object and drop any field added since (or keep a corrupt
+      // one from a hand edit).
+      merge: (persisted, current) => ({
+        ...current,
+        settings: normalizeSettings((persisted as { settings?: unknown } | null)?.settings),
+      }),
     },
   ),
 );

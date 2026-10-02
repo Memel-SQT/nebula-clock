@@ -119,19 +119,19 @@ test('switching to the light theme survives a reload', async ({ page }) => {
   await page.goto('/#/settings');
   await ready(page);
 
-  await page.getByRole('radio', { name: 'Light', exact: true }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('radio', { name: 'Nebula light', exact: true }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'nebula-light');
 
   await page.reload();
   // The inline bootstrap script has to restore it before first paint.
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'nebula-light');
 });
 
 test('the interface can be switched to French', async ({ page }) => {
   await page.goto('/#/settings');
   await ready(page);
 
-  await page.getByLabel(/interface language/i).selectOption('fr');
+  await page.getByRole('radio', { name: 'Français', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Réglages', level: 1 })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
 });
@@ -140,8 +140,8 @@ test('every view is reachable from the navigation', async ({ page }) => {
   await page.goto('/');
   await ready(page);
 
-  // Desktop renders a sidebar and mobile a bottom bar; only one is visible.
-  const nav = page.locator('nav:visible').first();
+  // The sidebar: a floating panel, an icon rail below 1100 px, a bar at the top below 720 px.
+  const nav = page.getByRole('navigation', { name: /main navigation/i });
 
   for (const label of ['Tasks', 'Statistics', 'Calendar', 'Settings'] as const) {
     await nav.getByRole('button', { name: label, exact: true }).click();

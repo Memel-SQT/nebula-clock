@@ -1,23 +1,33 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { Minimize2 } from 'lucide-react';
-import { Button, GlowBackground } from '@nebula-clock/ui';
+import { Button } from '@nebula-clock/ui';
 import { TimerControls } from './TimerControls.js';
 import { TimerDisplay } from './TimerDisplay.js';
 import { getDesktop } from '../lib/platform.js';
 import { useTimerView } from '../store/timerStore.js';
 
+/** The ring size for the window: half its height, at most 440 px. */
+const ringSize = () => Math.round(Math.min(440, window.innerHeight * 0.5, window.innerWidth * 0.8));
+
 /**
- * Immersive focus mode: nothing on screen but the ring and the controls.
- * Uses the real Fullscreen API on the web and the native window flag on
- * desktop, and always leaves on Escape.
+ * Immersive focus mode: nothing on screen but the ring and the controls. Uses the real
+ * Fullscreen API on the web and the native window flag on desktop, and always leaves on Escape.
+ * It is a modal dialog: focus moves into it, the app behind is out of the tab order, and focus
+ * returns where it was on exit.
  */
 export function FullscreenTimer({ onExit }: { onExit: () => void }) {
   const { t } = useTranslation(['timer']);
   const view = useTimerView();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(ringSize);
 
   useEffect(() => {
+    const restoreFocus = document.activeElement as HTMLElement | null;
+    panelRef.current?.querySelector<HTMLElement>('button')?.focus();
+    // Everything behind the overlay leaves the tab order and the accessibility tree.
+    const shell = document.querySelector<HTMLElement>('.app-shell');
+    shell?.setAttribute('inert', '');
+
     const desktop = getDesktop();
     if (desktop) {
       void desktop.setFullscreen(true);
@@ -33,47 +43,49 @@ export function FullscreenTimer({ onExit }: { onExit: () => void }) {
     const onFullscreenChange = () => {
       if (!document.fullscreenElement && !getDesktop()) onExit();
     };
+    const onResize = () => setSize(ringSize());
 
     window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('resize', onResize);
     document.addEventListener('fullscreenchange', onFullscreenChange);
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('resize', onResize);
       document.removeEventListener('fullscreenchange', onFullscreenChange);
+      shell?.removeAttribute('inert');
       if (desktop) void desktop.setFullscreen(false);
       else if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+      restoreFocus?.focus();
     };
   }, [onExit]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 grid place-items-center bg-canvas"
+    <div
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('timer:fullscreen.enter')}
+      className="fullscreen-timer"
     >
-      <GlowBackground />
+      <TimerDisplay
+        phase={view.phase}
+        status={view.status}
+        remaining={view.remaining}
+        progress={view.progress}
+        completedInCycle={view.completedInCycle}
+        cycleTarget={view.cycleTarget}
+        size={size}
+      />
 
-      <div className="relative z-10 flex flex-col items-center gap-10">
-        <TimerDisplay
-          phase={view.phase}
-          status={view.status}
-          remaining={view.remaining}
-          progress={view.progress}
-          completedInCycle={view.completedInCycle}
-          cycleTarget={view.cycleTarget}
-          size={Math.min(440, typeof window === 'undefined' ? 440 : window.innerHeight * 0.5)}
-        />
+      <TimerControls status={view.status} phase={t(`timer:phase.${view.phase}`)} />
 
-        <TimerControls status={view.status} phase={t(`timer:phase.${view.phase}`)} />
-
-        <div className="flex flex-col items-center gap-2">
-          <Button variant="ghost" size="sm" icon={<Minimize2 size={14} />} onClick={onExit}>
-            {t('timer:fullscreen.exit')}
-          </Button>
-          <p className="text-xs text-text-secondary">{t('timer:fullscreen.hint')}</p>
-        </div>
+      <div className="fullscreen-timer-exit">
+        <Button variant="ghost" size="sm" icon="collapse" onClick={onExit}>
+          {t('timer:fullscreen.exit')}
+        </Button>
+        <p>{t('timer:fullscreen.hint')}</p>
       </div>
-    </motion.div>
+    </div>
   );
 }

@@ -1,26 +1,23 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { buildCalendar, formatFocusTime } from '@nebula-clock/core';
-import { Card, IconButton, cn } from '@nebula-clock/ui';
-import { revealDelay } from '../lib/reveal.js';
+import { buildCalendar, formatFocusTime, toDayKey } from '@nebula-clock/core';
+import { Card, IconButton, PageHeader, cn } from '@nebula-clock/ui';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
 
-/** Heat ramp, from "nothing" to "well past the daily goal". */
-const LEVELS = [
-  'bg-card-alt',
-  'bg-accent/25',
-  'bg-accent/45',
-  'bg-accent/70',
-  'bg-nebula-gradient',
-] as const;
+const LEVELS = [0, 1, 2, 3, 4] as const;
 
+/**
+ * Month heat map. A real ARIA grid: weeks are rows, one roving tab stop, the arrow keys move
+ * between days (Home / End within the week). It used to put all 42 days in the tab order.
+ */
 export function CalendarView() {
   const { t, i18n } = useTranslation(['stats', 'common']);
   const sessions = useDataStore((state) => state.sessions);
   const goals = useSettingsStore((state) => state.settings.goals);
   const [monthOffset, setMonthOffset] = useState(0);
+  const [focusIndex, setFocusIndex] = useState<number | null>(null);
+  const cellRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const reference = useMemo(() => {
     const date = new Date();
@@ -34,6 +31,7 @@ export function CalendarView() {
     [sessions, goals, reference],
   );
 
+  const todayKey = toDayKey(Date.now());
   const weekdays = t('common:weekdaysShort', { returnObjects: true }) as unknown as string[];
   const monthLabel = new Intl.DateTimeFormat(i18n.language, {
     month: 'long',
@@ -41,76 +39,131 @@ export function CalendarView() {
   }).format(new Date(reference));
   const dayFormatter = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'full' });
 
-  return (
-    <div className="mx-auto w-full max-w-3xl space-y-4">
-      <header>
-        <h1 className="text-xl font-semibold tracking-tight">{t('stats:calendar.title')}</h1>
-      </header>
+  // The roving tab stop: the focused cell, else today, else the 1st of the month.
+  const defaultIndex = Math.max(
+    0,
+    cells.findIndex((cell) => cell.day === todayKey) >= 0
+      ? cells.findIndex((cell) => cell.day === todayKey)
+      : cells.findIndex((cell) => cell.inMonth),
+  );
+  const tabIndex = focusIndex ?? defaultIndex;
 
-      <Card>
-        <div className="mb-4 flex items-center justify-between">
+  const moveFocus = (index: number) => {
+    const next = Math.min(cells.length - 1, Math.max(0, index));
+    setFocusIndex(next);
+    cellRefs.current[next]?.focus();
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>, index: number) => {
+    const steps: Record<string, number> = {
+      ArrowRight: 1,
+      ArrowLeft: -1,
+      ArrowDown: 7,
+      ArrowUp: -7,
+    };
+    if (event.key in steps) {
+      event.preventDefault();
+      moveFocus(index + (steps[event.key] ?? 0));
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      moveFocus(index - (index % 7));
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      moveFocus(index - (index % 7) + 6);
+    }
+  };
+
+  const changeMonth = (delta: number) => {
+    setFocusIndex(null);
+    setMonthOffset((current) => Math.min(0, current + delta));
+  };
+
+  const weeks = Array.from({ length: Math.ceil(cells.length / 7) }, (_, week) =>
+    cells.slice(week * 7, week * 7 + 7),
+  );
+
+  return (
+    <>
+      <PageHeader
+        eyebrow={t('common:pages.calendar.eyebrow')}
+        title={t('stats:calendar.title')}
+        intro={t('stats:calendar.intro')}
+      />
+
+      <Card className="calendar-panel">
+        <div className="calendar-head">
           <IconButton
             label={t('stats:calendar.previousMonth')}
-            icon={<ChevronLeft size={16} />}
-            onClick={() => setMonthOffset((current) => current - 1)}
+            icon="chevronLeft"
+            variant="ghost"
+            size="sm"
+            onClick={() => changeMonth(-1)}
           />
-          <h2 className="text-sm font-semibold capitalize">{monthLabel}</h2>
+          <h2 className="calendar-month">{monthLabel}</h2>
           <IconButton
             label={t('stats:calendar.nextMonth')}
-            icon={<ChevronRight size={16} />}
+            icon="chevronRight"
+            variant="ghost"
+            size="sm"
             disabled={monthOffset >= 0}
-            onClick={() => setMonthOffset((current) => Math.min(0, current + 1))}
+            onClick={() => changeMonth(1)}
           />
         </div>
 
-        <div role="grid" aria-label={monthLabel}>
-          <div role="row" className="mb-1 grid grid-cols-7 gap-1.5">
+        <div role="grid" aria-label={monthLabel} className="calendar-grid">
+          <div role="row" className="calendar-row">
             {(Array.isArray(weekdays) ? weekdays : []).map((day) => (
-              <div
-                key={day}
-                role="columnheader"
-                className="py-1 text-center text-[11px] font-medium uppercase tracking-wide text-text-secondary"
-              >
+              <div key={day} role="columnheader" className="calendar-weekday">
                 {day}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1.5">
-            {cells.map((cell, index) => (
-              <div
-                key={cell.day}
-                role="gridcell"
-                tabIndex={0}
-                aria-label={t('stats:calendar.cellAria', {
+          {weeks.map((week, weekIndex) => (
+            <div key={week[0]?.day ?? weekIndex} role="row" className="calendar-row">
+              {week.map((cell, dayIndex) => {
+                const index = weekIndex * 7 + dayIndex;
+                const isToday = cell.day === todayKey;
+                const label = t('stats:calendar.cellAria', {
                   date: dayFormatter.format(new Date(cell.date)),
                   count: cell.pomodoros,
-                })}
-                title={`${dayFormatter.format(new Date(cell.date))} — ${cell.pomodoros} · ${formatFocusTime(cell.focusSeconds)}`}
-                style={revealDelay(index, 10)}
-                className={cn(
-                  'nebula-reveal',
-                  'grid aspect-square place-items-center rounded text-xs font-medium tabular-nums',
-                  'transition-transform duration-fast ease-nebula hover:scale-105',
-                  LEVELS[cell.level],
-                  cell.level >= 3 ? 'text-white' : 'text-text-secondary',
-                  !cell.inMonth && 'opacity-35',
-                )}
-              >
-                {new Date(cell.date).getDate()}
-              </div>
-            ))}
-          </div>
+                });
+                return (
+                  <div
+                    key={cell.day}
+                    ref={(element) => {
+                      cellRefs.current[index] = element;
+                    }}
+                    role="gridcell"
+                    tabIndex={index === tabIndex ? 0 : -1}
+                    aria-label={isToday ? `${label} · ${t('stats:calendar.today')}` : label}
+                    aria-current={isToday ? 'date' : undefined}
+                    title={`${dayFormatter.format(new Date(cell.date))} — ${cell.pomodoros} · ${formatFocusTime(cell.focusSeconds)}`}
+                    onKeyDown={(event) => onKeyDown(event, index)}
+                    onFocus={() => setFocusIndex(index)}
+                    className={cn(
+                      'calendar-cell',
+                      `level-${cell.level}`,
+                      !cell.inMonth && 'is-outside',
+                      isToday && 'is-today',
+                    )}
+                  >
+                    {new Date(cell.date).getDate()}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
 
-        <div className="mt-4 flex items-center justify-end gap-2 text-xs text-text-secondary">
+        <div className="calendar-legend" aria-hidden="true">
           <span>{t('stats:calendar.legendLess')}</span>
-          {LEVELS.map((level, index) => (
-            <span key={index} aria-hidden="true" className={cn('h-3 w-3 rounded-sm', level)} />
+          {LEVELS.map((level) => (
+            <i key={level} className={`calendar-cell level-${level}`} />
           ))}
           <span>{t('stats:calendar.legendMore')}</span>
         </div>
       </Card>
-    </div>
+    </>
   );
 }

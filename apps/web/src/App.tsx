@@ -1,16 +1,18 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
-import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { BackgroundFx, useInterfaceEffects } from '@nebula-clock/ui';
 import { AppShell } from './components/AppShell.js';
 import { BreakReminder } from './components/BreakReminder.js';
 import { FullscreenTimer } from './components/FullscreenTimer.js';
 import { SplashScreen } from './components/SplashScreen.js';
+import { useAmbientSync } from './hooks/useAmbientSync.js';
+import { useAppearance } from './hooks/useAppearance.js';
 import { useDesktopSync } from './hooks/useDesktopSync.js';
 import { useNebulaHubSync } from './hooks/useNebulaHub.js';
+import { useShellLabels } from './hooks/useShellLabels.js';
 import { getDesktop } from './lib/platform.js';
 import { useDocumentTitle } from './hooks/useDocumentTitle.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
-import { useTheme } from './hooks/useTheme.js';
 import { useTicker } from './hooks/useTicker.js';
 import { changeLanguage } from './lib/i18n.js';
 import { CalendarView } from './views/CalendarView.js';
@@ -28,8 +30,8 @@ const SettingsView = lazy(() =>
   import('./views/SettingsView.js').then((m) => ({ default: m.SettingsView })),
 );
 
-/** Short enough that moving between screens never feels like waiting. */
-const ROUTE_TRANSITION = { duration: 0.18, ease: [0.4, 0, 0.2, 1] as const };
+/** Glass themes light up every Nebula surface under the pointer. */
+const GLASS_SURFACES = '.nebula-surface';
 
 export function App() {
   const [route, navigate] = useHashRoute();
@@ -37,23 +39,24 @@ export function App() {
 
   const language = useSettingsStore((state) => state.settings.language);
   const fullscreenOnFocus = useSettingsStore((state) => state.settings.fullscreenOnFocus);
-  const reduceMotion = useSettingsStore((state) => state.settings.appearance.reduceMotion);
   const phase = useTimerStore((state) => state.machine.phase);
   const status = useTimerStore((state) => state.machine.status);
+  const { appearance, resolved } = useAppearance();
 
-  // Someone who has asked for less motion should not be shown a launch
-  // animation at all, so the splash starts out already dismissed for them.
-  // A window recreated for (or after) the Nebula Hub mode is not a launch: no splash either.
+  // Animations off means no launch sequence at all; a window recreated for (or after) the
+  // Nebula Hub mode is not a launch either.
   const [splashDone, setSplashDone] = useState(
-    () => reduceMotion || Boolean(getDesktop()?.hubMode),
+    () => appearance.motion === 'off' || Boolean(getDesktop()?.hubMode),
   );
   const dismissSplash = useCallback(() => setSplashDone(true), []);
 
-  useTheme();
+  useInterfaceEffects(appearance.motion, resolved, GLASS_SURFACES);
   useTicker();
   useDocumentTitle();
   useDesktopSync();
   useNebulaHubSync();
+  useAmbientSync();
+  useShellLabels();
 
   const enterFullscreen = useCallback(() => setFullscreen(true), []);
   const exitFullscreen = useCallback(() => setFullscreen(false), []);
@@ -73,40 +76,42 @@ export function App() {
     else if (phase !== 'focus') setFullscreen(false);
   }, [fullscreenOnFocus, phase, status]);
 
+  // After a navigation (not on launch), focus moves to the new screen's title so screen
+  // readers announce where they landed.
+  const firstRoute = useRef(true);
+  useEffect(() => {
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
+    const frame = window.requestAnimationFrame(() =>
+      document.querySelector<HTMLElement>('#main h1')?.focus({ preventScroll: true }),
+    );
+    return () => window.cancelAnimationFrame(frame);
+  }, [route]);
+
   return (
-    // `user` follows the operating system; `always` lets the in-app
-    // accessibility switch override it. Framer then reduces every animation
-    // it drives, matching what tokens.css does to the CSS ones.
-    <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
+    <>
+      <BackgroundFx effect={appearance.background} motion={appearance.motion} />
+
       <AppShell route={route} onNavigate={navigate}>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={route}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={ROUTE_TRANSITION}
-          >
-            <Suspense fallback={<div className="p-8 text-sm text-text-secondary">…</div>}>
-              {route === 'timer' ? <TimerView onEnterFullscreen={enterFullscreen} /> : null}
-              {route === 'tasks' ? <TasksView /> : null}
-              {route === 'stats' ? <StatsView /> : null}
-              {route === 'calendar' ? <CalendarView /> : null}
-              {route === 'settings' ? <SettingsView /> : null}
-            </Suspense>
-          </motion.div>
-        </AnimatePresence>
+        {/* Keyed on the route, so each screen replays its entrance. */}
+        <div key={route} className="page-in">
+          <Suspense fallback={<span className="skeleton skeleton-line" />}>
+            {route === 'timer' ? <TimerView onEnterFullscreen={enterFullscreen} /> : null}
+            {route === 'tasks' ? <TasksView /> : null}
+            {route === 'stats' ? <StatsView /> : null}
+            {route === 'calendar' ? <CalendarView /> : null}
+            {route === 'settings' ? <SettingsView /> : null}
+          </Suspense>
+        </div>
       </AppShell>
 
       <BreakReminder />
 
-      <AnimatePresence>
-        {fullscreen ? <FullscreenTimer onExit={exitFullscreen} /> : null}
-      </AnimatePresence>
+      {fullscreen ? <FullscreenTimer onExit={exitFullscreen} /> : null}
 
-      <AnimatePresence>
-        {splashDone ? null : <SplashScreen onDone={dismissSplash} />}
-      </AnimatePresence>
-    </MotionConfig>
+      {splashDone ? null : <SplashScreen motion={appearance.motion} onDone={dismissSplash} />}
+    </>
   );
 }

@@ -1,14 +1,13 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Maximize2, PictureInPicture2 } from 'lucide-react';
-import { Button, Card, LiveRegion } from '@nebula-clock/ui';
+import { Button, Card, LiveRegion, PageHeader } from '@nebula-clock/ui';
 import {
+  KEYBOARD_SHORTCUTS,
   formatFocusTime,
   getRange,
   filterByRange,
-  isPomodoro,
   summarize,
 } from '@nebula-clock/core';
-import { revealDelay } from '../lib/reveal.js';
 import { ActiveTaskPicker } from '../components/ActiveTaskPicker.js';
 import { AmbientMixer } from '../components/AmbientMixer.js';
 import { PresetPicker } from '../components/PresetPicker.js';
@@ -23,7 +22,21 @@ export interface TimerViewProps {
   onEnterFullscreen: () => void;
 }
 
+/** The ring follows the window: 220 px on a phone, up to 480 px on a large screen. */
+function ringSize(): number {
+  return Math.round(
+    Math.min(480, Math.max(220, Math.min(window.innerHeight * 0.42, window.innerWidth - 96))),
+  );
+}
+
 export function TimerView({ onEnterFullscreen }: TimerViewProps) {
+  const [size, setSize] = useState(ringSize);
+  useEffect(() => {
+    const onResize = () => setSize(ringSize());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   const { t } = useTranslation(['timer', 'stats', 'common']);
   const view = useTimerView();
   const announcement = useTimerStore((state) => state.announcement);
@@ -34,108 +47,94 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
   const todaySummary = summarize(today);
   const desktop = getDesktop();
 
+  const shortcuts: [string, string][] = [
+    [t('timer:shortcuts.keySpace'), t('timer:shortcuts.toggle')],
+    [KEYBOARD_SHORTCUTS.skip.toUpperCase(), t('timer:shortcuts.skip')],
+    [KEYBOARD_SHORTCUTS.reset.toUpperCase(), t('timer:shortcuts.reset')],
+    [KEYBOARD_SHORTCUTS.fullscreen.toUpperCase(), t('timer:shortcuts.fullscreen')],
+    [KEYBOARD_SHORTCUTS.settings, t('timer:shortcuts.settings')],
+  ];
+
   return (
-    <div className="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      {/* Every view needs a level-1 heading; here the countdown itself is the
-          title, so the heading is for assistive technology only. */}
-      <h1 className="sr-only">{t('common:nav.timer')}</h1>
+    <>
+      <PageHeader
+        eyebrow={t('common:pages.timer.eyebrow')}
+        title={t('common:nav.timer')}
+        actions={
+          <>
+            <Button variant="ghost" size="sm" icon="expand" onClick={onEnterFullscreen}>
+              {t('timer:fullscreen.enter')}
+            </Button>
+            {desktop && !desktop.isMiniWindow ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="miniWindow"
+                onClick={() => void desktop.openMiniMode()}
+              >
+                {t('timer:miniMode.enter')}
+              </Button>
+            ) : null}
+          </>
+        }
+      />
 
       {/* Phase changes are announced here rather than by moving focus. */}
       <LiveRegion assertive>{announcement}</LiveRegion>
 
-      <section
-        className="nebula-reveal flex flex-col items-center gap-7 rounded-lg border border-border bg-card p-6 shadow-card sm:p-10"
-        style={revealDelay(0)}
-      >
-        <PresetPicker />
+      <div className="timer-layout">
+        <section className="timer-stage panel nebula-surface" aria-label={t('common:nav.timer')}>
+          <PresetPicker />
 
-        <TimerDisplay
-          phase={view.phase}
-          status={view.status}
-          remaining={view.remaining}
-          progress={view.progress}
-          completedInCycle={view.completedInCycle}
-          cycleTarget={view.cycleTarget}
-        />
+          <TimerDisplay
+            phase={view.phase}
+            status={view.status}
+            remaining={view.remaining}
+            progress={view.progress}
+            completedInCycle={view.completedInCycle}
+            cycleTarget={view.cycleTarget}
+            size={size}
+          />
 
-        <TimerControls status={view.status} phase={t(`timer:phase.${view.phase}`)} />
+          <TimerControls status={view.status} phase={t(`timer:phase.${view.phase}`)} />
 
-        <ActiveTaskPicker />
+          <ActiveTaskPicker />
+        </section>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-border pt-5">
-          <Button
-            size="sm"
-            variant="ghost"
-            icon={<Maximize2 size={14} />}
-            onClick={onEnterFullscreen}
+        <div className="timer-side motion-stagger">
+          <Card
+            title={t('stats:range.today')}
+            count={t('stats:goals.progress', {
+              done: todaySummary.pomodoros,
+              target: goals.dailyPomodoros,
+            })}
           >
-            {t('timer:fullscreen.enter')}
-          </Button>
-          {desktop && !desktop.isMiniWindow ? (
-            <Button
-              size="sm"
-              variant="ghost"
-              icon={<PictureInPicture2 size={14} />}
-              onClick={() => void desktop.openMiniMode()}
-            >
-              {t('timer:miniMode.enter')}
-            </Button>
-          ) : null}
-        </div>
-      </section>
-
-      <aside className="space-y-4">
-        {/* Each card arrives just after the one above it. */}
-        <Card title={t('stats:range.today')} className="nebula-reveal" style={revealDelay(1)}>
-          <dl className="grid grid-cols-2 gap-3">
-            <div>
-              <dt className="text-xs uppercase tracking-wide text-text-secondary">
-                {t('stats:metrics.pomodoros')}
-              </dt>
-              <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">
-                {todaySummary.pomodoros}
-                <span className="text-sm text-text-secondary"> / {goals.dailyPomodoros}</span>
-              </dd>
+            <div className="snapshot-row">
+              <span>{t('stats:metrics.pomodoros')}</span>
+              <strong>{todaySummary.pomodoros}</strong>
             </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wide text-text-secondary">
-                {t('stats:metrics.focusTime')}
-              </dt>
-              <dd className="mt-1 font-mono text-xl font-semibold tabular-nums">
-                {formatFocusTime(todaySummary.focusSeconds)}
-              </dd>
+            <div className="snapshot-row">
+              <span>{t('stats:metrics.focusTime')}</span>
+              <strong>{formatFocusTime(todaySummary.focusSeconds)}</strong>
             </div>
-          </dl>
-          <p className="mt-3 text-xs text-text-secondary">
-            {t('timer:cycle.sessionsToday', { count: today.filter(isPomodoro).length })}
-          </p>
-        </Card>
+          </Card>
 
-        <div className="nebula-reveal" style={revealDelay(2)}>
           <AmbientMixer />
-        </div>
 
-        <Card title={t('timer:shortcuts.title')} className="nebula-reveal" style={revealDelay(3)}>
-          <dl className="space-y-1.5 text-sm">
-            {[
-              ['Space', t('timer:shortcuts.toggle')],
-              ['N', t('timer:shortcuts.skip')],
-              ['R', t('timer:shortcuts.reset')],
-              ['F', t('timer:shortcuts.fullscreen')],
-              [',', t('timer:shortcuts.settings')],
-            ].map(([key, label]) => (
-              <div key={key} className="flex items-center justify-between gap-3">
-                <dt className="text-text-secondary">{label}</dt>
-                <dd>
-                  <kbd className="rounded border border-border bg-card-alt px-1.5 py-0.5 font-mono text-xs">
-                    {key}
-                  </kbd>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </Card>
-      </aside>
-    </div>
+          <Card title={t('timer:shortcuts.title')}>
+            <dl className="shortcut-list">
+              {shortcuts.map(([key, label]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>
+                    <kbd className="kbd">{key}</kbd>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </Card>
+        </div>
+      </div>
+    </>
   );
 }

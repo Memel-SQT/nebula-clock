@@ -77,6 +77,9 @@ function announcePhase(phase: Phase): string {
   const body = i18next.t(`notifications:${phase}.body`, { minutes });
 
   if (settings.notifications.sound) {
+    // The saved volume, not the engine's default: until the slider was touched, every chime
+    // played at 70 %.
+    getSoundEngine().setNotificationVolume(settings.notifications.volume);
     getSoundEngine().playNotification(
       settings.notifications.soundId,
       settings.notifications.customSound?.dataUrl ?? null,
@@ -84,11 +87,6 @@ function announcePhase(phase: Phase): string {
   }
   if (settings.notifications.system) {
     void notify({ title, body, tag: 'nebula-clock-phase' });
-  }
-
-  // Ambient sound is a focus aid, so it steps aside during breaks.
-  if (settings.ambient.pauseOnBreak) {
-    getSoundEngine().suspendAmbient(phase !== 'focus');
   }
 
   return `${title}. ${body}`;
@@ -106,14 +104,21 @@ export const useTimerStore = create<TimerStore>()(
         const before = get().machine;
         const { state, effects } = transition(before, event, config());
 
-        const { activeTaskId } = get();
-        const tagIds =
-          useDataStore.getState().tasks.find((task) => task.id === activeTaskId)?.tagIds ?? [];
+        // Only an existing, unfinished task is credited: a deleted or completed one would
+        // otherwise keep collecting pomodoros nobody can see.
+        const activeTask = useDataStore
+          .getState()
+          .tasks.find((task) => task.id === get().activeTaskId && !task.done);
+        const activeTaskId = activeTask?.id ?? null;
+        const tagIds = activeTask?.tagIds ?? [];
 
         for (const effect of effects) {
           const session = toSession(effect, activeTaskId, tagIds);
           if (session && session.durationSeconds > 0) {
-            void useDataStore.getState().recordSession(session);
+            useDataStore
+              .getState()
+              .recordSession(session)
+              .catch((error: unknown) => console.error('[timer] session not saved', error));
           }
         }
 

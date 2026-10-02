@@ -12,8 +12,8 @@ const SIZE = 64;
 
 const PHASE_COLORS: Record<Phase, [string, string]> = {
   focus: [nebulaTokens.brand.blue, nebulaTokens.brand.violet],
-  shortBreak: [nebulaTokens.brand.success, '#2DD4BF'],
-  longBreak: [nebulaTokens.brand.warning, '#F97316'],
+  shortBreak: [nebulaTokens.brand.success, nebulaTokens.brand.teal],
+  longBreak: [nebulaTokens.brand.warning, nebulaTokens.brand.orange],
 };
 
 let link: HTMLLinkElement | null = null;

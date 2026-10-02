@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Pause, Play, SkipForward, X } from 'lucide-react';
 import { IconButton } from '@nebula-clock/ui';
 import { TimerDisplay } from './TimerDisplay.js';
 import { getDesktop, type DesktopTimerSnapshot } from '../lib/platform.js';
@@ -10,14 +9,13 @@ export interface MiniTimerProps {
 }
 
 /**
- * The compact always-on-top window (Electron only).
+ * The compact always-on-top window (Electron only): its minimal layout is kept, with the
+ * family tokens, radii and icons.
  *
- * It runs no timer of its own: it renders whatever the main window publishes
- * and sends button presses back there, so there is exactly one state machine
- * and every session is recorded once.
- *
- * The whole surface is draggable except the buttons, which is what makes a
- * frameless window movable.
+ * It runs no timer of its own: it renders whatever the main window publishes and sends button
+ * presses back there, so there is exactly one state machine and every session is recorded
+ * once. The whole surface is draggable except the buttons, which is what makes a frameless
+ * window movable.
  */
 export function MiniTimer({ snapshot }: MiniTimerProps) {
   const { t } = useTranslation(['timer', 'common']);
@@ -25,7 +23,7 @@ export function MiniTimer({ snapshot }: MiniTimerProps) {
   const running = snapshot?.status === 'running';
 
   return (
-    <div className="app-drag flex h-screen w-screen select-none items-center gap-3 bg-card px-4">
+    <div className="mini-timer app-drag">
       {snapshot ? (
         <TimerDisplay
           phase={snapshot.phase}
@@ -38,28 +36,28 @@ export function MiniTimer({ snapshot }: MiniTimerProps) {
           compact
         />
       ) : (
-        <span className="text-sm text-text-secondary">{t('common:state.loading')}</span>
+        <span className="mini-timer-loading">{t('common:state.loading')}</span>
       )}
 
-      <div className="app-no-drag ml-auto flex items-center gap-1">
+      <div className="mini-timer-actions app-no-drag">
         <IconButton
           label={running ? t('timer:controls.pause') : t('timer:controls.start')}
-          icon={running ? <Pause size={16} /> : <Play size={16} />}
-          variant="accent"
+          icon={running ? 'pause' : 'start'}
+          variant="primary"
           size="sm"
           disabled={!snapshot}
           onClick={() => desktop?.requestCommand('toggle')}
         />
         <IconButton
           label={t('timer:controls.skipAria')}
-          icon={<SkipForward size={16} />}
+          icon="skipNext"
           size="sm"
           disabled={!snapshot}
           onClick={() => desktop?.requestCommand('skip')}
         />
         <IconButton
           label={t('timer:miniMode.exit')}
-          icon={<X size={16} />}
+          icon="close"
           size="sm"
           onClick={() => void desktop?.closeMiniMode()}
         />

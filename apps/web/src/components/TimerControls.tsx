@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
 import { Button, IconButton } from '@nebula-clock/ui';
 import { useTimerStore } from '../store/timerStore.js';
 import { getSoundEngine } from '../lib/sound.js';
@@ -7,10 +6,10 @@ import { getSoundEngine } from '../lib/sound.js';
 export interface TimerControlsProps {
   status: 'idle' | 'running' | 'paused';
   phase: string;
-  size?: 'md' | 'lg';
 }
 
-export function TimerControls({ status, phase, size = 'lg' }: TimerControlsProps) {
+/** Reset, the primary Start / Pause / Resume (the screen's one gradient button), Skip. */
+export function TimerControls({ status, phase }: TimerControlsProps) {
   const { t } = useTranslation(['timer']);
   const toggle = useTimerStore((state) => state.toggle);
   const skip = useTimerStore((state) => state.skip);
@@ -24,20 +23,20 @@ export function TimerControls({ status, phase, size = 'lg' }: TimerControlsProps
       : t('timer:controls.start');
 
   return (
-    <div className="flex items-center justify-center gap-3">
+    <div className="timer-controls">
       <IconButton
         label={t('timer:controls.resetAria')}
-        icon={<RotateCcw size={18} />}
-        variant="solid"
-        size={size === 'lg' ? 'md' : 'sm'}
+        icon="reset"
+        variant="ghost"
+        size="lg"
         onClick={reset}
       />
 
       <Button
         variant="primary"
-        size={size}
-        className="min-w-[9rem]"
-        icon={running ? <Pause size={18} /> : <Play size={18} />}
+        size="lg"
+        className="timer-primary"
+        icon={running ? 'pause' : 'start'}
         aria-label={
           running
             ? t('timer:controls.pauseAria')
@@ -56,9 +55,9 @@ export function TimerControls({ status, phase, size = 'lg' }: TimerControlsProps
 
       <IconButton
         label={t('timer:controls.skipAria')}
-        icon={<SkipForward size={18} />}
-        variant="solid"
-        size={size === 'lg' ? 'md' : 'sm'}
+        icon="skipNext"
+        variant="ghost"
+        size="lg"
         onClick={skip}
       />
     </div>

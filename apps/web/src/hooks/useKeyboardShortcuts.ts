@@ -15,6 +15,19 @@ function isEditing(target: EventTarget | null): boolean {
 }
 
 /**
+ * Space and Enter belong to a focused control: taking Space for the timer used to swallow the
+ * keyboard activation of every button, switch and radio in the app.
+ */
+function isActivatable(target: EventTarget | null): boolean {
+  return (
+    target instanceof HTMLElement &&
+    target.closest(
+      'button, a[href], [role="button"], [role="switch"], [role="radio"], [role="gridcell"], [role="tab"], [role="option"]',
+    ) !== null
+  );
+}
+
+/**
  * In-window shortcuts. The desktop app additionally registers OS-level
  * accelerators, which work when the window is not focused at all.
  *
@@ -31,11 +44,14 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers): void {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isEditing(event.target)) return;
-      // Leave browser and OS chords alone.
-      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      // Leave browser and OS chords alone, and a held key toggling the timer on and off.
+      if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+      // A dialog (or the immersive mode, which keeps its own keys) owns the keyboard.
+      if (document.querySelector('[aria-modal="true"]:not(.fullscreen-timer)')) return;
 
       const timer = useTimerStore.getState();
       const key = event.key === ' ' ? 'Space' : event.key;
+      if (key === 'Space' && isActivatable(event.target)) return;
 
       switch (key.toLowerCase()) {
         case KEYBOARD_SHORTCUTS.toggle.toLowerCase():

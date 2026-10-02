@@ -18,7 +18,7 @@ export function useDocumentTitle(): void {
     document.title =
       view.status === 'idle' && view.progress === 0
         ? appName
-        : `${view.display} · ${phase}${view.status === 'paused' ? ' ⏸' : ''}`;
+        : `${view.display} · ${phase}${view.status === 'paused' ? ` (${t('timer:paused')})` : ''}`;
 
     updateFavicon(view.phase, view.progress, view.status !== 'running');
   }, [t, view.display, view.phase, view.progress, view.status]);

@@ -1,29 +1,10 @@
 /* The Nebula design tokens must be imported first: a CSS @import is only
    valid at the top of a stylesheet, and anywhere else it is dropped, which
-   leaves every var() undefined and the app unstyled. */
+   leaves every var() undefined and the app unstyled. The component styles
+   (`@nebula-clock/ui/styles.css`) are imported from main.tsx, after this
+   file, so they come after Tailwind's preflight. */
 @import '@nebula-clock/ui/tokens.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  /* Native controls follow the theme (scrollbars, form widgets). */
-  :root[data-theme='dark'] {
-    color-scheme: dark;
-  }
-  :root[data-theme='light'] {
-    color-scheme: light;
-  }
-}
-
-@layer components {
-  /* The app chrome is draggable in the Electron frameless window; anything
-     interactive inside it has to opt back out. */
-  .app-drag {
-    -webkit-app-region: drag;
-  }
-  .app-no-drag {
-    -webkit-app-region: no-drag;
-  }
-}

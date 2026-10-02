@@ -41,23 +41,25 @@ export function StatsCharts({ buckets, range }: StatsChartsProps) {
   }));
 
   if (data.every((point) => point.minutes === 0)) {
-    return <EmptyState title={t('stats:chart.noData')} />;
+    return <EmptyState icon="chart" title={t('stats:chart.noData')} />;
   }
 
-  // Recharts needs concrete colours, so the tokens are read off the document.
-  const styles = getComputedStyle(document.documentElement);
-  const accentFrom = styles.getPropertyValue('--accent-from').trim() || '#4C6EF5';
-  const accentTo = styles.getPropertyValue('--accent-to').trim() || '#8B5CF6';
-  const border = styles.getPropertyValue('--border').trim() || '#2A2A45';
-  const textSecondary = styles.getPropertyValue('--text-secondary').trim() || '#9A94B8';
-  const card = styles.getPropertyValue('--card').trim() || '#1A1A2E';
-  const text = styles.getPropertyValue('--text').trim() || '#F1F1F6';
+  // CSS variables straight into the SVG attributes: the charts follow a theme or accent change
+  // without re-rendering (computed values read once used to keep the previous theme's colours).
+  const accentFrom = 'var(--gold)';
+  const accentTo = 'var(--accent)';
+  const border = 'var(--line)';
+  const textSecondary = 'var(--muted)';
+  // The page colour: opaque in the glass themes too, so the tooltip stays readable.
+  const card = 'var(--page)';
+  const text = 'var(--ink)';
 
   const axis = { stroke: textSecondary, fontSize: 11, tickLine: false, axisLine: false };
   const tooltipStyle = {
     backgroundColor: card,
     border: `1px solid ${border}`,
-    borderRadius: 12,
+    borderRadius: 10,
+    boxShadow: 'var(--shadow)',
     color: text,
     fontSize: 12,
   };
@@ -65,9 +67,7 @@ export function StatsCharts({ buckets, range }: StatsChartsProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="mb-2 text-sm font-medium text-text-secondary">
-          {t('stats:chart.focusByPeriod')}
-        </h3>
+        <h3 className="chart-title">{t('stats:chart.focusByPeriod')}</h3>
         <ResponsiveContainer width="100%" height={220}>
           <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
             <defs>
@@ -99,9 +99,7 @@ export function StatsCharts({ buckets, range }: StatsChartsProps) {
       </div>
 
       <div>
-        <h3 className="mb-2 text-sm font-medium text-text-secondary">
-          {t('stats:chart.pomodorosByPeriod')}
-        </h3>
+        <h3 className="chart-title">{t('stats:chart.pomodorosByPeriod')}</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
             <CartesianGrid stroke={border} strokeDasharray="3 3" vertical={false} />

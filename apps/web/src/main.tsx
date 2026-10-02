@@ -12,6 +12,7 @@ import { getDesktop, isMiniWindow } from './lib/platform.js';
 import { useDataStore } from './store/dataStore.js';
 import { useSettingsStore } from './store/settingsStore.js';
 import './styles/index.css';
+import '@nebula-clock/ui/styles.css';
 
 /**
  * Boot order matters: translations and the notification adapter must be in

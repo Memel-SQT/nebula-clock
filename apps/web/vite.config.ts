@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite';
+import { createHash } from 'node:crypto';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -17,6 +18,47 @@ const base = process.env.VITE_BASE ?? (isElectron ? './' : '/');
 // the workspace package.json, which semantic-release rewrites on each release.
 const appVersion = process.env.npm_package_version ?? '0.0.0-development';
 
+/**
+ * Content Security Policy for the Electron renderer (loaded over file://, so there are no
+ * response headers to carry it): a meta tag, with the inline theme script allowed by its hash
+ * rather than by 'unsafe-inline'. Styles keep 'unsafe-inline' for React's style attributes.
+ * The PWA is served by GitHub Pages, which this does not change.
+ */
+function electronCsp(): Plugin {
+  return {
+    name: 'nebula-clock-electron-csp',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html) {
+        const hashes = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(
+          (match) =>
+            `'sha256-${createHash('sha256')
+              .update(match[1] ?? '')
+              .digest('base64')}'`,
+        );
+        const policy = [
+          "default-src 'self'",
+          `script-src 'self' ${hashes.join(' ')}`,
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data: blob:",
+          "media-src 'self' data: blob:",
+          "font-src 'self'",
+          "connect-src 'self' data:",
+          "object-src 'none'",
+          "base-uri 'none'",
+          "form-action 'none'",
+        ].join('; ');
+        return html.replace(
+          '<meta charset="UTF-8" />',
+          `<meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="${policy}" />`,
+        );
+      },
+    },
+  };
+}
+
 export default defineConfig({
   base,
   define: {
@@ -25,7 +67,7 @@ export default defineConfig({
   plugins: [
     react(),
     ...(isElectron
-      ? []
+      ? [electronCsp()]
       : [
           VitePWA({
             registerType: 'autoUpdate',
@@ -40,9 +82,9 @@ export default defineConfig({
               scope: base,
               display: 'standalone',
               orientation: 'portrait-primary',
-              // Matches --bg-base / --card so the splash screen is on-brand.
-              background_color: '#0A0A0F',
-              theme_color: '#0A0A0F',
+              // Matches the nebula-dark --page so the splash screen is on-brand.
+              background_color: '#0a0a0f',
+              theme_color: '#0a0a0f',
               categories: ['productivity', 'utilities'],
               icons: [
                 { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },

@@ -19,7 +19,10 @@ const recorded: Session[] = [];
 vi.mock('./dataStore.js', () => ({
   useDataStore: {
     getState: () => ({
-      tasks: [{ id: 'task-1', tagIds: ['tag-1'] }],
+      tasks: [
+        { id: 'task-1', tagIds: ['tag-1'], done: false },
+        { id: 'task-done', tagIds: [], done: true },
+      ],
       recordSession: (session: Session) => {
         recorded.push(session);
         return Promise.resolve();
@@ -102,6 +105,16 @@ describe('timer store', () => {
       tagIds: ['tag-1'],
     });
     expect(useTimerStore.getState().machine.phase).toBe('shortBreak');
+  });
+
+  it.each(['task-done', 'task-gone'])('does not credit a finished or deleted task (%s)', (id) => {
+    vi.useFakeTimers({ now: T0 });
+    useTimerStore.getState().setActiveTask(id);
+    useTimerStore.getState().start();
+    vi.setSystemTime(T0 + 25 * 60_000);
+    useTimerStore.getState().tick();
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0]?.taskId).toBeNull();
   });
 
   it('does not attach a task to a break session', () => {
