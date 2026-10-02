@@ -1,3 +1,10 @@
+## 1.2.0 (2026-10-02)
+
+* fix(desktop): name the Linux executable explicitly ([c745644](https://github.com/Memel-SQT/nebula-clock/commit/c745644))
+* feat(core): add the pure rules of the Nebula Hub integration ([68d58d9](https://github.com/Memel-SQT/nebula-clock/commit/68d58d9))
+* feat(desktop): integrate with Nebula Hub through Nebula Link ([4ce0950](https://github.com/Memel-SQT/nebula-clock/commit/4ce0950))
+* build(deps): update electron to 44 and electron-builder to 26, add @nebula/link ([28433bf](https://github.com/Memel-SQT/nebula-clock/commit/28433bf))
+
 ## <small>1.1.3 (2026-09-03)</small>
 
 * fix(desktop): silence the font preload and web-installer warnings ([b838c33](https://github.com/Memel-SQT/nebula-clock/commit/b838c33))
