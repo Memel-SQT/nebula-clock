@@ -5,12 +5,56 @@
  */
 import { BrowserWindow, shell } from 'electron';
 import { join } from 'node:path';
+import type { WindowChrome } from './ipc.js';
+import { isSafeExternalUrl } from './validate.js';
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 const isDev = Boolean(DEV_SERVER_URL);
 
-/** Nebula `--bg-base`, so the window never flashes white before first paint. */
-const BACKGROUND = '#0A0A0F';
+/**
+ * The active theme's page and ink colours (nebula-dark until the renderer says otherwise): the
+ * window background, so it never flashes white, and the native window controls drawn by
+ * Windows over the frameless window.
+ */
+let chrome: WindowChrome = { page: '#0a0a0f', ink: '#f1f1f6' };
+
+/** Height of the drag strip (`.titlebar-drag` in shell.css) and of the window controls. */
+const TITLE_BAR_HEIGHT = 36;
+
+function titleBarOverlay(): Electron.TitleBarOverlayOptions {
+  // Transparent: the app's own background (and its animated glow) shows behind the controls.
+  return { color: 'rgba(0, 0, 0, 0)', symbolColor: chrome.ink, height: TITLE_BAR_HEIGHT };
+}
+
+/** Keeps the window controls and background in the current theme. */
+export function applyWindowTheme(next: WindowChrome): void {
+  chrome = next;
+  for (const window of allWindows()) {
+    window.setBackgroundColor(chrome.page);
+  }
+  const main = mainWindow;
+  if (main && !main.isDestroyed() && !dock.docked && process.platform === 'win32') {
+    main.setTitleBarOverlay(titleBarOverlay());
+  }
+}
+
+/**
+ * Every window shows the app and nothing else: no navigation away from it, no new windows
+ * (an https link opens in the browser, anything else is dropped), no webviews.
+ */
+function harden(window: BrowserWindow): void {
+  const contents = window.webContents;
+  contents.setWindowOpenHandler(({ url }) => {
+    if (isSafeExternalUrl(url)) void shell.openExternal(url);
+    return { action: 'deny' };
+  });
+  contents.on('will-navigate', (event, url) => {
+    const current = contents.getURL();
+    // Hash changes are the app's own routing; anything else leaves the app.
+    if (url.split('#')[0] !== current.split('#')[0]) event.preventDefault();
+  });
+  contents.on('will-attach-webview', (event) => event.preventDefault());
+}
 
 let mainWindow: BrowserWindow | null = null;
 let miniWindow: BrowserWindow | null = null;
@@ -95,8 +139,13 @@ export async function createMainWindow(
           maximizable: false,
           fullscreenable: false,
         }
-      : {}),
-    backgroundColor: BACKGROUND,
+      : {
+          // No native title bar: the window is drawn in the app's theme, Windows only draws
+          // the three controls on top (Nebula Hub does the same).
+          titleBarStyle: 'hidden' as const,
+          titleBarOverlay: titleBarOverlay(),
+        }),
+    backgroundColor: chrome.page,
     // Painted only once the renderer is ready, avoiding a white flash.
     show: false,
     autoHideMenuBar: true,
@@ -131,11 +180,7 @@ export async function createMainWindow(
     if (mainWindow === created) mainWindow = null;
   });
 
-  // External links belong in the user's browser, never in an app window.
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    void shell.openExternal(url);
-    return { action: 'deny' };
-  });
+  harden(created);
 
   await load(created, false);
   return created;
@@ -235,15 +280,18 @@ export async function openMiniWindow(alwaysOnTop: boolean): Promise<BrowserWindo
     // Frameless: the renderer marks its own drag region with `-webkit-app-region`.
     frame: false,
     alwaysOnTop,
-    backgroundColor: BACKGROUND,
+    backgroundColor: chrome.page,
     show: false,
     webPreferences: {
       preload: preloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      // Like the main window: the preload only needs contextBridge and ipcRenderer.
+      sandbox: true,
+      spellcheck: false,
     },
   });
+  harden(miniWindow);
 
   // Float above full-screen apps too, which the plain flag does not cover.
   if (alwaysOnTop) miniWindow.setAlwaysOnTop(true, 'floating');

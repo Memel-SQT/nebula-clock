@@ -13,7 +13,9 @@ import type {
   DesktopCommand,
   DesktopTimerSnapshot,
   NotificationPayload,
+  ShellLabels,
   UpdateEvent,
+  WindowChrome,
 } from './ipc.js';
 
 /** The mini window is told which it is by its query string. */
@@ -113,6 +115,13 @@ const bridge = {
   openHub: (): Promise<'opened' | 'not-installed'> =>
     ipcRenderer.invoke(CHANNELS.openHub) as Promise<'opened' | 'not-installed'>,
   detachFromHub: (): Promise<void> => ipcRenderer.invoke(CHANNELS.detachFromHub) as Promise<void>,
+
+  // Window chrome and translated shell texts (validated in the main process).
+  setWindowTheme: (chrome: WindowChrome): Promise<void> =>
+    ipcRenderer.invoke(CHANNELS.setWindowTheme, chrome) as Promise<void>,
+  setShellLabels: (labels: ShellLabels): void => {
+    ipcRenderer.send(CHANNELS.setShellLabels, labels);
+  },
 };
 
 contextBridge.exposeInMainWorld('nebula', bridge);

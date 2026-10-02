@@ -4,13 +4,14 @@
  */
 import { Menu, Tray, app, nativeImage } from 'electron';
 import { join } from 'node:path';
-import type { DesktopCommand, DesktopTimerSnapshot } from './ipc.js';
+import type { DesktopCommand, DesktopTimerSnapshot, ShellLabels } from './ipc.js';
 
 let tray: Tray | null = null;
 let snapshot: DesktopTimerSnapshot | null = null;
 let sendCommand: (command: DesktopCommand) => void = () => undefined;
 let onShow: () => void = () => undefined;
 let onQuit: () => void = () => undefined;
+let lastMenuKey = '';
 
 /** Bundled next to the compiled main process by electron-builder. */
 function trayIcon(): Electron.NativeImage {
@@ -21,11 +22,39 @@ function trayIcon(): Electron.NativeImage {
   return resized;
 }
 
-const PHASE_LABELS: Record<DesktopTimerSnapshot['phase'], string> = {
-  focus: 'Focus',
-  shortBreak: 'Break',
-  longBreak: 'Long break',
+/**
+ * English until the renderer sends its translated texts (`setShellLabels`), which it does as
+ * soon as it starts and again on every language change.
+ */
+let labels: ShellLabels = {
+  phase: { focus: 'Focus', shortBreak: 'Break', longBreak: 'Long break' },
+  start: 'Start',
+  pause: 'Pause',
+  resume: 'Resume',
+  skip: 'Skip phase',
+  reset: 'Reset phase',
+  miniMode: 'Mini mode',
+  open: 'Open Nebula Clock',
+  quit: 'Quit',
+  todayOne: '{{count}} pomodoro today',
+  todayOther: '{{count}} pomodoros today',
+  blockedTitle: 'Blocked during focus',
+  blockedBody: '{{name}} is on your block list.',
 };
+
+export function setTrayLabels(next: ShellLabels): void {
+  labels = next;
+  lastMenuKey = '';
+  if (snapshot) updateTray(snapshot);
+  else if (tray && !tray.isDestroyed()) tray.setContextMenu(buildMenu());
+}
+
+export function shellLabels(): ShellLabels {
+  return labels;
+}
+
+export const fill = (template: string, values: Record<string, string | number>): string =>
+  template.replace(/\{\{(\w+)\}\}/g, (match, key: string) => String(values[key] ?? match));
 
 function buildMenu(): Electron.Menu {
   const running = snapshot?.status === 'running';
@@ -33,26 +62,30 @@ function buildMenu(): Electron.Menu {
 
   return Menu.buildFromTemplate([
     {
-      label: snapshot ? `${PHASE_LABELS[snapshot.phase]} — ${snapshot.display}` : 'Nebula Clock',
+      label: snapshot ? `${labels.phase[snapshot.phase]} — ${snapshot.display}` : 'Nebula Clock',
       enabled: false,
     },
     {
-      label: snapshot ? `${snapshot.completedToday} pomodoros today` : '',
+      label: snapshot
+        ? fill(snapshot.completedToday === 1 ? labels.todayOne : labels.todayOther, {
+            count: snapshot.completedToday,
+          })
+        : '',
       enabled: false,
       visible: Boolean(snapshot),
     },
     { type: 'separator' },
     {
-      label: running ? 'Pause' : idle ? 'Start' : 'Resume',
+      label: running ? labels.pause : idle ? labels.start : labels.resume,
       click: () => sendCommand('toggle'),
     },
-    { label: 'Skip phase', click: () => sendCommand('skip') },
-    { label: 'Reset phase', click: () => sendCommand('reset') },
+    { label: labels.skip, click: () => sendCommand('skip') },
+    { label: labels.reset, click: () => sendCommand('reset') },
     { type: 'separator' },
-    { label: 'Mini mode', click: () => sendCommand('mini-mode') },
-    { label: 'Open Nebula Clock', click: () => onShow() },
+    { label: labels.miniMode, click: () => sendCommand('mini-mode') },
+    { label: labels.open, click: () => onShow() },
     { type: 'separator' },
-    { label: 'Quit', click: () => onQuit() },
+    { label: labels.quit, click: () => onQuit() },
   ]);
 }
 
@@ -81,8 +114,6 @@ function menuKey(s: DesktopTimerSnapshot): string {
   return `${s.phase}|${s.status}|${s.display}|${s.completedToday}`;
 }
 
-let lastMenuKey = '';
-
 /**
  * Refresh the tooltip, the macOS title and, when it would actually differ,
  * the context menu.
@@ -95,7 +126,7 @@ export function updateTray(next: DesktopTimerSnapshot): void {
   snapshot = next;
   if (!tray || tray.isDestroyed()) return;
 
-  const label = `${PHASE_LABELS[next.phase]} — ${next.display}`;
+  const label = `${labels.phase[next.phase]} — ${next.display}`;
   tray.setToolTip(`Nebula Clock · ${label}`);
   // A running countdown in the menu bar is useful; a static one is clutter.
   if (process.platform === 'darwin') {

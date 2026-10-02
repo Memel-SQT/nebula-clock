@@ -12,15 +12,32 @@ import type { FocusTodayPublication } from '@nebula-clock/core';
 import { NebulaIntegration } from './nebula.js';
 import { CHANNELS } from './ipc.js';
 import type {
-  BlockerConfig,
   DesktopCommand,
   DesktopTimerSnapshot,
   NotificationPayload,
   UpdateEvent,
 } from './ipc.js';
-import { applyBlocker, teardownBlocker } from './blocker.js';
+import { applyBlocker, cleanupStaleBlock, teardownBlocker } from './blocker.js';
 import { applyGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts.js';
-import { createTray, destroyTray, updateBadge, updateTray } from './tray.js';
+import {
+  createTray,
+  destroyTray,
+  fill,
+  setTrayLabels,
+  shellLabels,
+  updateBadge,
+  updateTray,
+} from './tray.js';
+import {
+  asBlockerConfig,
+  asCommand,
+  asNotification,
+  asShellLabels,
+  asSnapshot,
+  asWindowChrome,
+  isBoolean,
+  isSafeExternalUrl,
+} from './validate.js';
 import {
   checkForUpdates,
   disposeUpdater,
@@ -31,6 +48,7 @@ import {
 import {
   allWindows,
   applyDock,
+  applyWindowTheme,
   closeMiniWindow,
   createMainWindow,
   focusMainWindow,
@@ -130,9 +148,22 @@ function showNotification(payload: NotificationPayload): void {
 }
 
 function registerIpc(): void {
-  ipcMain.handle(CHANNELS.notify, (_event, payload: NotificationPayload) => {
+  // Every payload from the renderer is validated before use (validate.ts).
+  ipcMain.handle(CHANNELS.notify, (_event, value: unknown) => {
+    const payload = asNotification(value);
+    if (!payload) return;
     showNotification(payload);
-    nebula.notify(String(payload?.title ?? ''), String(payload?.body ?? ''));
+    nebula.notify(payload.title, payload.body);
+  });
+
+  ipcMain.handle(CHANNELS.setWindowTheme, (_event, value: unknown) => {
+    const chrome = asWindowChrome(value);
+    if (chrome) applyWindowTheme(chrome);
+  });
+
+  ipcMain.on(CHANNELS.setShellLabels, (_event, value: unknown) => {
+    const labels = asShellLabels(value);
+    if (labels) setTrayLabels(labels);
   });
 
   ipcMain.on(CHANNELS.appInfo, (event) => {
@@ -153,7 +184,8 @@ function registerIpc(): void {
       await shell.openExternal('nebula://hub/');
       return 'opened';
     }
-    await shell.openExternal('https://github.com/Memel-SQT/Nebula-Hub/releases');
+    const page = 'https://github.com/Memel-SQT/Nebula-Hub/releases';
+    if (isSafeExternalUrl(page)) await shell.openExternal(page);
     return 'not-installed';
   });
   ipcMain.handle(CHANNELS.detachFromHub, async () => {
@@ -165,9 +197,11 @@ function registerIpc(): void {
   });
 
   // The main window is the source of truth; the mini window mirrors it.
-  ipcMain.on(CHANNELS.publishTimer, (event, snapshot: DesktopTimerSnapshot) => {
+  ipcMain.on(CHANNELS.publishTimer, (event, value: unknown) => {
     const sender = BrowserWindow.fromWebContents(event.sender);
     if (sender && sender === getMiniWindow()) return;
+    const snapshot = asSnapshot(value);
+    if (!snapshot) return;
 
     lastSnapshot = snapshot;
     nebula.publishPhase({
@@ -181,8 +215,9 @@ function registerIpc(): void {
   });
 
   // A button in the mini window: forward it to the window that owns the timer.
-  ipcMain.on(CHANNELS.requestCommand, (_event, command: DesktopCommand) => {
-    broadcastCommand(command);
+  ipcMain.on(CHANNELS.requestCommand, (_event, value: unknown) => {
+    const command = asCommand(value);
+    if (command) broadcastCommand(command);
   });
 
   // A mirror has just mounted and needs the current state, not the next change.
@@ -190,38 +225,42 @@ function registerIpc(): void {
     if (lastSnapshot) event.sender.send(CHANNELS.timerSnapshot, lastSnapshot);
   });
 
-  ipcMain.handle(CHANNELS.setLaunchAtLogin, (_event, enabled: boolean) => {
+  ipcMain.handle(CHANNELS.setLaunchAtLogin, (_event, enabled: unknown) => {
+    if (!isBoolean(enabled)) return app.getLoginItemSettings().openAtLogin;
     // (openAsHidden, macOS only, is gone from Electron 44.)
     app.setLoginItemSettings({ openAtLogin: enabled });
     return app.getLoginItemSettings().openAtLogin;
   });
 
-  ipcMain.handle(CHANNELS.setGlobalShortcuts, (_event, enabled: boolean) =>
-    applyGlobalShortcuts(enabled, broadcastCommand),
+  ipcMain.handle(CHANNELS.setGlobalShortcuts, (_event, enabled: unknown) =>
+    isBoolean(enabled) ? applyGlobalShortcuts(enabled, broadcastCommand) : false,
   );
 
-  ipcMain.handle(CHANNELS.setDoNotDisturb, (_event, enabled: boolean) => {
-    setDoNotDisturb(enabled);
+  ipcMain.handle(CHANNELS.setDoNotDisturb, (_event, enabled: unknown) => {
+    if (isBoolean(enabled)) setDoNotDisturb(enabled);
   });
 
-  ipcMain.handle(CHANNELS.setMiniAlwaysOnTop, (_event, enabled: boolean) => {
+  ipcMain.handle(CHANNELS.setMiniAlwaysOnTop, (_event, enabled: unknown) => {
+    if (!isBoolean(enabled)) return;
     miniAlwaysOnTop = enabled;
     setMiniAlwaysOnTop(enabled);
   });
 
-  ipcMain.handle(CHANNELS.setMinimizeToTray, (_event, enabled: boolean) => {
-    setMinimizeToTray(enabled);
+  ipcMain.handle(CHANNELS.setMinimizeToTray, (_event, enabled: unknown) => {
+    if (isBoolean(enabled)) setMinimizeToTray(enabled);
   });
 
-  ipcMain.handle(CHANNELS.applyBlocker, (_event, config: BlockerConfig) =>
-    applyBlocker(config, {
+  ipcMain.handle(CHANNELS.applyBlocker, (_event, value: unknown) => {
+    const config = asBlockerConfig(value);
+    if (!config) return { ok: false, reason: 'invalid' };
+    return applyBlocker(config, {
       onBlockedApp: (name) =>
         showNotification({
-          title: 'Blocked during focus',
-          body: `${name} is on your block list.`,
+          title: shellLabels().blockedTitle,
+          body: fill(shellLabels().blockedBody, { name }),
         }),
-    }),
-  );
+    });
+  });
 
   ipcMain.handle(CHANNELS.openMiniMode, () =>
     openMiniWindow(miniAlwaysOnTop).then(() => undefined),
@@ -230,8 +269,8 @@ function registerIpc(): void {
     closeMiniWindow();
   });
 
-  ipcMain.handle(CHANNELS.setFullscreen, (_event, enabled: boolean) => {
-    getMainWindow()?.setFullScreen(enabled);
+  ipcMain.handle(CHANNELS.setFullscreen, (_event, enabled: unknown) => {
+    if (isBoolean(enabled)) getMainWindow()?.setFullScreen(enabled);
   });
 
   ipcMain.handle(CHANNELS.checkForUpdates, () => checkForUpdates(broadcastUpdate));
@@ -260,6 +299,7 @@ if (!app.requestSingleInstanceLock()) {
     app.setAppUserModelId('clock.nebula.desktop');
 
     registerIpc();
+    cleanupStaleBlock();
     await createMainWindow();
 
     createTray({

@@ -17,6 +17,7 @@
 import { execFile } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { promisify } from 'node:util';
+import { normalizeSite } from '@nebula-clock/core/blocker';
 import type { BlockerConfig } from './ipc.js';
 
 const execFileAsync = promisify(execFile);
@@ -70,12 +71,10 @@ function applyHosts(config: BlockerConfig): BlockerResult {
 
   const cleaned = stripOwnBlock(current);
   const shouldBlock = config.enabled && config.active && config.mode === 'blacklist';
+  const lines = shouldBlock ? hostsLines(config.sites) : '';
 
   let next = cleaned;
-  if (shouldBlock && config.sites.length > 0) {
-    const lines = config.sites
-      .flatMap((site) => [`127.0.0.1 ${site}`, `127.0.0.1 www.${site}`, `::1 ${site}`])
-      .join('\n');
+  if (shouldBlock && lines.length > 0) {
     next = `${cleaned.trimEnd()}\n\n${BEGIN}\n${lines}\n${END}\n`;
   }
 
@@ -83,11 +82,38 @@ function applyHosts(config: BlockerConfig): BlockerResult {
 
   try {
     writeFileSync(path, next, 'utf8');
-    hostsWritten = shouldBlock;
+    hostsWritten = next.includes(BEGIN);
     return { ok: true };
   } catch {
     // Almost always EACCES: the app is not running elevated.
     return { ok: false, reason: 'permission' };
+  }
+}
+
+/**
+ * Checked again right here, next to the write: only a plain hostname may ever reach the hosts
+ * file (a space or a line break would let an entry redirect any other domain).
+ */
+function hostsLines(sites: readonly string[]): string {
+  return sites
+    .map((site) => normalizeSite(site))
+    .filter((site): site is string => site !== null)
+    .flatMap((site) => [`127.0.0.1 ${site}`, `127.0.0.1 www.${site}`, `::1 ${site}`])
+    .join('\n');
+}
+
+/**
+ * At launch: a block left in the hosts file by a crash (or a forced shutdown) mid-focus is
+ * removed, otherwise those sites would stay blocked until the next focus phase ended.
+ */
+export function cleanupStaleBlock(): void {
+  try {
+    const path = hostsPath();
+    const current = readFileSync(path, 'utf8');
+    if (!current.includes(BEGIN)) return;
+    writeFileSync(path, stripOwnBlock(current), 'utf8');
+  } catch {
+    // Not elevated, or no hosts file: nothing this app can do without asking.
   }
 }
 

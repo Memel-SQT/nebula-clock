@@ -21,6 +21,8 @@ export const CHANNELS = {
   setUpdatesByHub: 'nebula:set-updates-by-hub',
   openHub: 'nebula:open-hub',
   detachFromHub: 'nebula:detach-from-hub',
+  /** Theme colours for the native window controls of the frameless window. */
+  setWindowTheme: 'nebula:set-window-theme',
 
   // renderer -> main (synchronous, read once by the preload)
   appInfo: 'nebula:app-info',
@@ -34,6 +36,8 @@ export const CHANNELS = {
   quitAndInstall: 'nebula:quit-and-install',
   /** Today's focus for the Nebula Hub widget (the renderer owns sessions and translations). */
   publishFocus: 'nebula:publish-focus',
+  /** Translated texts for the tray menu and the main process notifications. */
+  setShellLabels: 'nebula:set-shell-labels',
 
   // main -> renderer
   command: 'nebula:command',
@@ -85,3 +89,26 @@ export type UpdateEvent =
   | { type: 'progress'; percent: number }
   | { type: 'downloaded'; version: string }
   | { type: 'error'; message: string };
+
+/** Page and ink colours of the active theme (packages/ui THEME_CHROME). */
+export interface WindowChrome {
+  page: string;
+  ink: string;
+}
+
+/** Texts the main process shows; the count and the app name placeholders are filled in here. */
+export interface ShellLabels {
+  phase: Record<Phase, string>;
+  start: string;
+  pause: string;
+  resume: string;
+  skip: string;
+  reset: string;
+  miniMode: string;
+  open: string;
+  quit: string;
+  todayOne: string;
+  todayOther: string;
+  blockedTitle: string;
+  blockedBody: string;
+}
