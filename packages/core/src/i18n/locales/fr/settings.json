@@ -12,7 +12,9 @@
     "desktop": "Application desktop",
     "data": "Tes données",
     "about": "À propos",
-    "nebula": "Nebula Hub"
+    "nebula": "Nebula Hub",
+    "effects": "Effets et animations",
+    "sounds": "Sons"
   },
   "timer": {
     "focus": "Durée de concentration",
@@ -46,7 +48,9 @@
       "bell": "Cloche",
       "digital": "Numérique",
       "marimba": "Marimba"
-    }
+    },
+    "customSoundTooLarge": "Ce fichier audio est trop lourd : 1 Mo au maximum.",
+    "customSoundInvalid": "Ce fichier n’est pas un son lisible."
   },
   "ambient": {
     "enable": "Jouer des sons d'ambiance pendant la concentration",
@@ -64,31 +68,58 @@
   },
   "appearance": {
     "theme": "Thème",
-    "themeLight": "Clair",
-    "themeDark": "Sombre",
-    "themeSystem": "Suivre le système",
-    "accent": "Couleur d'accent",
-    "accentCustom": "Accent personnalisé",
+    "accent": "Couleurs d’accent",
     "accents": {
       "nebula": "Nebula",
-      "blue": "Géante bleue",
       "aurora": "Aurore",
       "ember": "Braise",
-      "rose": "Rose",
-      "mint": "Menthe"
-    }
+      "ocean": "Océan",
+      "sunset": "Couchant",
+      "sakura": "Sakura",
+      "custom": "Personnalisée"
+    },
+    "language": "Langue",
+    "themes": {
+      "nebula-dark": "Nebula sombre",
+      "nebula-light": "Nebula clair",
+      "glass-dark": "Verre sombre",
+      "glass-light": "Verre clair",
+      "system": "Système"
+    },
+    "glassHint": "Astuce : le verre liquide est à son meilleur avec l’arrière-plan « Aurore boréale ».",
+    "accentPrimary": "Couleur principale",
+    "accentSecondary": "Couleur secondaire",
+    "background": "Arrière-plan animé",
+    "backgrounds": {
+      "glow": "Halo nébuleuse",
+      "aurora": "Aurore boréale",
+      "stars": "Champ d’étoiles",
+      "particles": "Constellation",
+      "waves": "Vagues",
+      "none": "Aucun"
+    },
+    "motion": "Animations de l’interface",
+    "motions": {
+      "full": "Complètes",
+      "reduced": "Réduites",
+      "off": "Désactivées"
+    },
+    "soundEnabled": "Sons de l’interface",
+    "soundVolume": "Volume",
+    "soundTest": "Tester",
+    "on": "Activés",
+    "off": "Désactivés",
+    "reset": "Réinitialiser l’apparence"
   },
   "accessibility": {
     "fontScale": "Taille du texte",
     "fontScaleHint": "Met à l'échelle toute l'interface.",
-    "reduceMotion": "Réduire les animations",
-    "reduceMotionHint": "Supprime la dérive lumineuse et les animations de transition.",
     "highContrast": "Contraste renforcé",
     "highContrastHint": "Augmente le contraste du texte et des bordures."
   },
   "language": {
     "label": "Langue de l'interface",
-    "system": "Suivre le système",
+    "system": "Système",
     "fr": "Français",
     "en": "English"
   },
@@ -109,12 +140,13 @@
       "whitelist": "N'autoriser que cette liste",
       "sites": "Sites web",
       "sitesPlaceholder": "exemple.com",
-      "sitesHint": "Un nom de domaine par ligne. Appliqué pendant une phase de concentration.",
+      "sitesHint": "Un nom de domaine par ligne (youtube.com). Appliqué pendant une phase de concentration.",
       "apps": "Applications",
       "appsPlaceholder": "Discord.exe",
       "appsHint": "Un nom d'exécutable par ligne.",
       "permission": "Le blocage de sites modifie le fichier hosts et nécessite les droits administrateur.",
-      "active": "Le blocage est actif"
+      "active": "Le blocage est actif",
+      "ignored": "Ignoré, ce n’est pas une entrée valide : {{entries}}"
     }
   },
   "data": {
@@ -145,14 +177,16 @@
     "restartNow": "Redémarrer maintenant",
     "upToDate": "Tu es à jour",
     "source": "Code source",
-    "license": "Licence MIT"
+    "license": "Licence MIT",
+    "checking": "Recherche de mises à jour…",
+    "updateError": "La recherche de mise à jour a échoué. Réessaie plus tard."
   },
   "nebula": {
     "privacy": "Avec Nebula Hub (facultatif), Nebula Clock partage seulement des données publiques : tes pomodoros du jour, ta série et le début de tes pauses. Aucune tâche, aucun détail de session.",
     "connected": "Connectée à Nebula Hub {{version}}.",
     "offline": "Nebula Hub n’est pas ouvert : Nebula Clock fonctionne seule, comme toujours.",
     "follow": "Suivre l’apparence Nebula",
-    "followHint": "Thème clair ou sombre, couleur d’accent et langue réglés dans Nebula Hub s’appliquent ici.",
+    "followHint": "Le thème, les couleurs d’accent, l’arrière-plan, les animations, les sons et la langue réglés dans Nebula Hub s’appliquent ici.",
     "updatesByHub": "Mises à jour gérées par Nebula Hub",
     "updatesByHubHint": "Quand le Hub est ouvert, c’est lui qui installe les mises à jour. Sans le Hub, Nebula Clock se met à jour seule.",
     "widget": {
@@ -161,5 +195,6 @@
       "caption_one": "Série : {{count}} jour",
       "caption_other": "Série : {{count}} jours"
     }
-  }
+  },
+  "intro": "Tout est enregistré sur cet appareil et s’applique tout de suite."
 }

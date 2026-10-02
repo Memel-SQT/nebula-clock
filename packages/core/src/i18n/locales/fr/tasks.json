@@ -23,7 +23,8 @@
     "selected": "Sélectionnée",
     "dragHandle": "Réorganiser la tâche",
     "moveUp": "Monter",
-    "moveDown": "Descendre"
+    "moveDown": "Descendre",
+    "rename": "Renommer la tâche"
   },
   "filters": {
     "all": "Toutes",

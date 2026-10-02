@@ -8,6 +8,7 @@
 export type * from './types.js';
 export * from './utils/index.js';
 export * from './config/index.js';
+export * from './appearance/index.js';
 export * from './timer/index.js';
 export * from './storage/index.js';
 export * from './stats/index.js';
@@ -16,3 +17,4 @@ export * from './notifications/index.js';
 export * from './sounds/index.js';
 export * from './i18n/index.js';
 export * from './nebula/index.js';
+export * from './blocker/index.js';

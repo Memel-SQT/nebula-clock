@@ -2,7 +2,9 @@
  * Export / import. The app is privacy-first: this module is the *only* way
  * data leaves the device, and it always goes to a file the user picked.
  */
-import { DEFAULT_SETTINGS } from '../config/index.js';
+import { BUILT_IN_PRESETS, LIMITS, TAG_COLORS } from '../config/index.js';
+import { clamp } from '../utils/index.js';
+import { normalizeSettings } from './settings.js';
 import type { Preset, Session, Settings, Tag, Task } from '../types.js';
 
 export const EXPORT_FORMAT_VERSION = 1;
@@ -169,37 +171,34 @@ const isTag = (v: unknown): v is Tag =>
   isRecord(v) && typeof v.id === 'string' && typeof v.name === 'string';
 
 const isPreset = (v: unknown): v is Preset =>
-  isRecord(v) && typeof v.id === 'string' && typeof v.focusMinutes === 'number';
+  isRecord(v) && typeof v.id === 'string' && Number.isFinite(v.focusMinutes);
 
 /**
- * Merge an unknown settings object onto the defaults, one level deep.
- * Anything missing or the wrong shape falls back to the default, so an
- * export from an older version still imports cleanly.
+ * An unknown settings object, normalized field by field (`normalizeSettings`): anything
+ * missing, out of range or of the wrong type falls back to its default, so an export from an
+ * older version, or a hand-edited one, still imports cleanly.
  */
 export function mergeSettings(incoming: unknown): Settings {
-  if (!isRecord(incoming)) return DEFAULT_SETTINGS;
-
-  // Written against an index-signature view of Settings: the per-key union
-  // cannot be expressed generically, and the isRecord guards below are what
-  // actually make the writes safe at runtime.
-  const merged = { ...DEFAULT_SETTINGS } as unknown as Record<string, unknown>;
-  const defaults = DEFAULT_SETTINGS as unknown as Record<string, unknown>;
-
-  for (const key of Object.keys(defaults)) {
-    const value = incoming[key];
-    if (value === undefined) continue;
-    const fallback = defaults[key];
-    if (isRecord(fallback) && isRecord(value)) {
-      merged[key] = { ...fallback, ...value };
-    } else if (typeof value === typeof fallback) {
-      merged[key] = value;
-    }
-  }
-
-  const settings = merged as unknown as Settings;
-  settings.version = DEFAULT_SETTINGS.version;
-  return settings;
+  return normalizeSettings(incoming);
 }
+
+const finite = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value);
+
+const text = (value: unknown, fallback = '', max = 500): string =>
+  typeof value === 'string' ? value.slice(0, max) : fallback;
+
+const ids = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : [];
+
+/** Keeps the first occurrence of each id: a duplicate would abort the whole import. */
+function uniqueById<T extends { id: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((item) => (seen.has(item.id) ? false : (seen.add(item.id), true)));
+}
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+const BUILT_IN_IDS = new Set(BUILT_IN_PRESETS.map((preset) => preset.id));
 
 export interface ParsedImport {
   settings: Settings;
@@ -225,10 +224,13 @@ export function parseImportBundle(raw: string): ParsedImport {
   const version = typeof parsed.formatVersion === 'number' ? parsed.formatVersion : 0;
   if (version > EXPORT_FORMAT_VERSION) warnings.push('newerFormat');
 
-  const sessions = asArray(parsed.sessions, isSession);
-  const tasks = asArray(parsed.tasks, isTask);
-  const tags = asArray(parsed.tags, isTag);
-  const presets = asArray(parsed.presets, isPreset);
+  const sessions = uniqueById(asArray(parsed.sessions, isSession));
+  const tasks = uniqueById(asArray(parsed.tasks, isTask));
+  const tags = uniqueById(asArray(parsed.tags, isTag));
+  // The built-in presets ship with the app: a copy in the file would show up twice.
+  const presets = uniqueById(asArray(parsed.presets, isPreset)).filter(
+    (preset) => !BUILT_IN_IDS.has(preset.id),
+  );
 
   const countDropped = (source: unknown, kept: number, label: string) => {
     if (Array.isArray(source) && source.length !== kept) {
@@ -240,30 +242,83 @@ export function parseImportBundle(raw: string): ParsedImport {
   countDropped(parsed.tags, tags.length, 'droppedTags');
   countDropped(parsed.presets, presets.length, 'droppedPresets');
 
+  const now = Date.now();
+  // Only the known fields are kept, each with its own type check: a value of the wrong type
+  // would otherwise reach the UI (`notes.trim()` on a number) or the statistics.
   return {
     settings: mergeSettings(parsed.settings),
-    tasks: tasks.map((t, index) => ({
-      ...t,
-      notes: t.notes ?? '',
-      estimatedPomodoros: t.estimatedPomodoros ?? 1,
-      completedPomodoros: t.completedPomodoros ?? 0,
-      done: t.done ?? false,
-      tagIds: Array.isArray(t.tagIds) ? t.tagIds : [],
-      order: typeof t.order === 'number' ? t.order : index,
-      createdAt: t.createdAt ?? Date.now(),
-      updatedAt: t.updatedAt ?? Date.now(),
-      completedAt: t.completedAt ?? null,
+    tasks: tasks.map((t, index): Task => ({
+      id: t.id,
+      title: text(t.title),
+      notes: text(t.notes, '', 5000),
+      estimatedPomodoros: finite(t.estimatedPomodoros)
+        ? clamp(
+            Math.round(t.estimatedPomodoros),
+            LIMITS.estimatedPomodoros.min,
+            LIMITS.estimatedPomodoros.max,
+          )
+        : 1,
+      completedPomodoros: finite(t.completedPomodoros)
+        ? Math.max(0, Math.round(t.completedPomodoros))
+        : 0,
+      done: typeof t.done === 'boolean' ? t.done : false,
+      tagIds: ids(t.tagIds),
+      order: finite(t.order) ? t.order : index,
+      createdAt: finite(t.createdAt) ? t.createdAt : now,
+      updatedAt: finite(t.updatedAt) ? t.updatedAt : now,
+      completedAt: finite(t.completedAt) ? t.completedAt : null,
     })),
-    tags,
-    sessions: sessions.map((s) => ({
-      ...s,
-      durationSeconds: s.durationSeconds ?? Math.round((s.endedAt - s.startedAt) / 1000),
-      plannedSeconds: s.plannedSeconds ?? Math.round((s.endedAt - s.startedAt) / 1000),
-      completed: s.completed ?? true,
-      taskId: s.taskId ?? null,
-      tagIds: Array.isArray(s.tagIds) ? s.tagIds : [],
+    tags: tags.map((tag): Tag => ({
+      id: tag.id,
+      name: text(tag.name, '', 80),
+      color: typeof tag.color === 'string' && HEX_COLOR.test(tag.color) ? tag.color : TAG_COLORS[0],
+      createdAt: finite(tag.createdAt) ? tag.createdAt : now,
     })),
-    presets: presets.map((p) => ({ ...p, builtIn: false })),
+    sessions: sessions.map((s): Session => {
+      const span = Math.max(0, Math.round((s.endedAt - s.startedAt) / 1000));
+      return {
+        id: s.id,
+        phase: s.phase,
+        startedAt: s.startedAt,
+        endedAt: s.endedAt,
+        durationSeconds: finite(s.durationSeconds) ? Math.max(0, s.durationSeconds) : span,
+        plannedSeconds: finite(s.plannedSeconds) ? Math.max(0, s.plannedSeconds) : span,
+        completed: typeof s.completed === 'boolean' ? s.completed : true,
+        taskId: typeof s.taskId === 'string' ? s.taskId : null,
+        tagIds: ids(s.tagIds),
+      };
+    }),
+    presets: presets.map((p): Preset => ({
+      id: p.id,
+      name: text(p.name, p.id, 80),
+      focusMinutes: clamp(
+        Math.round(p.focusMinutes),
+        LIMITS.focusMinutes.min,
+        LIMITS.focusMinutes.max,
+      ),
+      shortBreakMinutes: finite(p.shortBreakMinutes)
+        ? clamp(
+            Math.round(p.shortBreakMinutes),
+            LIMITS.shortBreakMinutes.min,
+            LIMITS.shortBreakMinutes.max,
+          )
+        : 5,
+      longBreakMinutes: finite(p.longBreakMinutes)
+        ? clamp(
+            Math.round(p.longBreakMinutes),
+            LIMITS.longBreakMinutes.min,
+            LIMITS.longBreakMinutes.max,
+          )
+        : 15,
+      cyclesBeforeLongBreak: finite(p.cyclesBeforeLongBreak)
+        ? clamp(
+            Math.round(p.cyclesBeforeLongBreak),
+            LIMITS.cyclesBeforeLongBreak.min,
+            LIMITS.cyclesBeforeLongBreak.max,
+          )
+        : 4,
+      builtIn: false,
+    })),
     warnings,
   };
 }

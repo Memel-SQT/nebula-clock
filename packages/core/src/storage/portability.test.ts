@@ -133,6 +133,73 @@ describe('mergeSettings', () => {
   it('always stamps the current settings version', () => {
     expect(mergeSettings({ version: 99 }).version).toBe(DEFAULT_SETTINGS.version);
   });
+
+  it('clamps every bounded number and rejects the wrong types field by field', () => {
+    const merged = mergeSettings({
+      timer: { focusMinutes: 5000, shortBreakMinutes: '5', longBreakMinutes: 20.4 },
+      goals: { dailyPomodoros: -3, weeklyPomodoros: Number.NaN },
+      notifications: {
+        volume: 7,
+        soundId: 'siren',
+        customSound: { name: 'x', dataUrl: 'javascript:1' },
+      },
+      ambient: { tracks: { rain: 2, forest: 'loud' } },
+      breakReminders: { intervalSeconds: 1, customMessages: ['  Stretch ', '', 3] },
+    });
+    expect(merged.timer).toMatchObject({
+      focusMinutes: 180,
+      shortBreakMinutes: 5,
+      longBreakMinutes: 20,
+    });
+    expect(merged.goals).toEqual({ dailyPomodoros: 1, weeklyPomodoros: 40 });
+    expect(merged.notifications).toMatchObject({ volume: 1, soundId: 'chime', customSound: null });
+    expect(merged.ambient.tracks).toEqual({ rain: 1, forest: 0, cafe: 0, whiteNoise: 0 });
+    expect(merged.breakReminders).toMatchObject({
+      intervalSeconds: 30,
+      customMessages: ['Stretch'],
+    });
+  });
+
+  it('migrates a 1.2 backup: appearance and blocker lists included', () => {
+    const merged = mergeSettings({
+      version: 1,
+      appearance: {
+        theme: 'dark',
+        accent: '#F43F5E',
+        fontScale: 1.125,
+        reduceMotion: true,
+        highContrast: false,
+      },
+      desktop: {
+        blocker: {
+          enabled: true,
+          mode: 'blacklist',
+          sites: ['https://www.reddit.com/r/x', 'bad site'],
+          apps: ['Discord.exe', 'C:\\x.exe'],
+        },
+      },
+    });
+    expect(merged.appearance).toMatchObject({
+      theme: 'nebula-dark',
+      accentPreset: 'sunset',
+      motion: 'reduced',
+      fontScale: 1.125,
+      background: 'glow',
+      soundEnabled: false,
+    });
+    expect(merged.desktop.blocker).toEqual({
+      enabled: true,
+      mode: 'blacklist',
+      sites: ['reddit.com'],
+      apps: ['Discord.exe'],
+    });
+  });
+
+  it('is stable on its own output', () => {
+    expect(mergeSettings(mergeSettings({ appearance: { theme: 'light' } }))).toEqual(
+      mergeSettings({ appearance: { theme: 'light' } }),
+    );
+  });
 });
 
 describe('parseImportBundle', () => {
@@ -210,6 +277,39 @@ describe('parseImportBundle', () => {
       wrap({ presets: [{ id: 'p1', focusMinutes: 25, builtIn: true }] }),
     );
     expect(parsed.presets[0]?.builtIn).toBe(false);
+  });
+
+  it('keeps the first of duplicated ids, which would otherwise abort the whole import', () => {
+    const parsed = parseImportBundle(
+      wrap({ tasks: [task, { ...task, title: 'copy' }], sessions: [session, session] }),
+    );
+    expect(parsed.tasks).toHaveLength(1);
+    expect(parsed.tasks[0]?.title).toBe(task.title);
+    expect(parsed.sessions).toHaveLength(1);
+  });
+
+  it('leaves out copies of the built-in presets', () => {
+    const parsed = parseImportBundle(
+      wrap({
+        presets: [
+          { id: 'classic', focusMinutes: 25 },
+          { id: 'mine', focusMinutes: 40 },
+        ],
+      }),
+    );
+    expect(parsed.presets.map((preset) => preset.id)).toEqual(['mine']);
+  });
+
+  it('type-checks every field it keeps', () => {
+    const parsed = parseImportBundle(
+      wrap({
+        tasks: [{ id: 't', title: 'T', notes: 42, estimatedPomodoros: 500, done: 'yes', extra: 1 }],
+        tags: [{ id: 'g', name: 'Tag', color: 'red;background:url(x)' }],
+      }),
+    );
+    expect(parsed.tasks[0]).toMatchObject({ notes: '', estimatedPomodoros: 20, done: false });
+    expect(parsed.tasks[0]).not.toHaveProperty('extra');
+    expect(parsed.tags[0]?.color).toMatch(/^#[0-9A-F]{6}$/i);
   });
 
   it('rejects a session with an unknown phase', () => {

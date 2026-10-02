@@ -5,6 +5,7 @@
  * a sound id or a goal: UI and storage both read from here, so changing a
  * default is a one-line change with no hunting.
  */
+import { DEFAULT_APPEARANCE } from '../appearance/index.js';
 import type {
   AmbientTrackId,
   BadgeDefinition,
@@ -12,6 +13,8 @@ import type {
   Settings,
   SupportedLanguage,
 } from '../types.js';
+
+export { LIMITS } from './limits.js';
 
 /** Nebula brand tokens, lifted verbatim from the Nebula desktop app theme. */
 export const NEBULA_PALETTE = {
@@ -29,35 +32,6 @@ export const NEBULA_PALETTE = {
   text: '#F1F1F6',
   textSecondary: '#9A94B8',
 } as const;
-
-/**
- * Accent choices offered in Settings. Each carries both ends of the Nebula
- * gradient so the default reproduces the original `--accent-gradient`
- * (`#4C6EF5 -> #8B5CF6`) exactly rather than approximating it.
- */
-export const ACCENT_PRESETS = [
-  { id: 'nebula', from: NEBULA_PALETTE.blue, to: NEBULA_PALETTE.violet },
-  { id: 'blue', from: '#3B82F6', to: NEBULA_PALETTE.blueBright },
-  { id: 'aurora', from: '#0EA5E9', to: '#22D3EE' },
-  { id: 'ember', from: '#F97316', to: '#FBBF24' },
-  { id: 'rose', from: '#E11D48', to: '#F43F5E' },
-  { id: 'mint', from: '#10B981', to: NEBULA_PALETTE.success },
-] as const;
-
-export type AccentPresetId = (typeof ACCENT_PRESETS)[number]['id'];
-
-/**
- * Resolve a stored accent into the two gradient stops.
- *
- * `accent` holds either a preset id or a raw hex colour picked by the user;
- * a custom colour becomes the bright end, with the cooler end mixed toward
- * the Nebula blue so the gradient keeps the family look.
- */
-export function resolveAccent(accent: string): { from: string; to: string } {
-  const preset = ACCENT_PRESETS.find((entry) => entry.id === accent || entry.to === accent);
-  if (preset) return { from: preset.from, to: preset.to };
-  return { from: `color-mix(in oklab, ${accent} 45%, ${NEBULA_PALETTE.blue})`, to: accent };
-}
 
 /** Colours proposed when creating a tag - all legible on both themes. */
 export const TAG_COLORS = [
@@ -109,19 +83,6 @@ export const BUILT_IN_PRESETS: Preset[] = [
     builtIn: true,
   },
 ];
-
-/** Bounds enforced by the settings UI and by import validation. */
-export const LIMITS = {
-  focusMinutes: { min: 1, max: 180 },
-  shortBreakMinutes: { min: 1, max: 60 },
-  longBreakMinutes: { min: 1, max: 120 },
-  cyclesBeforeLongBreak: { min: 1, max: 12 },
-  dailyPomodoros: { min: 1, max: 40 },
-  weeklyPomodoros: { min: 1, max: 200 },
-  fontScale: { min: 0.875, max: 1.5 },
-  volume: { min: 0, max: 1 },
-  breakReminderSeconds: { min: 30, max: 900 },
-} as const;
 
 export const NOTIFICATION_SOUNDS = [
   { id: 'chime', file: 'chime.wav' },
@@ -181,8 +142,11 @@ export const DEFAULT_BREAK_REMINDERS: Record<SupportedLanguage, string[]> = {
 
 const CLASSIC = BUILT_IN_PRESETS[0]!;
 
+/** 2: the Nebula family appearance model (1.3). */
+export const SETTINGS_VERSION = 2;
+
 export const DEFAULT_SETTINGS: Settings = {
-  version: 1,
+  version: SETTINGS_VERSION,
   language: 'system',
   timer: {
     focusMinutes: CLASSIC.focusMinutes,
@@ -215,13 +179,7 @@ export const DEFAULT_SETTINGS: Settings = {
     intervalSeconds: 120,
     customMessages: [],
   },
-  appearance: {
-    theme: 'system',
-    accent: NEBULA_PALETTE.violet,
-    fontScale: 1,
-    reduceMotion: false,
-    highContrast: false,
-  },
+  appearance: DEFAULT_APPEARANCE,
   desktop: {
     minimizeToTray: true,
     launchAtLogin: false,

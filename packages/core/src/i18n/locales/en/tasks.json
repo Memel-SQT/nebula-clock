@@ -23,7 +23,8 @@
     "selected": "Currently selected",
     "dragHandle": "Reorder task",
     "moveUp": "Move up",
-    "moveDown": "Move down"
+    "moveDown": "Move down",
+    "rename": "Rename task"
   },
   "filters": {
     "all": "All",

@@ -78,7 +78,9 @@
     "skip": "Passer la phase",
     "reset": "Réinitialiser la phase",
     "fullscreen": "Mode immersif",
-    "settings": "Ouvrir les réglages"
+    "settings": "Ouvrir les réglages",
+    "keySpace": "Espace"
   },
-  "progressAria": "{{remaining}} restant dans la phase {{phase}}"
+  "progressAria": "{{remaining}} restant dans la phase {{phase}}",
+  "paused": "en pause"
 }

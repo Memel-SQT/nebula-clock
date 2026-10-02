@@ -5,6 +5,7 @@
  * Only public data leaves Nebula Clock: today's pomodoro count against the goal, the streak, and
  * the start of a break. No task, no session detail, no history.
  */
+import { familyAppearancePatch, type AppearanceSettings } from '../appearance/index.js';
 import type { Phase } from '../types.js';
 
 /** What the renderer publishes for the Hub's "Today's focus" widget (texts already translated). */
@@ -70,43 +71,18 @@ export function breakStarted(
   };
 }
 
-/** Primary accent of each Nebula preset (the Hub broadcasts the preset id, `@nebula/design`). */
-const HUB_ACCENTS: Record<string, string> = {
-  nebula: '#8B5CF6',
-  aurora: '#10B981',
-  ocean: '#0EA5E9',
-  sunset: '#EC4899',
-  sakura: '#F472B6',
-  ember: '#F59E0B',
-};
-
-const HEX = /^#[0-9a-f]{6}$/i;
-
 /**
- * What Nebula Clock takes from the Nebula appearance (`AppearanceV1`): the light or dark theme,
- * the accent colour and the language. Anything unknown is ignored, field by field.
+ * What Nebula Clock takes from the Nebula appearance (`AppearanceV1`): Nebula Clock uses the
+ * family model, so the theme, the accent (preset or custom pair), the background, the motion
+ * level and the interface sounds map 1 for 1, plus the language. Anything unknown or invalid is
+ * left out, field by field, and the local value stays.
  */
 export function clockAppearanceFromHub(payload: unknown): {
-  theme?: 'light' | 'dark' | 'system';
-  accent?: string;
+  appearance: Partial<AppearanceSettings>;
   language?: 'fr' | 'en';
 } {
   const record = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : {};
-  const result: { theme?: 'light' | 'dark' | 'system'; accent?: string; language?: 'fr' | 'en' } =
-    {};
-  if (record.theme === 'system') result.theme = 'system';
-  else if (typeof record.theme === 'string' && /^(nebula|glass)-(dark|light)$/.test(record.theme)) {
-    result.theme = record.theme.endsWith('-light') ? 'light' : 'dark';
-  }
-  if (
-    record.accentPreset === 'custom' &&
-    typeof record.customPrimary === 'string' &&
-    HEX.test(record.customPrimary)
-  ) {
-    result.accent = record.customPrimary.toUpperCase();
-  } else if (typeof record.accentPreset === 'string' && HUB_ACCENTS[record.accentPreset]) {
-    result.accent = HUB_ACCENTS[record.accentPreset];
-  }
-  if (record.language === 'fr' || record.language === 'en') result.language = record.language;
-  return result;
+  const language =
+    record.language === 'fr' || record.language === 'en' ? record.language : undefined;
+  return { appearance: familyAppearancePatch(record), ...(language ? { language } : {}) };
 }

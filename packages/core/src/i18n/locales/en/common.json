@@ -9,7 +9,11 @@
     "stats": "Statistics",
     "calendar": "Calendar",
     "settings": "Settings",
-    "label": "Main navigation"
+    "label": "Main navigation",
+    "groups": {
+      "focus": "Focus",
+      "progress": "Progress"
+    }
   },
   "actions": {
     "save": "Save",
@@ -78,7 +82,6 @@
   ],
   "a11y": {
     "skipToContent": "Skip to main content",
-    "themeToggle": "Switch theme",
     "languageSelect": "Choose language",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
@@ -88,12 +91,63 @@
     "deleteTask": "This task will be deleted. Its logged sessions are kept.",
     "deleteTag": "This tag will be removed from every task.",
     "clearData": "This permanently deletes every task, tag and session on this device.",
-    "importReplace": "Importing replaces all current data on this device."
+    "importReplace": "Importing replaces all current data on this device.",
+    "clearDataTitle": "Delete all your data?",
+    "clearDataConfirm": "Delete everything",
+    "importTitle": "Replace the data on this device?",
+    "importConfirm": "Replace",
+    "resetTitle": "Reset the settings?",
+    "resetBody": "Every setting goes back to its default. Your tasks and sessions are kept.",
+    "resetConfirm": "Reset"
   },
   "nebula": {
     "apps": "Nebula apps",
     "notInstalled": "Nebula Hub is not installed: its download page just opened.",
     "docked": "Shown inside Nebula Hub",
     "detach": "Detach"
+  },
+  "pages": {
+    "timer": {
+      "eyebrow": "Focus"
+    },
+    "tasks": {
+      "eyebrow": "Focus"
+    },
+    "stats": {
+      "eyebrow": "Progress"
+    },
+    "calendar": {
+      "eyebrow": "Progress"
+    },
+    "settings": {
+      "eyebrow": "Preferences"
+    }
+  },
+  "sidebar": {
+    "local": "Local, no account",
+    "localNote": "Nothing leaves this device.",
+    "version": "Version {{version}}",
+    "hub": "Nebula Hub",
+    "hubConnected": "Connected",
+    "hubAbsent": "Not running"
+  },
+  "tray": {
+    "phase": {
+      "focus": "Focus",
+      "shortBreak": "Break",
+      "longBreak": "Long break"
+    },
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "skip": "Skip phase",
+    "reset": "Reset phase",
+    "miniMode": "Mini mode",
+    "open": "Open Nebula Clock",
+    "quit": "Quit",
+    "today_one": "{{count}} pomodoro today",
+    "today_other": "{{count}} pomodoros today",
+    "blockedTitle": "Blocked during focus",
+    "blockedBody": "{{name}} is on your block list."
   }
 }

@@ -12,7 +12,9 @@
     "desktop": "Desktop",
     "data": "Your data",
     "about": "About",
-    "nebula": "Nebula Hub"
+    "nebula": "Nebula Hub",
+    "effects": "Effects and motion",
+    "sounds": "Sounds"
   },
   "timer": {
     "focus": "Focus duration",
@@ -46,7 +48,9 @@
       "bell": "Bell",
       "digital": "Digital",
       "marimba": "Marimba"
-    }
+    },
+    "customSoundTooLarge": "This audio file is too large: 1 MB at most.",
+    "customSoundInvalid": "This file is not a playable sound."
   },
   "ambient": {
     "enable": "Play ambient sounds during focus",
@@ -64,31 +68,58 @@
   },
   "appearance": {
     "theme": "Theme",
-    "themeLight": "Light",
-    "themeDark": "Dark",
-    "themeSystem": "Follow system",
-    "accent": "Accent colour",
-    "accentCustom": "Custom accent",
+    "accent": "Accent colors",
     "accents": {
       "nebula": "Nebula",
-      "blue": "Blue giant",
       "aurora": "Aurora",
       "ember": "Ember",
-      "rose": "Rose",
-      "mint": "Mint"
-    }
+      "ocean": "Ocean",
+      "sunset": "Sunset",
+      "sakura": "Sakura",
+      "custom": "Custom"
+    },
+    "language": "Language",
+    "themes": {
+      "nebula-dark": "Nebula dark",
+      "nebula-light": "Nebula light",
+      "glass-dark": "Glass dark",
+      "glass-light": "Glass light",
+      "system": "System"
+    },
+    "glassHint": "Tip: liquid glass looks its best with the “Aurora” background.",
+    "accentPrimary": "Main color",
+    "accentSecondary": "Secondary color",
+    "background": "Animated background",
+    "backgrounds": {
+      "glow": "Nebula glow",
+      "aurora": "Aurora",
+      "stars": "Starfield",
+      "particles": "Constellation",
+      "waves": "Waves",
+      "none": "None"
+    },
+    "motion": "Interface motion",
+    "motions": {
+      "full": "Full",
+      "reduced": "Reduced",
+      "off": "Off"
+    },
+    "soundEnabled": "Interface sounds",
+    "soundVolume": "Volume",
+    "soundTest": "Test",
+    "on": "On",
+    "off": "Off",
+    "reset": "Reset appearance"
   },
   "accessibility": {
     "fontScale": "Text size",
     "fontScaleHint": "Scales the whole interface.",
-    "reduceMotion": "Reduce animations",
-    "reduceMotionHint": "Removes the drifting glow and transition animations.",
     "highContrast": "Stronger contrast",
     "highContrastHint": "Increases text and border contrast."
   },
   "language": {
     "label": "Interface language",
-    "system": "Follow system",
+    "system": "System",
     "fr": "Français",
     "en": "English"
   },
@@ -109,12 +140,13 @@
       "whitelist": "Allow only this list",
       "sites": "Websites",
       "sitesPlaceholder": "example.com",
-      "sitesHint": "One hostname per line. Applied while a focus phase is running.",
+      "sitesHint": "One hostname per line (youtube.com). Applied while a focus phase is running.",
       "apps": "Applications",
       "appsPlaceholder": "Discord.exe",
       "appsHint": "One executable name per line.",
       "permission": "Website blocking edits your hosts file and needs administrator rights.",
-      "active": "Blocking is active"
+      "active": "Blocking is active",
+      "ignored": "Ignored, not a valid entry: {{entries}}"
     }
   },
   "data": {
@@ -145,14 +177,16 @@
     "restartNow": "Restart now",
     "upToDate": "You are up to date",
     "source": "Source code",
-    "license": "MIT licence"
+    "license": "MIT licence",
+    "checking": "Checking for updates…",
+    "updateError": "Checking for updates failed. Try again later."
   },
   "nebula": {
     "privacy": "With Nebula Hub (optional), Nebula Clock only shares public data: today's pomodoros, your streak and the start of your breaks. No task, no session detail.",
     "connected": "Connected to Nebula Hub {{version}}.",
     "offline": "Nebula Hub is not open: Nebula Clock works on its own, as always.",
     "follow": "Follow the Nebula appearance",
-    "followHint": "Light or dark theme, accent colour and language set in Nebula Hub apply here.",
+    "followHint": "The theme, accent colors, background, motion, sounds and language set in Nebula Hub apply here.",
     "updatesByHub": "Updates handled by Nebula Hub",
     "updatesByHubHint": "While the Hub is open, it installs the updates. Without the Hub, Nebula Clock updates itself.",
     "widget": {
@@ -161,5 +195,6 @@
       "caption_one": "Streak: {{count}} day",
       "caption_other": "Streak: {{count}} days"
     }
-  }
+  },
+  "intro": "Everything is stored on this device and applies right away."
 }

@@ -9,7 +9,14 @@
     "label": "Période",
     "previous": "Période précédente",
     "next": "Période suivante",
-    "today": "Aujourd'hui"
+    "today": "Aujourd'hui",
+    "current": {
+      "day": "Aujourd’hui",
+      "week": "Cette semaine",
+      "month": "Ce mois-ci",
+      "year": "Cette année"
+    },
+    "weekOf": "Semaine du {{date}}"
   },
   "metrics": {
     "focusTime": "Temps de concentration",
@@ -74,7 +81,9 @@
     "legendMore": "Plus",
     "cellAria": "{{date}} : {{count}} pomodoros",
     "previousMonth": "Mois précédent",
-    "nextMonth": "Mois suivant"
+    "nextMonth": "Mois suivant",
+    "intro": "Chaque case est une journée : plus elle est vive, plus tu t’es concentré ce jour-là.",
+    "today": "Aujourd’hui"
   },
   "report": {
     "export": "Exporter le rapport PDF",

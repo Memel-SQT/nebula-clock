@@ -59,19 +59,48 @@ describe('breakStarted', () => {
 });
 
 describe('clockAppearanceFromHub', () => {
-  it('maps the theme, the accent and the language', () => {
+  it('maps the whole family appearance 1 for 1, with the language', () => {
     expect(
-      clockAppearanceFromHub({ theme: 'glass-light', accentPreset: 'nebula', language: 'en' }),
-    ).toEqual({ theme: 'light', accent: '#8B5CF6', language: 'en' });
-    expect(
-      clockAppearanceFromHub({ theme: 'system', accentPreset: 'custom', customPrimary: '#12ab34' }),
-    ).toEqual({ theme: 'system', accent: '#12AB34' });
+      clockAppearanceFromHub({
+        theme: 'glass-light',
+        accentPreset: 'custom',
+        customPrimary: '#12AB34',
+        customSecondary: '#4c6ef5',
+        background: 'stars',
+        motion: 'reduced',
+        soundEnabled: true,
+        soundVolume: 60,
+        language: 'en',
+      }),
+    ).toEqual({
+      appearance: {
+        theme: 'glass-light',
+        accentPreset: 'custom',
+        customPrimary: '#12ab34',
+        customSecondary: '#4c6ef5',
+        background: 'stars',
+        motion: 'reduced',
+        soundEnabled: true,
+        soundVolume: 60,
+      },
+      language: 'en',
+    });
   });
 
-  it('ignores anything unknown', () => {
+  it('keeps only the valid fields, never replacing the others with a default', () => {
     expect(
-      clockAppearanceFromHub({ theme: 'old-dark', accentPreset: 'lava', language: 'de' }),
-    ).toEqual({});
-    expect(clockAppearanceFromHub(null)).toEqual({});
+      clockAppearanceFromHub({
+        theme: 'old-dark',
+        accentPreset: 'lava',
+        background: 'aurora',
+        soundVolume: null,
+        language: 'de',
+      }),
+    ).toEqual({ appearance: { background: 'aurora' } });
+    expect(clockAppearanceFromHub(null)).toEqual({ appearance: {} });
+  });
+
+  it('clamps the volume instead of dropping it', () => {
+    expect(clockAppearanceFromHub({ soundVolume: 140 }).appearance).toEqual({ soundVolume: 100 });
   });
 });

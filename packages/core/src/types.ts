@@ -12,7 +12,7 @@ export type Phase = 'focus' | 'shortBreak' | 'longBreak';
 /** Calendar day key, `YYYY-MM-DD`, always in the user's local timezone. */
 export type DayKey = string;
 
-export type ThemeMode = 'light' | 'dark' | 'system';
+import type { AppearanceSettings } from './appearance/index.js';
 
 export type LanguageSetting = 'fr' | 'en' | 'system';
 
@@ -118,15 +118,8 @@ export interface BreakReminderSettings {
   customMessages: string[];
 }
 
-export interface AppearanceSettings {
-  theme: ThemeMode;
-  /** Hex accent colour driving the Nebula gradient. */
-  accent: string;
-  /** 0.875 .. 1.5 multiplier on the root font size. */
-  fontScale: number;
-  reduceMotion: boolean;
-  highContrast: boolean;
-}
+/** The Nebula family appearance model, plus two accessibility settings (`appearance/`). */
+export type { AppearanceSettings };
 
 export type BlockerMode = 'blacklist' | 'whitelist';
 

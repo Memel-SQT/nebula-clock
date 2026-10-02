@@ -9,7 +9,14 @@
     "label": "Time range",
     "previous": "Previous period",
     "next": "Next period",
-    "today": "Today"
+    "today": "Today",
+    "current": {
+      "day": "Today",
+      "week": "This week",
+      "month": "This month",
+      "year": "This year"
+    },
+    "weekOf": "Week of {{date}}"
   },
   "metrics": {
     "focusTime": "Focus time",
@@ -74,7 +81,9 @@
     "legendMore": "More",
     "cellAria": "{{date}}: {{count}} pomodoros",
     "previousMonth": "Previous month",
-    "nextMonth": "Next month"
+    "nextMonth": "Next month",
+    "intro": "Each square is a day: the brighter it is, the more you focused that day.",
+    "today": "Today"
   },
   "report": {
     "export": "Export PDF report",

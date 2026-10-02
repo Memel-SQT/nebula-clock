@@ -13,6 +13,8 @@
     "./storage": "./src/storage/index.ts",
     "./stats": "./src/stats/index.ts",
     "./config": "./src/config/index.ts",
+    "./blocker": "./src/blocker/index.ts",
+    "./appearance": "./src/appearance/index.ts",
     "./notifications": "./src/notifications/index.ts",
     "./sounds": "./src/sounds/index.ts",
     "./i18n": "./src/i18n/index.ts"

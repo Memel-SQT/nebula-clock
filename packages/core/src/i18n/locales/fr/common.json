@@ -9,7 +9,11 @@
     "stats": "Statistiques",
     "calendar": "Calendrier",
     "settings": "Réglages",
-    "label": "Navigation principale"
+    "label": "Navigation principale",
+    "groups": {
+      "focus": "Focus",
+      "progress": "Progrès"
+    }
   },
   "actions": {
     "save": "Enregistrer",
@@ -78,7 +82,6 @@
   ],
   "a11y": {
     "skipToContent": "Aller au contenu principal",
-    "themeToggle": "Changer de thème",
     "languageSelect": "Choisir la langue",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu"
@@ -88,12 +91,63 @@
     "deleteTask": "Cette tâche sera supprimée. Les sessions enregistrées sont conservées.",
     "deleteTag": "Ce tag sera retiré de toutes les tâches.",
     "clearData": "Supprime définitivement toutes les tâches, tags et sessions de cet appareil.",
-    "importReplace": "L'import remplace toutes les données actuelles de cet appareil."
+    "importReplace": "L'import remplace toutes les données actuelles de cet appareil.",
+    "clearDataTitle": "Supprimer toutes tes données ?",
+    "clearDataConfirm": "Tout supprimer",
+    "importTitle": "Remplacer les données de cet appareil ?",
+    "importConfirm": "Remplacer",
+    "resetTitle": "Réinitialiser les réglages ?",
+    "resetBody": "Tous les réglages reviennent à leurs valeurs par défaut. Tes tâches et tes sessions sont conservées.",
+    "resetConfirm": "Réinitialiser"
   },
   "nebula": {
     "apps": "Apps Nebula",
     "notInstalled": "Nebula Hub n’est pas installé : sa page de téléchargement vient de s’ouvrir.",
     "docked": "Affichée dans Nebula Hub",
     "detach": "Détacher"
+  },
+  "pages": {
+    "timer": {
+      "eyebrow": "Focus"
+    },
+    "tasks": {
+      "eyebrow": "Focus"
+    },
+    "stats": {
+      "eyebrow": "Progrès"
+    },
+    "calendar": {
+      "eyebrow": "Progrès"
+    },
+    "settings": {
+      "eyebrow": "Préférences"
+    }
+  },
+  "sidebar": {
+    "local": "Local, sans compte",
+    "localNote": "Rien ne quitte cet appareil.",
+    "version": "Version {{version}}",
+    "hub": "Nebula Hub",
+    "hubConnected": "Connecté",
+    "hubAbsent": "Absent"
+  },
+  "tray": {
+    "phase": {
+      "focus": "Concentration",
+      "shortBreak": "Pause",
+      "longBreak": "Pause longue"
+    },
+    "start": "Démarrer",
+    "pause": "Pause",
+    "resume": "Reprendre",
+    "skip": "Passer la phase",
+    "reset": "Réinitialiser la phase",
+    "miniMode": "Mini-mode",
+    "open": "Ouvrir Nebula Clock",
+    "quit": "Quitter",
+    "today_one": "{{count}} pomodoro aujourd’hui",
+    "today_other": "{{count}} pomodoros aujourd’hui",
+    "blockedTitle": "Bloquée pendant la concentration",
+    "blockedBody": "{{name}} est dans ta liste de blocage."
   }
 }
