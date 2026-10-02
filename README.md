@@ -3,9 +3,11 @@
 A privacy-first Pomodoro time manager, shipped as an installable **PWA** and as
 a native **desktop app** (Windows / macOS / Linux) from a single codebase.
 
-Part of the **Nebula** family — the design tokens and the dark blue-to-violet
-identity come straight from the Nebula design system, with a clock mark of its
-own. See [`docs/brand`](docs/brand) for the standalone logo files.
+Part of the **Nebula** family, and visually one with it: the window shell, the
+floating sidebar, the icons, the controls and the appearance settings are those of
+[Nebula Hub](https://github.com/Memel-SQT/Nebula-Hub) (`@nebula/design`), on the
+tokens of the Nebula design system, with a clock mark of its own. See
+[`docs/brand`](docs/brand) for the standalone logo files.
 
 > **Everything stays on your device.** No account, no server, no telemetry.
 > Data lives in IndexedDB and only ever leaves through an export _you_ trigger.
@@ -160,22 +162,28 @@ optional distraction blocking, and auto-updates from GitHub Releases. See
 is installed, the desktop app shows today's focus (pomodoros against the goal,
 streak) on the Hub's Home, sends the timer's notifications to its activity
 centre, announces the start of each break (the Hub can then offer the Nebula
-News briefing during a long one), can follow the Nebula appearance (theme,
-accent, language), can open inside the Hub's window instead of its own
+News briefing during a long one), can follow the Nebula appearance 1 for 1 (theme,
+accents, background, motion, sounds, language), can open inside the Hub's window instead of its own
 ("Detach" brings it back), and can leave its updates to the Hub. A "Nebula
 apps" button opens the Hub. Without the Hub nothing changes: the link is
 optional and silent.
 
-**Motion** — a launch animation that draws the mark, transitions between
-screens, staggered entrances for lists and cards, a sliding navigation
-indicator and a flourish on the ring at every phase change. All of it is
-driven by one switch: turning on "reduce animations", or setting the
-preference at OS level, silences the lot.
+**Appearance** — the Nebula family model, with the same values and labels as
+every Nebula app: four themes (Nebula dark, Nebula light, Glass dark, Glass light)
+plus "System", six accent presets plus a custom pair of colours, an animated
+background (nebula glow, aurora, starfield, constellation, waves or none),
+interface motion (full, reduced, off) and interface sounds (off by default in
+Nebula Clock). Settings from 1.2 are migrated field by field.
 
-**Accessibility & i18n** — French and English with automatic detection, light
-and dark themes (both fully Nebula-branded) plus "follow system", custom accent
-colour, text scaling, reduced motion, high contrast, full keyboard navigation,
-ARIA throughout, and complete offline support.
+**Motion** — the family launch sequence, screen entrances, staggered lists and
+a flourish on the ring at every phase change. Only opacity and transform are
+animated, the background is the only infinite animation on screen, and both the
+in-app motion level and the OS "reduce motion" preference are honoured.
+
+**Accessibility & i18n** — French and English with automatic detection, text
+scaling, high contrast, full keyboard navigation (radio groups, a roving-focus
+calendar grid, Space never stolen from a focused control), ARIA throughout, and
+complete offline support.
 
 ---
 

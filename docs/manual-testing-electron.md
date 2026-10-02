@@ -117,15 +117,18 @@ Needs two builds and a published GitHub Release.
 
 ## 10. Appearance and accessibility
 
-| #    | Step                                              | Expected                                                                  |
-| ---- | ------------------------------------------------- | ------------------------------------------------------------------------- |
-| 10.1 | Switch theme to light                             | Whole window repaints; still recognisably Nebula, not a generic white app |
-| 10.2 | Set theme to "follow system", change the OS theme | App follows without a restart                                             |
-| 10.3 | Change the accent colour                          | Ring, buttons and logo gradient all follow                                |
-| 10.4 | Set text size to 150%                             | Nothing clips or overlaps; the window is still usable                     |
-| 10.5 | Enable reduced motion                             | The ambient glow stops drifting; transitions are instant                  |
-| 10.6 | Tab through the whole window                      | Every control is reachable and its focus ring is visible                  |
-| 10.7 | Switch to French                                  | Every string changes, including the tray menu's countdown label           |
+| #     | Step                                             | Expected                                                            |
+| ----- | ------------------------------------------------ | ------------------------------------------------------------------- |
+| 10.1  | Switch through the four themes                   | Whole window repaints, window controls (top right) follow the theme |
+| 10.2  | Set theme to "System", change the OS theme       | App follows without a restart                                       |
+| 10.3  | Pick each accent, then "Custom" with two colours | Ring, buttons, sidebar and background all follow                    |
+| 10.4  | Pick each animated background                    | One layer behind everything; it stops while the window is hidden    |
+| 10.5  | Set the motion level to "Off"                    | Nothing animates and nothing stays invisible                        |
+| 10.6  | Set text size to 150%                            | Nothing clips or overlaps; the window is still usable               |
+| 10.7  | Resize to 1050 x 700, then 700 x 700             | Icon rail below 1100 px, navigation bar at the top below 720 px     |
+| 10.8  | Tab through the whole window                     | Every control is reachable and its focus ring is visible            |
+| 10.9  | Switch to French                                 | Every string changes, including the whole tray menu                 |
+| 10.10 | Drag the window by its top strip                 | It moves; the strip never covers a control                          |
 
 ## 11. Nebula Hub (optional)
 
@@ -143,3 +146,4 @@ throwaway `--user-data-dir`.
 | 11.5 | Click "Détacher", or stop the Hub while docked | The normal window comes back where it was                              |
 | 11.6 | Settings → Nebula Hub                          | State, "Follow the Nebula appearance", "Updates handled by Nebula Hub" |
 | 11.7 | Click the "Nebula apps" button                 | Opens the Hub, or its download page when it is not installed           |
+| 11.8 | Change the appearance in the Hub               | Theme, accents, background, motion and sounds follow 1 for 1           |
