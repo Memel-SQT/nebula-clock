@@ -1,3 +1,12 @@
+## 1.3.0 (2026-10-02)
+
+* docs: describe the family appearance and refresh the screenshots ([b1d95cd](https://github.com/Memel-SQT/nebula-clock/commit/b1d95cd))
+* feat(core): adopt the Nebula family appearance model ([06e30f4](https://github.com/Memel-SQT/nebula-clock/commit/06e30f4))
+* feat(desktop): frameless themed window, translated tray and hardened IPC ([2d99afe](https://github.com/Memel-SQT/nebula-clock/commit/2d99afe))
+* feat(ui): port the Nebula Hub design system ([f1b0dd5](https://github.com/Memel-SQT/nebula-clock/commit/f1b0dd5)), closes [hi#contrast](https://github.com/hi/issues/contrast)
+* feat(web): the Nebula family shell, screens and appearance settings ([9772c07](https://github.com/Memel-SQT/nebula-clock/commit/9772c07))
+* fix(core): keep task order, daylight-saving hours and PWA icons right ([edb17df](https://github.com/Memel-SQT/nebula-clock/commit/edb17df))
+
 ## 1.2.0 (2026-10-02)
 
 * fix(desktop): name the Linux executable explicitly ([c745644](https://github.com/Memel-SQT/nebula-clock/commit/c745644))
