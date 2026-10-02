@@ -8,12 +8,7 @@ import {
   type TextareaHTMLAttributes,
 } from 'react';
 import { cn } from '../lib/cn.js';
-
-const control =
-  'w-full rounded border border-border bg-card-alt px-3 text-sm text-text ' +
-  'placeholder:text-text-secondary transition-colors duration-fast ease-nebula ' +
-  'hover:border-accent/60 focus:border-accent focus-visible:outline-none ' +
-  'disabled:opacity-50 disabled:cursor-default';
+import { Icon } from '../nebula/Icon.js';
 
 interface FieldShellProps {
   id: string;
@@ -26,26 +21,29 @@ interface FieldShellProps {
 
 function FieldShell({ id, label, hint, error, className, children }: FieldShellProps) {
   return (
-    <div className={cn('py-1', className)}>
+    <div className={cn('min-w-0', className)}>
       {label ? (
-        <label htmlFor={id} className="mb-1.5 block text-sm font-medium">
+        <label htmlFor={id} className="field-label">
           {label}
         </label>
       ) : null}
       {children}
       {hint && !error ? (
-        <p id={`${id}-hint`} className="mt-1 text-xs text-text-secondary">
+        <small id={`${id}-hint`} className="field-hint">
           {hint}
-        </p>
+        </small>
       ) : null}
       {error ? (
-        <p id={`${id}-error`} role="alert" className="mt-1 text-xs text-danger">
+        <small id={`${id}-error`} role="alert" className="field-error">
           {error}
-        </p>
+        </small>
       ) : null}
     </div>
   );
 }
+
+const describedBy = (id: string, hint: ReactNode, error: ReactNode) =>
+  error ? `${id}-error` : hint ? `${id}-hint` : undefined;
 
 export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
   label?: ReactNode;
@@ -65,8 +63,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         ref={ref}
         id={id}
         aria-invalid={error ? true : undefined}
-        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className={cn(control, 'h-10', className)}
+        aria-describedby={describedBy(id, hint, error)}
+        className={cn('field', className)}
         {...rest}
       />
     </FieldShell>
@@ -81,7 +79,7 @@ export interface NumberFieldProps extends Omit<TextFieldProps, 'type' | 'onChang
 }
 
 export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(function NumberField(
-  { label, hint, error, wrapperClassName, className, value, onChange, suffix, ...rest },
+  { label, hint, error, wrapperClassName, className, value, onChange, onBlur, suffix, ...rest },
   ref,
 ) {
   const id = useId();
@@ -89,10 +87,10 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
   /**
    * The field keeps its own text while it is being edited.
    *
-   * A fully controlled numeric input cannot be cleared: an empty string
-   * parses to 0, the caller clamps that to its minimum, and the value snaps
-   * back before the user can type the number they wanted. Holding the raw
-   * text lets the field be emptied, and only real numbers are committed.
+   * A fully controlled numeric input cannot be cleared: an empty string parses to 0, the
+   * caller clamps that to its minimum, and the value snaps back before the user can type the
+   * number they wanted. Holding the raw text lets the field be emptied, and only real numbers
+   * are committed.
    */
   const [draft, setDraft] = useState<string | null>(null);
 
@@ -104,9 +102,11 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
           id={id}
           type="number"
           inputMode="numeric"
-          value={draft ?? String(value)}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+          aria-describedby={describedBy(id, hint, error)}
+          className={cn('field tabular', suffix && 'pr-12', className)}
+          {...rest}
+          value={draft ?? String(value)}
           onChange={(event) => {
             const text = event.target.value;
             setDraft(text);
@@ -115,13 +115,11 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
             if (Number.isFinite(next)) onChange(next);
           }}
           onBlur={(event) => {
-            // Whatever the field is left holding, fall back to the committed
-            // value so it never sits empty or half-typed.
+            // Whatever the field is left holding, fall back to the committed value so it never
+            // sits empty, half-typed or outside the bounds the caller clamped to.
             setDraft(null);
-            rest.onBlur?.(event);
+            onBlur?.(event);
           }}
-          className={cn(control, 'h-10 tabular-nums', suffix && 'pr-12', className)}
-          {...rest}
         />
         {suffix ? (
           <span
@@ -136,26 +134,52 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
   );
 });
 
-export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'id'> {
+export interface TextAreaProps extends Omit<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  'id' | 'value' | 'onChange'
+> {
   label?: ReactNode;
   hint?: ReactNode;
   error?: ReactNode;
   wrapperClassName?: string;
+  /** One entry per line. */
+  lines: readonly string[];
+  /** Called on blur with the non-empty, trimmed lines. */
+  onCommit: (lines: string[]) => void;
 }
 
+/**
+ * A list edited as text, one entry per line. It keeps its own text while focused and commits
+ * on blur: filtering empty lines on every keystroke made it impossible to start a new line.
+ */
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
-  { label, hint, error, wrapperClassName, className, ...rest },
+  { label, hint, error, wrapperClassName, className, lines, onCommit, onBlur, ...rest },
   ref,
 ) {
   const id = useId();
+  const [draft, setDraft] = useState<string | null>(null);
   return (
     <FieldShell id={id} label={label} hint={hint} error={error} className={wrapperClassName}>
       <textarea
         ref={ref}
         id={id}
-        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-        className={cn(control, 'min-h-24 resize-y py-2 leading-relaxed', className)}
+        aria-describedby={describedBy(id, hint, error)}
+        className={cn('field', className)}
         {...rest}
+        value={draft ?? lines.join('\n')}
+        onChange={(event) => setDraft(event.target.value)}
+        onBlur={(event) => {
+          if (draft !== null) {
+            onCommit(
+              draft
+                .split('\n')
+                .map((line) => line.trim())
+                .filter(Boolean),
+            );
+          }
+          setDraft(null);
+          onBlur?.(event);
+        }}
       />
     </FieldShell>
   );
@@ -175,19 +199,26 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(funct
   const id = useId();
   return (
     <FieldShell id={id} label={label} hint={hint} className={wrapperClassName}>
-      <select
-        ref={ref}
-        id={id}
-        aria-describedby={hint ? `${id}-hint` : undefined}
-        className={cn(control, 'h-10 cursor-pointer appearance-none pr-8', className)}
-        {...rest}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          ref={ref}
+          id={id}
+          aria-describedby={hint ? `${id}-hint` : undefined}
+          className={cn('field', className)}
+          {...rest}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <Icon
+          name="chevronDown"
+          size={16}
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary"
+        />
+      </div>
     </FieldShell>
   );
 });

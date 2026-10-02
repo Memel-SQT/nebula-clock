@@ -6,51 +6,55 @@ export interface SegmentedOption<T extends string> {
   label: string;
   /** Overrides the accessible name when the label is an abbreviation. */
   ariaLabel?: string;
+  /** `lang` of the label (a language picker names each language in itself). */
+  lang?: string;
 }
 
 export interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   options: readonly SegmentedOption<T>[];
-  /** Names the group for assistive technology. */
-  label: string;
-  size?: 'sm' | 'md';
+  /** Names the group for assistive technology (or use `labelledBy`). */
+  label?: string;
+  labelledBy?: string;
+  disabled?: boolean;
   className?: string;
 }
 
 /**
- * A radio group styled as a pill switcher (theme, stats range, task filter).
- * Follows the ARIA radiogroup pattern: one tab stop for the whole group, and
- * arrow keys move both the selection and the focus.
+ * The Nebula segmented control (`controls.css` `.segmented`), as a radio group: one tab stop for
+ * the whole group, and the arrow keys move both the selection and the focus.
  */
 export function SegmentedControl<T extends string>({
   value,
   onChange,
   options,
   label,
-  size = 'md',
+  labelledBy,
+  disabled,
   className,
 }: SegmentedControlProps<T>) {
   const buttons = useRef(new Map<string, HTMLButtonElement>());
+  // A value matching no option still leaves one option reachable by Tab.
+  const focusable = options.some((option) => option.value === value) ? value : options[0]?.value;
 
   const move = (delta: number) => {
     const index = options.findIndex((option) => option.value === value);
     const next = options[(index + delta + options.length) % options.length];
     if (!next) return;
     onChange(next.value);
-    // Focus has to follow the selection, otherwise it is left on a button
-    // that just dropped out of the tab order.
+    // Focus has to follow the selection, otherwise it is left on a button that just dropped
+    // out of the tab order.
     buttons.current.get(next.value)?.focus();
   };
 
   return (
     <div
       role="radiogroup"
-      aria-label={label}
-      className={cn(
-        'inline-flex items-center gap-1 rounded-pill border border-border bg-card-alt p-1',
-        className,
-      )}
+      aria-label={labelledBy ? undefined : label}
+      aria-labelledby={labelledBy}
+      aria-disabled={disabled || undefined}
+      className={cn('segmented', className)}
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -65,9 +69,10 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={selected}
             aria-label={option.ariaLabel}
-            // Only the active option stays in the tab order; arrow keys move
-            // within the group, which is the expected radio behaviour.
-            tabIndex={selected ? 0 : -1}
+            lang={option.lang}
+            disabled={disabled}
+            data-sound="toggle"
+            tabIndex={option.value === focusable ? 0 : -1}
             onClick={() => onChange(option.value)}
             onKeyDown={(event) => {
               switch (event.key) {
@@ -85,13 +90,7 @@ export function SegmentedControl<T extends string>({
                   break;
               }
             }}
-            className={cn(
-              'rounded-pill font-medium transition-colors duration-fast ease-nebula',
-              size === 'sm' ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm',
-              selected
-                ? 'bg-nebula-gradient text-white shadow-glow'
-                : 'text-text-secondary hover:text-text',
-            )}
+            className={cn('btn', selected && 'active')}
           >
             {option.label}
           </button>

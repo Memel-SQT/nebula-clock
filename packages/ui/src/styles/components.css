@@ -1,0 +1,652 @@
+/* Components: the Finterest / Nebula Hub dashboard grammar.
+   Ported from Nebula Hub 05204fd: src/renderer/styles/dashboard.css (status dots, KPI cards,
+   panels, section headings, pills, empty panels), app.css (empty state, state banners, settings
+   sections) and operations.css (dialog). Nebula Clock additions are marked. */
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--positive);
+  box-shadow: 0 0 0 3px var(--positive-soft);
+}
+.status-dot.warn {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px var(--warning-soft);
+}
+.status-dot.off {
+  background: var(--muted);
+  box-shadow: 0 0 0 3px var(--surface-raised);
+}
+
+/* KPI cards: auto-fit grid, accent rule on top, icon in a tile. */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 1rem;
+}
+.summary-card {
+  min-height: 148px;
+  padding: 1.3rem;
+  border-radius: var(--radius);
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    border-color var(--motion-base) var(--ease),
+    box-shadow var(--motion-base) var(--ease);
+  animation: rise-in var(--motion-slow) var(--ease-out) both;
+}
+.summary-card:nth-child(1) {
+  animation-delay: 40ms;
+}
+.summary-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+.summary-card:nth-child(3) {
+  animation-delay: 120ms;
+}
+.summary-card:nth-child(4) {
+  animation-delay: 160ms;
+}
+.summary-card:nth-child(n + 5) {
+  animation-delay: 200ms;
+}
+.summary-card:hover {
+  border-color: var(--line-strong);
+}
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.card-top i {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  font-style: normal;
+}
+.summary-card strong {
+  display: block;
+  margin-top: 1.4rem;
+  font-size: clamp(1.2rem, 1.9vw, 1.7rem);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.summary-card small {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.tone-accent {
+  border-top: 2px solid var(--accent);
+}
+.tone-accent .card-top i {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.tone-positive {
+  border-top: 2px solid var(--positive);
+}
+.tone-positive .card-top i {
+  background: var(--positive-soft);
+  color: var(--positive);
+}
+.tone-gold {
+  border-top: 2px solid var(--gold);
+}
+.tone-gold .card-top i {
+  background: var(--gold-soft);
+  color: var(--gold-bright);
+}
+.tone-warning {
+  border-top: 2px solid var(--warning);
+}
+.tone-warning .card-top i {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+/* Panels: overline, title, then a count pill on the right. */
+.panel {
+  padding: 1.45rem;
+  border-radius: var(--radius);
+  animation: rise-in var(--motion-slow) var(--ease-out) both;
+}
+.section-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.section-heading .eyebrow {
+  margin-bottom: 0.45rem;
+}
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.section-heading-copy {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+.section-heading-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pill {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: 0.73rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.panel-copy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+.panel-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 1rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-control);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.panel-empty .icon {
+  flex: 0 0 auto;
+  color: var(--accent-hover);
+}
+.snapshot-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.snapshot-row:last-child {
+  border-bottom: 0;
+}
+.snapshot-row strong {
+  color: var(--ink);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pills and chips (Nebula Clock: tags carry their own colour as --chip). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.chip.tone-accent {
+  border: 0;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.chip.tone-warning {
+  border: 0;
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+.chip.tone-positive {
+  border: 0;
+  background: var(--positive-soft);
+  color: var(--positive);
+}
+.chip.tagged {
+  background: color-mix(in srgb, var(--chip) 16%, transparent);
+  color: color-mix(in srgb, var(--chip) 70%, var(--ink));
+}
+.chip.tagged::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--chip);
+}
+
+/* Empty, loading and error states (ScreenState.tsx). */
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 2.6rem 2rem;
+  text-align: center;
+  animation: card-fade-in var(--motion-slow) var(--ease-out) both;
+}
+.empty-state-icon {
+  display: grid;
+  place-items: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  margin-bottom: 0.4rem;
+  border-radius: 18px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.empty-state h2,
+.empty-state h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.empty-state p {
+  max-width: 460px;
+  margin: 0 0 0.8rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.empty-state.compact {
+  max-width: none;
+  padding: 1.6rem 1rem 0.6rem;
+  animation: none;
+}
+.empty-state.compact h3 {
+  font-size: 1rem;
+}
+.state-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: 0.8rem;
+  animation: banner-in var(--motion-base) var(--ease-out) both;
+}
+.state-banner > div {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 0.15rem;
+}
+.state-banner span {
+  color: var(--muted);
+}
+.state-banner > .icon {
+  color: var(--accent-hover);
+}
+.state-banner.tone-accent {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: var(--accent-soft);
+}
+.state-banner.tone-warning > .icon,
+.state-banner.tone-warning strong {
+  color: var(--warning);
+}
+.error-banner {
+  border-color: var(--danger-soft);
+  background: var(--danger-soft);
+}
+.error-banner .icon,
+.error-banner strong {
+  color: var(--danger);
+}
+.skeleton {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--ink) 8%, transparent),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: skeleton-shimmer 1.4s var(--ease) infinite;
+}
+.skeleton-line {
+  height: 0.8rem;
+}
+
+/* Settings sections (Hub settings panel). */
+.settings-panel {
+  padding: 1.6rem;
+  border-radius: var(--radius);
+  animation: rise-in var(--motion-slow) var(--ease-out) both;
+}
+.settings-section {
+  margin-top: 1.3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.settings-section:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.settings-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.7rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.settings-label {
+  margin: 1rem 0 0.5rem;
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+.settings-section h2 + .settings-label {
+  margin-top: 0.2rem;
+}
+.settings-copy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+.settings-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 1rem 1.2rem;
+}
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+.settings-reset {
+  margin-top: 0.9rem;
+}
+.path-note {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  word-break: break-word;
+}
+.path-note.settings-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.sound-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+.switch-list {
+  display: grid;
+  gap: 0.15rem;
+}
+.switch-list .switch {
+  justify-content: flex-start;
+  width: 100%;
+  text-align: left;
+}
+.switch-hint {
+  display: block;
+  margin: -0.1rem 0 0.4rem 3.6rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+.settings-layout {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 1500px) {
+  .settings-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+/* Dialog: focus trap, dimmed backdrop, dialog-in. */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: color-mix(in srgb, var(--page) 72%, transparent);
+  animation: backdrop-in var(--motion-base) var(--ease-out) both;
+}
+.dialog {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+  padding: 1.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-strong);
+  animation: dialog-in var(--motion-base) var(--ease-out) both;
+}
+:root[data-motion='off'] .dialog,
+:root[data-motion='off'] .dialog-backdrop {
+  animation: none;
+}
+.dialog-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+.dialog-head h2 {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+.dialog-icon {
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  flex: 0 0 auto;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.dialog.tone-danger .dialog-icon {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.dialog.tone-warning .dialog-icon {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+.dialog-body {
+  display: grid;
+  gap: 0.7rem;
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.dialog-body p {
+  margin: 0;
+}
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+.dialog-actions .btn.danger:not(.ghost) {
+  background: var(--danger);
+  color: var(--on-accent);
+}
+.dialog-actions .btn.danger:not(.ghost):hover {
+  background: var(--danger);
+  box-shadow: 0 10px 26px -12px var(--danger);
+}
+
+/* Progress bar (Nebula Clock). */
+.progress-track {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-raised);
+}
+.progress-track.small {
+  height: 0.35rem;
+}
+.progress-track > i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--accent-gradient);
+  transform-origin: left center;
+  transition: transform var(--motion-slow) var(--ease-out);
+}
+.progress-track.tone-positive > i {
+  background: var(--positive);
+}
+.progress-track.tone-warning > i {
+  background: var(--warning);
+}
+
+/* Range sliders follow the accent (Nebula Clock: same track as the Hub's range-field). */
+.nebula-range {
+  width: 100%;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.nebula-range:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+.slider-head label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.slider-head b {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Toast (Nebula Clock: break reminders). */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  max-width: min(520px, calc(100vw - 2rem));
+  padding: 0.8rem 1.1rem;
+  border-radius: var(--radius);
+  transform: translateX(-50%);
+  animation: toast-in var(--motion-base) var(--ease-out) both;
+}
+.toast > .icon {
+  color: var(--accent-hover);
+}
+.toast p {
+  margin: 0;
+  font-size: 0.86rem;
+}
+.toast .eyebrow {
+  margin: 0 0 0.15rem;
+  font-size: 0.62rem;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

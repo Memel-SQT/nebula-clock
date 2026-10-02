@@ -1,0 +1,12 @@
+/* Nebula Clock component styles, in cascade order. Imported from JavaScript after the app
+   stylesheet, so they come after Tailwind's preflight and win over its element resets. The
+   tokens (`tokens.css`) are imported separately, before Tailwind. */
+@import './base.css';
+@import './backgrounds.css';
+@import './motion.css';
+@import './controls.css';
+@import './shell.css';
+@import './sidebar.css';
+@import './components.css';
+@import './splash.css';
+@import './clock.css';

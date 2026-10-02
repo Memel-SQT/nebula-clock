@@ -15,13 +15,18 @@ export interface ProgressRingProps {
   className?: string;
 }
 
+/** The family gradient angle (CSS `100deg`), as a unit vector in screen coordinates. */
+const ANGLE = (100 * Math.PI) / 180;
+const DX = Math.sin(ANGLE);
+const DY = -Math.cos(ANGLE);
+
 /**
  * The circular countdown.
  *
- * The arc is a stroked circle whose dash offset tracks progress, painted with
- * the Nebula accent gradient. The transition is short and linear so the ring
- * advances smoothly once a second without ever appearing to run backwards
- * after a re-render.
+ * The arc is a stroked path starting at twelve o'clock, so nothing is rotated and the accent
+ * gradient keeps the family's 100deg angle on screen. Progress is a stroke-dashoffset step once
+ * a second (a drawn stroke, which the design system allows); nothing on the ring loops, so the
+ * animated background remains the only infinite animation on screen.
  */
 export function ProgressRing({
   progress,
@@ -35,12 +40,14 @@ export function ProgressRing({
   const gradientId = useId();
   const clamped = Math.min(1, Math.max(0, Number.isFinite(progress) ? progress : 0));
   const radius = (size - thickness) / 2;
-  const circumference = 2 * Math.PI * radius;
   const center = size / 2;
+  const circumference = 2 * Math.PI * radius;
+  // A full circle as one arc path, clockwise from the top.
+  const arc = `M ${center} ${center - radius} a ${radius} ${radius} 0 1 1 -0.01 0`;
 
   return (
     <div
-      className={cn('relative grid place-items-center', className)}
+      className={cn('progress-ring', muted && 'is-muted', className)}
       style={{ width: size, height: size }}
     >
       <svg
@@ -52,41 +59,44 @@ export function ProgressRing({
         aria-valuemax={100}
         aria-valuenow={Math.round(clamped * 100)}
         aria-label={label}
-        className={cn('-rotate-90', muted && 'opacity-60')}
       >
         <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="var(--accent-from)" />
-            <stop offset="1" stopColor="var(--accent-to)" />
+          <linearGradient
+            id={gradientId}
+            gradientUnits="userSpaceOnUse"
+            x1={center - DX * radius}
+            y1={center - DY * radius}
+            x2={center + DX * radius}
+            y2={center + DY * radius}
+          >
+            <stop offset="0" stopColor="var(--gold)" />
+            <stop offset="1" stopColor="var(--accent)" />
           </linearGradient>
         </defs>
 
         <circle
+          className="progress-ring-track"
           cx={center}
           cy={center}
           r={radius}
           fill="none"
-          stroke="var(--card-alt)"
           strokeWidth={thickness}
         />
-        <circle
-          cx={center}
-          cy={center}
-          r={radius}
+        <path
+          className="progress-ring-arc"
+          d={arc}
           fill="none"
           stroke={`url(#${gradientId})`}
           strokeWidth={thickness}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - clamped)}
-          style={{
-            transition: 'stroke-dashoffset var(--motion-base) linear',
-            filter: 'drop-shadow(0 0 12px rgba(139, 92, 246, 0.35))',
-          }}
+          // A zero-length round cap would still paint a dot at twelve o'clock.
+          visibility={clamped === 0 ? 'hidden' : undefined}
         />
       </svg>
 
-      <div className="absolute inset-0 grid place-items-center">{children}</div>
+      <div className="progress-ring-content">{children}</div>
     </div>
   );
 }

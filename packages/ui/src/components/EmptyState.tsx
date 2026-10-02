@@ -1,32 +1,35 @@
 import type { ReactNode } from 'react';
 import { cn } from '../lib/cn.js';
+import { Icon, type IconName } from '../nebula/Icon.js';
 
 export interface EmptyStateProps {
   title: ReactNode;
   description?: ReactNode;
-  icon?: ReactNode;
+  icon?: IconName;
   action?: ReactNode;
+  /** Drops the surface when the empty state already sits inside a panel. */
+  compact?: boolean;
   className?: string;
 }
 
-export function EmptyState({ title, description, icon, action, className }: EmptyStateProps) {
+/** Nebula Hub `ScreenState.tsx` empty state: icon in an accent tile, title, help, action. */
+export function EmptyState({
+  title,
+  description,
+  icon = 'sparkles',
+  action,
+  compact = true,
+  className,
+}: EmptyStateProps) {
+  const Heading = compact ? 'h3' : 'h2';
   return (
-    <div
-      className={cn(
-        'grid place-items-center rounded-md border border-dashed border-border px-6 py-12 text-center',
-        className,
-      )}
-    >
-      {icon ? (
-        <div aria-hidden="true" className="mb-3 text-text-secondary opacity-70">
-          {icon}
-        </div>
-      ) : null}
-      <p className="text-sm font-medium">{title}</p>
-      {description ? (
-        <p className="mt-1 max-w-sm text-sm text-text-secondary">{description}</p>
-      ) : null}
-      {action ? <div className="mt-4">{action}</div> : null}
+    <div className={cn('empty-state', compact ? 'compact' : 'nebula-surface', className)}>
+      <span className="empty-state-icon" aria-hidden="true">
+        <Icon name={icon} size={26} />
+      </span>
+      <Heading>{title}</Heading>
+      {description ? <p>{description}</p> : null}
+      {action}
     </div>
   );
 }

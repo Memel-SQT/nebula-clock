@@ -1,433 +1,237 @@
 /**
- * Nebula design tokens.
+ * Nebula design tokens: the four family themes.
  *
- * Values are lifted verbatim from the Nebula desktop app's
- * `src/nebula/web/static/css/theme.css`, which is the brand's source of
- * truth. Nothing in this repo is allowed to hard-code a colour: components
- * only ever reference these custom properties, so the whole family of Nebula
- * products stays in step.
+ * Ported from Nebula Hub 05204fd, `packages/nebula-design/src/styles/tokens.css` (values checked
+ * there against nebula-design-system/tokens/tokens.css and Nebula Finterest v0.1.36). The
+ * variable names are the family's (`--page`, `--surface`, `--ink`, `--accent`, `--gold`…) so
+ * the ported appearance modules and the sidebar work unchanged; the block at the end aliases the
+ * names Nebula Clock used before (`--bg-base`, `--card`, `--text`…).
+ *
+ * This file only declares custom properties and is imported before Tailwind (an `@import` is
+ * only valid at the top of a stylesheet). Never hard-code a colour outside a token block.
  */
-
 :root {
-  /* ---- Surfaces (dark: the canonical Nebula identity) ---- */
-  --bg-base: #0a0a0f;
-  --bg-surface: #12121f;
-  --card: #1a1a2e;
-  --card-alt: #231942;
-  --border: #2a2a45;
-
-  /* ---- Brand hues ---- */
-  --blue: #4c6ef5;
-  --blue-bright: #5b5fef;
-  --violet: #8b5cf6;
-  --violet-bright: #a855f7;
-
-  /* Overridden at runtime by the accent picker; defaults reproduce the
-     original Nebula gradient exactly. */
-  --accent-from: var(--blue);
-  --accent-to: var(--violet);
-  --accent: var(--accent-to);
-  --accent-gradient: linear-gradient(100deg, var(--accent-from), var(--accent-to));
-  --accent-gradient-hover: linear-gradient(100deg, var(--blue-bright), var(--violet-bright));
-
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f43f5e;
-
-  --text: #f1f1f6;
-  --text-secondary: #9a94b8;
-
-  /* ---- Motion ---- */
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-control: 8px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --motion-fast: 150ms;
   --motion-base: 220ms;
   --motion-slow: 420ms;
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --accent-gradient: linear-gradient(100deg, var(--gold), var(--accent));
+  --accent-gradient-hover: linear-gradient(100deg, var(--gold-bright), var(--accent-hover));
+  /* Fourth aurora orb: an accent tint that follows custom accents too. */
+  --accent-tint: color-mix(in srgb, var(--accent) 70%, var(--ink));
 
-  /* ---- Radii (from the Nebula component sheet) ---- */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --radius-pill: 999px;
-
-  /* ---- Elevation / glow ---- */
-  --shadow-glow: 0 10px 30px -12px rgba(139, 92, 246, 0.55);
-  --shadow-card: 0 18px 40px -28px rgba(10, 10, 15, 0.9);
-  --ring-soft: inset 0 0 0 1px rgba(139, 92, 246, 0.25);
-  --ring-strong: inset 0 0 0 1px rgba(139, 92, 246, 0.4);
-  --focus-ring: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent-to);
-
-  /* ---- Ambient glow, the signature Nebula backdrop ---- */
-  --glow-a: rgba(76, 110, 245, 0.16);
-  --glow-b: rgba(139, 92, 246, 0.14);
-
-  /* ---- Typography ---- */
-  --font-sans: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Mono', ui-monospace, monospace;
+  /* Inter is self-hosted (fonts.css): Nebula Clock makes no third-party request. */
+  --font-sans: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', ui-monospace, monospace;
   /* Driven by the accessibility "text size" setting. */
   --font-scale: 1;
 }
 
-/**
- * Light theme.
- *
- * Deliberately *not* an inversion of the dark palette: the accent hues stay
- * identical and the neutrals become light violet-tinted greys, so the light
- * mode still reads as Nebula rather than as a generic white app. Copied
- * from the desktop app's `:root[data-theme="light"]` block.
- */
-:root[data-theme='light'] {
-  --bg-base: #f4f3fb;
-  --bg-surface: #ffffff;
-  --card: #ffffff;
-  --card-alt: #ece9f9;
-  --border: #ddd9ef;
-
-  --success: #059669;
-  --warning: #b45309;
-  --danger: #e11d48;
-
-  --text: #18172b;
-  --text-secondary: #6b6584;
-
-  --shadow-card: 0 18px 40px -30px rgba(35, 25, 66, 0.45);
-  --shadow-glow: 0 10px 30px -14px rgba(139, 92, 246, 0.45);
-  --glow-a: rgba(76, 110, 245, 0.1);
-  --glow-b: rgba(139, 92, 246, 0.1);
+/* Nebula sombre — identité par défaut. */
+:root,
+:root[data-theme='nebula-dark'] {
+  color-scheme: dark;
+  --page: #0a0a0f;
+  --sidebar: #12121f;
+  --surface: #1a1a2e;
+  --surface-raised: #231942;
+  --surface-muted: #12121f;
+  --ink: #f1f1f6;
+  --muted: #9a94b8;
+  --line: #2a2a45;
+  --line-strong: #3b3b63;
+  --accent: #8b5cf6;
+  --accent-hover: #a855f7;
+  --accent-soft: rgba(139, 92, 246, 0.16);
+  --accent-glow: rgba(139, 92, 246, 0.24);
+  --on-accent: #ffffff;
+  --gold: #4c6ef5;
+  --gold-bright: #5b5fef;
+  --gold-soft: rgba(76, 110, 245, 0.18);
+  --positive: #34d399;
+  --positive-soft: rgba(52, 211, 153, 0.16);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.16);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.16);
+  --focus-ring: rgba(168, 85, 247, 0.6);
+  --shadow: 0 12px 30px rgba(5, 5, 12, 0.45);
+  --shadow-strong: 0 24px 60px rgba(5, 5, 12, 0.6);
+  --glow-1: rgba(76, 110, 245, 0.16);
+  --glow-2: rgba(139, 92, 246, 0.14);
 }
 
-/**
- * Fallback for the brief moment before the inline theme script runs, and for
- * anyone browsing with JavaScript disabled. Once the app boots it always
- * writes an explicit `data-theme`, so this only ever covers first paint.
- */
+/* Nebula clair — mêmes teintes d'accent, neutres teintés violet (pas une simple inversion). */
+:root[data-theme='nebula-light'] {
+  color-scheme: light;
+  --page: #f4f3fb;
+  --sidebar: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #ece9f9;
+  --surface-muted: #f3f1fc;
+  --ink: #18172b;
+  --muted: #6b6584;
+  --line: #ddd9ef;
+  --line-strong: #c7c0e6;
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-soft: rgba(124, 58, 237, 0.1);
+  --accent-glow: rgba(124, 58, 237, 0.16);
+  --on-accent: #ffffff;
+  --gold: #3b5bdb;
+  --gold-bright: #3450c8;
+  --gold-soft: rgba(59, 91, 219, 0.1);
+  --positive: #059669;
+  --positive-soft: rgba(5, 150, 105, 0.1);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.1);
+  --danger: #be123c;
+  --danger-soft: rgba(190, 18, 60, 0.1);
+  --focus-ring: rgba(124, 58, 237, 0.5);
+  --shadow: 0 10px 26px rgba(24, 23, 43, 0.07);
+  --shadow-strong: 0 20px 50px rgba(24, 23, 43, 0.13);
+  --glow-1: rgba(76, 110, 245, 0.1);
+  --glow-2: rgba(139, 92, 246, 0.09);
+}
+
+/* Verre liquide sombre : palette Nebula, surfaces translucides floutées sur un fond vivant. */
+:root[data-theme='glass-dark'] {
+  color-scheme: dark;
+  --page: #06060f;
+  --sidebar: rgba(18, 18, 38, 0.42);
+  --surface: rgba(255, 255, 255, 0.055);
+  --surface-raised: rgba(255, 255, 255, 0.11);
+  --surface-muted: rgba(8, 8, 22, 0.38);
+  --ink: #f5f4ff;
+  --muted: #b4afd2;
+  --line: rgba(255, 255, 255, 0.11);
+  --line-strong: rgba(255, 255, 255, 0.22);
+  --accent: #8b5cf6;
+  --accent-hover: #b07cff;
+  --accent-soft: rgba(139, 92, 246, 0.2);
+  --accent-glow: rgba(139, 92, 246, 0.35);
+  --on-accent: #ffffff;
+  --gold: #4c6ef5;
+  --gold-bright: #6282ff;
+  --gold-soft: rgba(76, 110, 245, 0.2);
+  --positive: #34d399;
+  --positive-soft: rgba(52, 211, 153, 0.18);
+  --warning: #fcd34d;
+  --warning-soft: rgba(251, 191, 36, 0.18);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.18);
+  --focus-ring: rgba(176, 124, 255, 0.7);
+  --shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+  --shadow-strong: 0 28px 70px rgba(0, 0, 0, 0.5);
+  --glow-1: rgba(76, 110, 245, 0.38);
+  --glow-2: rgba(139, 92, 246, 0.34);
+  --glass-hi: rgba(255, 255, 255, 0.1);
+  --glass-lo: rgba(255, 255, 255, 0.025);
+  --glass-edge: rgba(255, 255, 255, 0.28);
+  --glass-shine: rgba(255, 255, 255, 0.13);
+  --radius: 16px;
+  --radius-lg: 24px;
+}
+
+/* Verre liquide clair : givré, lumineux, ombres douces teintées violet. */
+:root[data-theme='glass-light'] {
+  color-scheme: light;
+  --page: #e9ebf8;
+  --sidebar: rgba(255, 255, 255, 0.5);
+  --surface: rgba(255, 255, 255, 0.5);
+  --surface-raised: rgba(255, 255, 255, 0.72);
+  --surface-muted: rgba(255, 255, 255, 0.42);
+  --ink: #17162a;
+  --muted: #5b5676;
+  --line: rgba(60, 45, 130, 0.12);
+  --line-strong: rgba(60, 45, 130, 0.22);
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-soft: rgba(124, 58, 237, 0.12);
+  --accent-glow: rgba(124, 58, 237, 0.22);
+  --on-accent: #ffffff;
+  --gold: #3b5bdb;
+  --gold-bright: #3450c8;
+  --gold-soft: rgba(59, 91, 219, 0.12);
+  --positive: #059669;
+  --positive-soft: rgba(5, 150, 105, 0.12);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.12);
+  --danger: #be123c;
+  --danger-soft: rgba(190, 18, 60, 0.12);
+  --focus-ring: rgba(124, 58, 237, 0.5);
+  --shadow: 0 14px 36px rgba(60, 45, 130, 0.12);
+  --shadow-strong: 0 24px 60px rgba(60, 45, 130, 0.18);
+  --glow-1: rgba(76, 110, 245, 0.3);
+  --glow-2: rgba(168, 85, 247, 0.28);
+  --glass-hi: rgba(255, 255, 255, 0.78);
+  --glass-lo: rgba(255, 255, 255, 0.36);
+  --glass-edge: rgba(255, 255, 255, 0.95);
+  --glass-shine: rgba(255, 255, 255, 0.6);
+  --radius: 16px;
+  --radius-lg: 24px;
+}
+
+/* First paint without a theme yet (JavaScript disabled): follow the OS. The inline script in
+   index.html always writes an explicit data-theme before the first frame otherwise. */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-    --bg-base: #f4f3fb;
-    --bg-surface: #ffffff;
-    --card: #ffffff;
-    --card-alt: #ece9f9;
-    --border: #ddd9ef;
-    --success: #059669;
-    --warning: #b45309;
-    --danger: #e11d48;
-    --text: #18172b;
-    --text-secondary: #6b6584;
-    --glow-a: rgba(76, 110, 245, 0.1);
-    --glow-b: rgba(139, 92, 246, 0.1);
+    color-scheme: light;
+    --page: #f4f3fb;
+    --sidebar: #ffffff;
+    --surface: #ffffff;
+    --surface-raised: #ece9f9;
+    --surface-muted: #f3f1fc;
+    --ink: #18172b;
+    --muted: #6b6584;
+    --line: #ddd9ef;
+    --line-strong: #c7c0e6;
   }
 }
 
-/* Stronger contrast, from the accessibility settings. Raises text and border
-   contrast without leaving the Nebula palette. */
-:root[data-contrast='high'] {
-  --text: #ffffff;
-  --text-secondary: #d5d0ea;
-  --border: #4c4a78;
-  --card: #15152a;
-  --bg-base: #05050a;
-  --focus-ring: 0 0 0 2px var(--bg-base), 0 0 0 4px #ffffff;
+/* Stronger contrast (Nebula Clock accessibility setting, WCAG AA and beyond): raises text and
+   border contrast and makes surfaces opaque, without leaving the Nebula palette. */
+:root[data-contrast='high'][data-theme$='-dark'] {
+  --page: #05050a;
+  --sidebar: #0d0d1a;
+  --surface: #15152a;
+  --surface-raised: #2a2050;
+  --surface-muted: #0d0d1a;
+  --ink: #ffffff;
+  --muted: #d5d0ea;
+  --line: #4c4a78;
+  --line-strong: #7a76b0;
+  --focus-ring: #ffffff;
 }
 
-:root[data-theme='light'][data-contrast='high'] {
-  --text: #000000;
-  --text-secondary: #35304d;
-  --border: #9a94b8;
-  --card: #ffffff;
-  --bg-base: #ffffff;
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #18172b;
+:root[data-contrast='high'][data-theme$='-light'] {
+  --page: #ffffff;
+  --sidebar: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #ece9f9;
+  --surface-muted: #f7f6fd;
+  --ink: #000000;
+  --muted: #35304d;
+  --line: #9a94b8;
+  --line-strong: #6b6584;
+  --focus-ring: #18172b;
 }
 
-/* Two independent switches, exactly as in the desktop app: the OS
-   preference, and an explicit in-app setting. */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --motion-fast: 0ms;
-    --motion-base: 0ms;
-    --motion-slow: 0ms;
-  }
-}
-
-:root[data-reduce-motion='true'] {
-  --motion-fast: 0ms;
-  --motion-base: 0ms;
-  --motion-slow: 0ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-:root[data-reduce-motion='true'] *,
-:root[data-reduce-motion='true'] *::before,
-:root[data-reduce-motion='true'] *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-}
-
-/* ------------------------------------------------------------------ base */
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  /* The accessibility text-size slider scales the whole interface. */
-  font-size: calc(16px * var(--font-scale));
-}
-
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-}
-
-body {
-  background: var(--bg-base);
-  color: var(--text);
-  font-family: var(--font-sans);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'cv11', 'ss01';
-}
-
-:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-radius: var(--radius-sm);
-}
-
-/**
- * Ambient nebula glow behind the whole app - decorative, slow drift,
- * reinforces the identity without ever demanding attention.
- */
-.nebula-glow {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(600px 400px at 15% 15%, var(--glow-a), transparent 60%),
-    radial-gradient(700px 500px at 85% 75%, var(--glow-b), transparent 60%);
-  animation: nebula-glow-drift 24s ease-in-out infinite alternate;
-}
-
-@keyframes nebula-glow-drift {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    transform: translate(2%, -2%) scale(1.05);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .nebula-glow {
-    animation: none;
-  }
-}
-
-:root[data-reduce-motion='true'] .nebula-glow {
-  animation: none;
-}
-
-/* Scrollbars, matching the Nebula treatment. */
-.nebula-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-
-.nebula-scrollbar::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.nebula-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.nebula-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: var(--radius-pill);
-}
-
-.nebula-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-to);
-}
-
-/* Text that rides the accent gradient - used for the timer readout. */
-.nebula-gradient-text {
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/**
- * Range inputs. Restyled per-engine because there is still no cross-browser
- * way to paint a track and thumb; `--slider-fill` is set inline by <Slider>.
- */
-.nebula-range::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(
-    to right,
-    var(--accent-from) 0%,
-    var(--accent-to) var(--slider-fill, 0%),
-    var(--card-alt) var(--slider-fill, 0%),
-    var(--card-alt) 100%
-  );
-}
-
-.nebula-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  margin-top: -5px;
-  height: 16px;
-  width: 16px;
-  border-radius: var(--radius-pill);
-  background: #ffffff;
-  border: 2px solid var(--accent-to);
-  box-shadow: var(--shadow-glow);
-  transition: transform var(--motion-fast) var(--ease);
-}
-
-.nebula-range:active::-webkit-slider-thumb {
-  transform: scale(1.1);
-}
-
-.nebula-range::-moz-range-track {
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--card-alt);
-}
-
-.nebula-range::-moz-range-progress {
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--accent-to);
-}
-
-.nebula-range::-moz-range-thumb {
-  height: 16px;
-  width: 16px;
-  border-radius: var(--radius-pill);
-  background: #ffffff;
-  border: 2px solid var(--accent-to);
-  box-shadow: var(--shadow-glow);
-}
-
-.nebula-range:focus-visible::-webkit-slider-thumb {
-  box-shadow: var(--focus-ring);
-}
-
-.nebula-range:focus-visible::-moz-range-thumb {
-  box-shadow: var(--focus-ring);
-}
-
-/**
- * Logo animation, used by the launch screen.
- *
- * The ring draws itself from twelve o'clock and the hands sweep into place
- * behind it. Both animations are `forwards`, so when the reduced-motion rules
- * above collapse the duration to nothing the mark simply appears finished
- * rather than disappearing.
- */
-.nebula-logo-animated .nebula-logo-ring {
-  /* 2 * pi * r, with r = 32 in the 0..100 viewBox. */
-  stroke-dasharray: 201.06;
-  stroke-dashoffset: 201.06;
-  transform-box: view-box;
-  transform-origin: 50px 50px;
-  transform: rotate(-90deg);
-  animation: nebula-logo-draw 900ms var(--ease) forwards;
-}
-
-.nebula-logo-animated .nebula-logo-hands {
-  transform-box: view-box;
-  transform-origin: 50px 50px;
-  opacity: 0;
-  animation: nebula-logo-hands 620ms var(--ease) 460ms forwards;
-}
-
-@keyframes nebula-logo-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes nebula-logo-hands {
-  from {
-    opacity: 0;
-    transform: rotate(-150deg) scale(0.55);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-/**
- * Entrance for lists and card grids.
- *
- * A CSS animation rather than a JS one because these elements are also
- * dragged by dnd-kit, which owns their transform; a library animating the
- * same property would fight it. Stagger by setting `animation-delay` inline.
- */
-.nebula-reveal {
-  opacity: 0;
-  animation: nebula-reveal var(--motion-slow) var(--ease) forwards;
-}
-
-@keyframes nebula-reveal {
-  from {
-    opacity: 0;
-    translate: 0 10px;
-  }
-  to {
-    opacity: 1;
-    translate: none;
-  }
-}
-
-/* A short flourish on the progress ring when the phase changes. */
-.nebula-phase-flourish {
-  animation: nebula-phase-flourish 620ms var(--ease);
-}
-
-@keyframes nebula-phase-flourish {
-  0% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  35% {
-    transform: scale(1.035);
-    filter: brightness(1.25);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-}
-
-/* Screen-reader-only, kept here so it is available without a component. */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+/* Names Nebula Clock used before the family model, kept as aliases. */
+:root {
+  --bg-base: var(--page);
+  --card: var(--surface);
+  --card-alt: var(--surface-raised);
+  --border: var(--line);
+  --text: var(--ink);
+  --text-secondary: var(--muted);
+  --success: var(--positive);
+  --accent-from: var(--gold);
+  --accent-to: var(--accent);
 }

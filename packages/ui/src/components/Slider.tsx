@@ -1,4 +1,4 @@
-import { useId, type CSSProperties, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { cn } from '../lib/cn.js';
 
 export interface SliderProps {
@@ -16,10 +16,7 @@ export interface SliderProps {
   className?: string;
 }
 
-/**
- * A native range input restyled to the Nebula palette. The filled portion is
- * painted with a gradient that follows the accent colour.
- */
+/** A native range input in the accent colour (Nebula Hub `.range-field`). */
 export function Slider({
   value,
   onChange,
@@ -33,17 +30,11 @@ export function Slider({
   className,
 }: SliderProps) {
   const id = useId();
-  const ratio = max === min ? 0 : ((value - min) / (max - min)) * 100;
-
   return (
-    <div className={cn('py-1', className)}>
-      <div className="mb-1.5 flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm font-medium">
-          {label}
-        </label>
-        {valueLabel ? (
-          <span className="font-mono text-xs tabular-nums text-text-secondary">{valueLabel}</span>
-        ) : null}
+    <div className={cn('slider', className)}>
+      <div className="slider-head">
+        <label htmlFor={id}>{label}</label>
+        {valueLabel !== undefined ? <b>{valueLabel}</b> : null}
       </div>
       <input
         id={id}
@@ -55,11 +46,7 @@ export function Slider({
         disabled={disabled}
         aria-valuetext={ariaValueText}
         onChange={(event) => onChange(Number(event.target.value))}
-        className={cn(
-          'nebula-range h-6 w-full cursor-pointer appearance-none bg-transparent',
-          'focus-visible:outline-none disabled:cursor-default disabled:opacity-50',
-        )}
-        style={{ '--slider-fill': `${ratio}%` } as CSSProperties}
+        className="nebula-range"
       />
     </div>
   );

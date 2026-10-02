@@ -6,18 +6,12 @@ export interface ProgressBarProps {
   label: string;
   /** Hides the bar from assistive tech when a sibling already announces it. */
   decorative?: boolean;
-  tone?: 'accent' | 'success' | 'warning';
+  tone?: 'accent' | 'positive' | 'warning';
   size?: 'sm' | 'md';
   className?: string;
 }
 
-const tones = {
-  accent: 'bg-nebula-gradient',
-  success: 'bg-success',
-  warning: 'bg-warning',
-} as const;
-
-/** Linear progress, matching `.scan-progress-bar` from the Nebula theme. */
+/** Linear progress in the accent gradient; the fill moves by `transform` only. */
 export function ProgressBar({
   value,
   label,
@@ -30,7 +24,7 @@ export function ProgressBar({
   const percent = Math.round(clamped * 100);
 
   return (
-    <div
+    <span
       role={decorative ? undefined : 'progressbar'}
       aria-hidden={decorative || undefined}
       aria-valuemin={decorative ? undefined : 0}
@@ -38,18 +32,13 @@ export function ProgressBar({
       aria-valuenow={decorative ? undefined : percent}
       aria-label={decorative ? undefined : label}
       className={cn(
-        'w-full overflow-hidden rounded-pill bg-card-alt',
-        size === 'sm' ? 'h-1.5' : 'h-2',
+        'progress-track',
+        size === 'sm' && 'small',
+        tone !== 'accent' && `tone-${tone}`,
         className,
       )}
     >
-      <div
-        className={cn(
-          'h-full rounded-pill transition-[width] duration-base ease-nebula',
-          tones[tone],
-        )}
-        style={{ width: `${percent}%` }}
-      />
-    </div>
+      <i style={{ transform: `scaleX(${clamped})` }} />
+    </span>
   );
 }

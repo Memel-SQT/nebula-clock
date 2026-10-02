@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { cn } from '../lib/cn.js';
+import { Icon, type IconName } from '../nebula/Icon.js';
 import { IconButton } from './IconButton.js';
 
 export interface ModalProps {
@@ -7,56 +8,53 @@ export interface ModalProps {
   onClose: () => void;
   title: ReactNode;
   description?: ReactNode;
+  icon?: IconName;
+  tone?: 'accent' | 'warning' | 'danger';
   children?: ReactNode;
   footer?: ReactNode;
   closeLabel: string;
-  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
-
-const sizes = {
-  sm: 'max-w-sm',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-} as const;
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Accessible dialog: labelled by its title, closes on Escape or a backdrop
- * click, traps Tab inside itself, and restores focus to whatever opened it.
+ * Nebula dialog (Nebula Hub `operations.css`): dimmed backdrop, `dialog-in` entrance, labelled
+ * by its title. Closes on Escape or a backdrop click, traps Tab inside itself, and restores
+ * focus to whatever opened it. The in-app shortcuts stay off while it is open (aria-modal).
  */
 export function Modal({
   open,
   onClose,
   title,
   description,
+  icon,
+  tone = 'accent',
   children,
   footer,
   closeLabel,
-  size = 'md',
   className,
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   const titleId = useId();
   const descriptionId = useId();
 
   useEffect(() => {
     if (!open) return;
 
-    restoreFocusRef.current = document.activeElement as HTMLElement | null;
+    const restoreFocus = document.activeElement as HTMLElement | null;
     const panel = panelRef.current;
-    // Focus the first control, or the panel itself when it holds none.
-    const firstControl = panel?.querySelector<HTMLElement>(FOCUSABLE);
-    if (firstControl) firstControl.focus();
-    else panel?.focus();
+    // Focus the first control after the close button, or the panel itself.
+    const controls = panel ? [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)] : [];
+    (controls[1] ?? controls[0] ?? panel)?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation();
-        onClose();
+        closeRef.current();
         return;
       }
       if (event.key !== 'Tab' || !panel) return;
@@ -85,21 +83,19 @@ export function Modal({
     return () => {
       document.removeEventListener('keydown', onKeyDown, true);
       document.body.style.overflow = previousOverflow;
-      restoreFocusRef.current?.focus();
+      restoreFocus?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center p-4"
-      // The backdrop is a sibling concern; clicking it closes the dialog.
+      className="dialog-backdrop"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div aria-hidden="true" className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
         ref={panelRef}
         role="dialog"
@@ -107,46 +103,22 @@ export function Modal({
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}
-        className={cn(
-          'relative w-full rounded-lg border border-border bg-card p-6 shadow-card',
-          'animate-scale-in',
-          sizes[size],
-          className,
-        )}
+        className={cn('dialog', `tone-${tone}`, className)}
       >
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h2 id={titleId} className="text-lg font-semibold tracking-tight">
-              {title}
-            </h2>
-            {description ? (
-              <p id={descriptionId} className="mt-1 text-sm text-text-secondary">
-                {description}
-              </p>
-            ) : null}
-          </div>
-          <IconButton
-            label={closeLabel}
-            onClick={onClose}
-            size="sm"
-            icon={
-              <svg
-                viewBox="0 0 20 20"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
-              </svg>
-            }
-          />
+        <div className="dialog-head">
+          {icon ? (
+            <span className="dialog-icon" aria-hidden="true">
+              <Icon name={icon} size={18} />
+            </span>
+          ) : null}
+          <h2 id={titleId}>{title}</h2>
+          <IconButton label={closeLabel} icon="close" size="sm" onClick={onClose} />
         </div>
-
-        {children}
-
-        {footer ? <div className="mt-6 flex justify-end gap-2">{footer}</div> : null}
+        <div className="dialog-body">
+          {description ? <p id={descriptionId}>{description}</p> : null}
+          {children}
+        </div>
+        {footer ? <div className="dialog-actions">{footer}</div> : null}
       </div>
     </div>
   );

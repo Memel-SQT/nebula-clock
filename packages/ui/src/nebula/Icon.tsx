@@ -1,0 +1,649 @@
+import type { ReactNode } from 'react';
+
+/**
+ * Nebula icon set: 24px grid, 1.8px rounded strokes, and one soft duotone shape (`.icon-duo`,
+ * filled with currentColor at low opacity) per glyph for depth. Everything is drawn in
+ * currentColor, so icons follow the theme and the user's custom accent colors. No Unicode
+ * glyph is ever used in the interface.
+ *
+ * Ported from Nebula Hub 05204fd, `packages/nebula-design/src/Icon.tsx`. The first block is
+ * ported verbatim from Nebula Finterest v0.1.36 `src/renderer/components/Icon.tsx`; the second
+ * block adds the Store's icons, drawn in the same style; the third, Nebula Clock's own.
+ */
+const duo = { className: 'icon-duo' };
+const duoFill = { className: 'icon-duo', stroke: 'none' };
+const dot = { fill: 'currentColor', stroke: 'none' };
+
+const glyphs = {
+  overview: (
+    <>
+      <rect x="3.5" y="3.5" width="7" height="9" rx="2" {...duo} />
+      <rect x="13.5" y="3.5" width="7" height="5" rx="2" />
+      <rect x="13.5" y="11.5" width="7" height="9" rx="2" />
+      <rect x="3.5" y="15.5" width="7" height="5" rx="2" />
+    </>
+  ),
+  calendar: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
+      <path d="M3.5 10h17" />
+      <path d="M8 3v4M16 3v4" />
+      <rect x="13" y="13" width="4.5" height="4.5" rx="1.2" {...duo} />
+    </>
+  ),
+  repeat: (
+    <>
+      <path d="M19.5 10.5A7.8 7.8 0 0 0 5.6 7.4L4 9" />
+      <path d="M4 4.5V9h4.5" />
+      <path d="M4.5 13.5a7.8 7.8 0 0 0 13.9 3.1L20 15" />
+      <path d="M20 19.5V15h-4.5" />
+      <circle cx="12" cy="12" r="2.6" {...duo} />
+    </>
+  ),
+  bag: (
+    <>
+      <path d="M5.5 8h13l-1 11.2a2 2 0 0 1-2 1.8h-7a2 2 0 0 1-2-1.8z" {...duo} />
+      <path d="M9 10.5V7a3 3 0 0 1 6 0v3.5" />
+    </>
+  ),
+  bank: (
+    <>
+      <path d="M3.5 9.5 12 4l8.5 5.5z" {...duo} />
+      <path d="M6 12v5M10 12v5M14 12v5M18 12v5" />
+      <path d="M3.5 20h17" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8.5" r="3.8" {...duo} />
+      <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+    </>
+  ),
+  sliders: (
+    <>
+      <path d="M4 7h8.5M17.5 7H20M4 17h2.5M11.5 17H20" />
+      <circle cx="15" cy="7" r="2.3" {...duo} />
+      <circle cx="9" cy="17" r="2.3" {...duo} />
+    </>
+  ),
+  trendUp: (
+    <>
+      <path d="M3.5 17 9 11.5l3.5 3.5 8-8" />
+      <path d="M15 7h5.5v5.5" />
+    </>
+  ),
+  wallet: (
+    <>
+      <path d="M4 8V7.5A2.5 2.5 0 0 1 6.5 5H16v3" />
+      <rect x="4" y="8" width="16.5" height="11.5" rx="2.5" {...duo} />
+      <circle cx="16" cy="13.75" r="1.3" {...dot} />
+    </>
+  ),
+  calculator: (
+    <>
+      <rect x="5" y="3.5" width="14" height="17" rx="2.5" {...duo} />
+      <path d="M8.5 7.5h7" />
+      <circle cx="9" cy="12" r="0.9" {...dot} />
+      <circle cx="12" cy="12" r="0.9" {...dot} />
+      <circle cx="15" cy="12" r="0.9" {...dot} />
+      <circle cx="9" cy="16" r="0.9" {...dot} />
+      <circle cx="12" cy="16" r="0.9" {...dot} />
+      <circle cx="15" cy="16" r="0.9" {...dot} />
+    </>
+  ),
+  chevronRight: <path d="m9.5 6 6 6-6 6" />,
+  chevronLeft: <path d="m14.5 6-6 6 6 6" />,
+  plus: <path d="M12 5v14M5 12h14" />,
+  close: <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />,
+  check: <path d="m5 12.5 4.5 4.5L19 7.5" />,
+  trash: (
+    <>
+      <path d="M4.5 7h15" />
+      <path d="M9.5 7V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 14.5 5v2" />
+      <path d="m6.5 7 .8 11.6a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9L17.5 7" {...duo} />
+    </>
+  ),
+  power: (
+    <>
+      <path d="M12 3.5v8" />
+      <path d="M7.2 6.6a7.5 7.5 0 1 0 9.6 0" />
+    </>
+  ),
+  sparkles: (
+    <>
+      <path d="m11 3.5 1.9 5.1 5.1 1.9-5.1 1.9L11 17.5l-1.9-5.1L4 10.5l5.1-1.9z" {...duo} />
+      <path d="M18.5 15v4.5M16.25 17.25h4.5" />
+    </>
+  ),
+  volume: (
+    <>
+      <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" {...duo} />
+      <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+    </>
+  ),
+  volumeOff: (
+    <>
+      <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" {...duo} />
+      <path d="m16 9.5 5 5M21 9.5l-5 5" />
+    </>
+  ),
+  folderSync: (
+    <>
+      <path
+        d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"
+        {...duo}
+      />
+      <path d="M14.8 12.2a3 3 0 0 0-5.3-1.1M9.2 14.8a3 3 0 0 0 5.3 1.1" />
+      <path d="M9.5 9.4v1.7h1.7M14.5 17.6v-1.7h-1.7" />
+    </>
+  ),
+  download: (
+    <>
+      <path d="M12 4v11" />
+      <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+      <path d="M4.5 19.5h15" />
+    </>
+  ),
+  upload: (
+    <>
+      <path d="M12 15V4" />
+      <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+      <path d="M4.5 19.5h15" />
+    </>
+  ),
+  refresh: (
+    <>
+      <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+      <path d="M19.5 4.5v4h-4" />
+    </>
+  ),
+  palette: (
+    <>
+      <path
+        d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.9 1.4-2l-.3-.8a1.6 1.6 0 0 1 1.5-2.2h2.3a3.6 3.6 0 0 0 3.6-3.6c0-4.8-3.8-8.4-8.5-8.4z"
+        {...duo}
+      />
+      <circle cx="7.8" cy="11.5" r="1.2" {...dot} />
+      <circle cx="10" cy="7.6" r="1.2" {...dot} />
+      <circle cx="14.6" cy="7.6" r="1.2" {...dot} />
+    </>
+  ),
+  droplet: (
+    <>
+      <path d="M12 3.5s6 6.3 6 10.5a6 6 0 0 1-12 0c0-4.2 6-10.5 6-10.5z" {...duo} />
+      <path d="M9.2 14.5a2.9 2.9 0 0 0 2.3 2.6" />
+    </>
+  ),
+  layers: (
+    <>
+      <path d="m12 3.5 8.5 4.5L12 12.5 3.5 8z" {...duo} />
+      <path d="m3.5 12 8.5 4.5 8.5-4.5" />
+      <path d="m3.5 16 8.5 4.5 8.5-4.5" />
+    </>
+  ),
+  bolt: <path d="M13 3.5 5.5 13.5H12l-1 7 7.5-10H12z" {...duo} />,
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.5 12h17" />
+      <path
+        d="M12 3.5c2.4 2.3 3.5 5.2 3.5 8.5s-1.1 6.2-3.5 8.5c-2.4-2.3-3.5-5.2-3.5-8.5S9.6 5.8 12 3.5z"
+        {...duo}
+      />
+    </>
+  ),
+  moon: <path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z" {...duo} />,
+  logout: (
+    <>
+      <path d="M14 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H14" />
+      <path d="M10 16.5 5.5 12 10 7.5" />
+      <path d="M5.5 12H15" />
+    </>
+  ),
+  camera: (
+    <>
+      <path
+        d="M4 8.5a2 2 0 0 1 2-2h2l1.5-2h5l1.5 2h2a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"
+        {...duo}
+      />
+      <circle cx="12" cy="12.5" r="3.2" />
+    </>
+  ),
+  alert: (
+    <>
+      <circle cx="12" cy="12" r="8.5" {...duo} />
+      <path d="M12 7.5V13" />
+      <circle cx="12" cy="16.3" r="0.95" {...dot} />
+    </>
+  ),
+  info: (
+    <>
+      <circle cx="12" cy="12" r="8.5" {...duo} />
+      <path d="M12 11v5.5" />
+      <circle cx="12" cy="7.8" r="0.95" {...dot} />
+    </>
+  ),
+  home: (
+    <>
+      <path d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z" {...duo} />
+      <path d="M9.5 20.5V15h5v5.5" />
+    </>
+  ),
+  wifi: (
+    <>
+      <path d="M3.5 9.5a12 12 0 0 1 17 0" />
+      <path d="M6.5 12.8a7.5 7.5 0 0 1 11 0" />
+      <path d="M9.5 16a3.5 3.5 0 0 1 5 0" />
+      <circle cx="12" cy="19" r="1.2" {...dot} />
+    </>
+  ),
+  play: (
+    <>
+      <rect x="3.5" y="4.5" width="17" height="12.5" rx="2.5" {...duo} />
+      <path d="m10.5 8.3 4 2.45-4 2.45z" fill="currentColor" />
+      <path d="M8.5 20.5h7" />
+    </>
+  ),
+  car: (
+    <>
+      <path d="M5.5 12 7 8a2 2 0 0 1 1.9-1.5h6.2A2 2 0 0 1 17 8l1.5 4" />
+      <rect x="4" y="12" width="16" height="5.5" rx="1.8" {...duo} />
+      <path d="M6.5 17.5v2M17.5 17.5v2" />
+      <circle cx="8" cy="14.75" r="0.95" {...dot} />
+      <circle cx="16" cy="14.75" r="0.95" {...dot} />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3.5 19 6v5.5c0 4.3-3 7.7-7 9-4-1.3-7-4.7-7-9V6z" {...duo} />
+      <path d="m9 12 2.2 2.2L15.5 10" />
+    </>
+  ),
+  heart: (
+    <path
+      d="M12 19.5s-7.5-4.4-7.5-9.7A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6c0 5.3-7.5 9.7-7.5 9.7z"
+      {...duo}
+    />
+  ),
+  tag: (
+    <>
+      <path
+        d="M3.5 12.3V5A1.5 1.5 0 0 1 5 3.5h7.3l8.2 8.2a1.5 1.5 0 0 1 0 2.1l-7.2 7.2a1.5 1.5 0 0 1-2.1 0z"
+        {...duo}
+      />
+      <circle cx="8" cy="8" r="1.4" {...dot} />
+    </>
+  ),
+
+  // ---- Nebula Store additions ----
+  store: (
+    <>
+      <path
+        d="M3.5 9.5 5 4.5h14l1.5 5a2.5 2.5 0 0 1-4.9.7 2.6 2.6 0 0 1-5.1 0 2.6 2.6 0 0 1-5.1 0A2.5 2.5 0 0 1 3.5 9.5z"
+        {...duo}
+      />
+      <path d="M5 12v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 19v-7" />
+      <path d="M10 20.5V16h4v4.5" />
+    </>
+  ),
+  grid: (
+    <>
+      <circle cx="12" cy="12" r="2.6" {...duoFill} />
+      <circle cx="5.5" cy="5.5" r="1.6" {...dot} />
+      <circle cx="12" cy="5.5" r="1.6" {...dot} />
+      <circle cx="18.5" cy="5.5" r="1.6" {...dot} />
+      <circle cx="5.5" cy="12" r="1.6" {...dot} />
+      <circle cx="12" cy="12" r="1.6" {...dot} />
+      <circle cx="18.5" cy="12" r="1.6" {...dot} />
+      <circle cx="5.5" cy="18.5" r="1.6" {...dot} />
+      <circle cx="12" cy="18.5" r="1.6" {...dot} />
+      <circle cx="18.5" cy="18.5" r="1.6" {...dot} />
+    </>
+  ),
+  link: (
+    <>
+      <circle cx="12" cy="12" r="2.4" {...duoFill} />
+      <path d="M10.2 13.8a3.6 3.6 0 0 0 5.1 0l3.2-3.2a3.6 3.6 0 0 0-5.1-5.1l-1.1 1.1" />
+      <path d="M13.8 10.2a3.6 3.6 0 0 0-5.1 0l-3.2 3.2a3.6 3.6 0 0 0 5.1 5.1l1.1-1.1" />
+    </>
+  ),
+  puzzle: (
+    <path
+      d="M4.5 8h3.4a2.1 2.1 0 1 1 4.2 0h3.4v3.4a2.1 2.1 0 1 1 0 4.2V19a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19z"
+      {...duo}
+    />
+  ),
+  package: (
+    <>
+      <path d="M12 3.5 20 7.5v9l-8 4-8-4v-9z" {...duo} />
+      <path d="m4 7.5 8 4 8-4" />
+      <path d="M12 11.5v9" />
+      <path d="m8 5.5 8 4" />
+    </>
+  ),
+  update: (
+    <>
+      <circle cx="12" cy="12" r="5" {...duoFill} />
+      <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+      <path d="M19.5 4.5v4h-4" />
+      <path d="M12 8.5v6" />
+      <path d="m9.5 12.5 2.5 2.5 2.5-2.5" />
+    </>
+  ),
+  repair: (
+    <path
+      d="M14.8 4a4.5 4.5 0 0 0-4.9 6l-5.4 5.4a1.9 1.9 0 0 0 2.7 2.7l5.4-5.4a4.5 4.5 0 0 0 6-4.9l-2.6 2.6-2.5-.4-.4-2.5z"
+      {...duo}
+    />
+  ),
+  uninstall: (
+    <>
+      <path d="M12 3.5 19.5 7.3v4.2" />
+      <path d="M4.5 7.3 12 3.5" />
+      <path d="M4.5 7.3v8.9l7.5 3.8" />
+      <path d="m4.5 7.3 7.5 3.8 7.5-3.8" />
+      <path d="M12 11.1v8.9" />
+      <circle cx="17.5" cy="17.5" r="3.5" {...duo} />
+      <path d="M16 17.5h3" />
+    </>
+  ),
+  tray: (
+    <>
+      <rect x="3.5" y="14.5" width="17" height="6" rx="2" {...duo} />
+      <path d="M12 11.5v-7" />
+      <path d="m8.5 8 3.5-3.5L15.5 8" />
+      <circle cx="13.5" cy="17.5" r="0.95" {...dot} />
+      <circle cx="16.8" cy="17.5" r="0.95" {...dot} />
+    </>
+  ),
+  bell: (
+    <>
+      <path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z" {...duo} />
+      <path d="M10 20.8a2.1 2.1 0 0 0 4 0" />
+    </>
+  ),
+  pause: (
+    <>
+      <rect x="6" y="4.5" width="4" height="15" rx="1.5" {...duo} />
+      <rect x="14" y="4.5" width="4" height="15" rx="1.5" {...duo} />
+    </>
+  ),
+  external: (
+    <>
+      <path d="M18 14v4.5a2 2 0 0 1-2 2H6.5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2H11" {...duo} />
+      <path d="M13.5 4.5h6v6" />
+      <path d="M19.5 4.5 11 13" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6.5" {...duo} />
+      <path d="m15.5 15.5 5 5" />
+    </>
+  ),
+  history: (
+    <>
+      <circle cx="12" cy="12" r="5.2" {...duoFill} />
+      <path d="M4.2 12a7.8 7.8 0 1 0 2.3-5.5" />
+      <path d="M4 4.5V9h4.5" />
+      <path d="M12 8v4.3l2.8 1.8" />
+    </>
+  ),
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" {...duo} />
+      <circle cx="12" cy="12" r="2.8" />
+    </>
+  ),
+  eyeOff: (
+    <>
+      <path
+        d="M6.6 7.4C4 9.2 2.5 12 2.5 12S6 18.5 12 18.5c1.9 0 3.5-.6 4.9-1.5M10 5.7c.6-.1 1.3-.2 2-.2 6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.4 3.2"
+        {...duo}
+      />
+      <path d="M4 4l16 16" />
+    </>
+  ),
+  grip: (
+    <>
+      <circle cx="9" cy="6.5" r="1.4" {...dot} />
+      <circle cx="15" cy="6.5" r="1.4" {...dot} />
+      <circle cx="9" cy="12" r="1.4" {...dot} />
+      <circle cx="15" cy="12" r="1.4" {...dot} />
+      <circle cx="9" cy="17.5" r="1.4" {...dot} />
+      <circle cx="15" cy="17.5" r="1.4" {...dot} />
+    </>
+  ),
+  rocket: (
+    <>
+      <path d="M14.5 4.5c3-1 5-1 5-1s0 2-1 5l-5.5 5.5-3-3z" {...duo} />
+      <path d="M10 10.5 6.5 10l-2 2 4 1.5M13.5 14l.5 3.5-2 2-1.5-4" />
+      <path d="M6 18c-1 .4-1.5 1-1.5 1.5.5 0 1.1-.5 1.5-1.5z" />
+    </>
+  ),
+
+  // ---- Navigation set (Hub sidebar, shared by the family): one glyph per section, the
+  // duotone shape carries the meaning so the icon still reads at 18 px. ----
+  navHome: (
+    <>
+      <path
+        d="M4 10.6 12 4l8 6.6v7.9a2 2 0 0 1-2 2h-3.2v-5.2a1.5 1.5 0 0 0-1.5-1.5h-2.6a1.5 1.5 0 0 0-1.5 1.5v5.2H6a2 2 0 0 1-2-2z"
+        {...duo}
+      />
+      <path d="M18.5 3.5v3M17 5h3" />
+    </>
+  ),
+  compass: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m15.6 8.4-2.1 5.1-5.1 2.1 2.1-5.1z" {...duo} />
+      <circle cx="12" cy="12" r="1" {...dot} />
+    </>
+  ),
+  apps: (
+    <>
+      <rect x="3.5" y="3.5" width="7" height="7" rx="2.2" />
+      <rect x="13.5" y="3.5" width="7" height="7" rx="2.2" {...duo} />
+      <rect x="3.5" y="13.5" width="7" height="7" rx="2.2" {...duo} />
+      <circle cx="17" cy="17" r="3.6" />
+    </>
+  ),
+  downloadTray: (
+    <>
+      <path
+        d="M3.5 14.5h4.2l1.4 2.2h5.8l1.4-2.2h4.2v3.5a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 18z"
+        {...duo}
+      />
+      <path d="M12 3.5v9" />
+      <path d="m8.3 9 3.7 3.7L15.7 9" />
+    </>
+  ),
+  orbit: (
+    <>
+      <circle cx="12" cy="12" r="3" {...duo} />
+      <ellipse cx="12" cy="12" rx="9" ry="4.3" transform="rotate(-30 12 12)" />
+      <circle cx="18.6" cy="6.5" r="1.5" {...dot} />
+      <circle cx="5.4" cy="17.5" r="1.5" {...dot} />
+    </>
+  ),
+  gear: (
+    <>
+      <path
+        d="M10.44 5.49L10.64 3.41L13.36 3.41L13.56 5.49L15.5 6.29L17.11 4.96L19.04 6.89L17.71 8.5L18.51 10.44L20.59 10.64L20.59 13.36L18.51 13.56L17.71 15.5L19.04 17.11L17.11 19.04L15.5 17.71L13.56 18.51L13.36 20.59L10.64 20.59L10.44 18.51L8.5 17.71L6.89 19.04L4.96 17.11L6.29 15.5L5.49 13.56L3.41 13.36L3.41 10.64L5.49 10.44L6.29 8.5L4.96 6.89L6.89 4.96L8.5 6.29Z"
+        {...duo}
+      />
+      <circle cx="12" cy="12" r="2.8" />
+    </>
+  ),
+
+  // Nebula Clock: the timer's own concepts, in the same style (24 px grid, 1.8 px rounded
+  // strokes, one duotone shape carrying the meaning, legible at 18 px).
+  timer: (
+    <>
+      <circle cx="12" cy="13.5" r="7" {...duo} />
+      <path d="M12 13.5V9.8" />
+      <path d="M9.8 3.5h4.4M12 3.5v3" />
+      <path d="m18.2 6.6 1.3-1.3" />
+    </>
+  ),
+  tasks: (
+    <>
+      <rect x="3.5" y="4.5" width="5" height="5" rx="1.4" {...duo} />
+      <path d="m4.4 16.6 1.4 1.4 2.6-2.8" />
+      <path d="M12 7h8.5M12 12h8.5M12 17h5.5" />
+    </>
+  ),
+  chart: (
+    <>
+      <rect x="4" y="12.5" width="4" height="8" rx="1.3" />
+      <rect x="10" y="7.5" width="4" height="13" rx="1.3" {...duo} />
+      <rect x="16" y="3.5" width="4" height="17" rx="1.3" />
+    </>
+  ),
+  start: (
+    <path
+      d="M7.5 5.3v13.4a1 1 0 0 0 1.5.86l10.9-6.7a1 1 0 0 0 0-1.72L9 4.44a1 1 0 0 0-1.5.86z"
+      {...duo}
+    />
+  ),
+  skipNext: (
+    <>
+      <path
+        d="M5.5 6.3v11.4a1 1 0 0 0 1.55.83l8.4-5.7a1 1 0 0 0 0-1.66l-8.4-5.7a1 1 0 0 0-1.55.83z"
+        {...duo}
+      />
+      <path d="M18.5 5.5v13" />
+    </>
+  ),
+  reset: (
+    <>
+      <circle cx="12" cy="12" r="3" {...duoFill} />
+      <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3" />
+      <path d="M4.5 4.5v4h4" />
+    </>
+  ),
+  expand: (
+    <>
+      <rect x="8" y="8" width="8" height="8" rx="2" {...duo} />
+      <path d="M14.5 3.5h6v6M9.5 20.5h-6v-6" />
+      <path d="m20.5 3.5-5 5M3.5 20.5l5-5" />
+    </>
+  ),
+  collapse: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="4" {...duo} />
+      <path d="M9.5 4v5.5H4M14.5 20v-5.5H20" />
+      <path d="m4 4 5.5 5.5M20 20l-5.5-5.5" />
+    </>
+  ),
+  miniWindow: (
+    <>
+      <rect x="3" y="4.5" width="18" height="15" rx="3" />
+      <rect x="11.5" y="11.5" width="7" height="5.5" rx="1.5" {...duo} />
+    </>
+  ),
+  rain: (
+    <>
+      <path d="M7.2 15.5a4 4 0 0 1-.4-7.98A5.5 5.5 0 0 1 17.4 9a3.3 3.3 0 0 1 .1 6.5z" {...duo} />
+      <path d="m8.5 18.5-1 2M12.5 18.5l-1 2M16.5 18.5l-1 2" />
+    </>
+  ),
+  forest: (
+    <>
+      <path d="M12 3.5 6.5 11.5h2.8L5.8 17h12.4l-3.5-5.5h2.8z" {...duo} />
+      <path d="M12 17v3.5" />
+    </>
+  ),
+  coffee: (
+    <>
+      <path d="M4.5 9h11.5v5.5a4.5 4.5 0 0 1-4.5 4.5h-2.5a4.5 4.5 0 0 1-4.5-4.5z" {...duo} />
+      <path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16" />
+      <path d="M8.5 3.5v2.5M12 3.5v2.5" />
+    </>
+  ),
+  waves: (
+    <>
+      <path
+        d="M3.5 16c1.4-1.3 2.8-1.3 4.2 0s2.8 1.3 4.3 0 2.8-1.3 4.3 0 2.8 1.3 4.2 0v4.5h-17z"
+        {...duoFill}
+      />
+      <path d="M3.5 8c1.4-1.3 2.8-1.3 4.2 0s2.8 1.3 4.3 0 2.8-1.3 4.3 0 2.8 1.3 4.2 0" />
+      <path d="M3.5 12c1.4-1.3 2.8-1.3 4.2 0s2.8 1.3 4.3 0 2.8-1.3 4.3 0 2.8 1.3 4.2 0" />
+      <path d="M3.5 16c1.4-1.3 2.8-1.3 4.2 0s2.8 1.3 4.3 0 2.8-1.3 4.3 0 2.8 1.3 4.2 0" />
+    </>
+  ),
+  flame: (
+    <>
+      <path
+        d="M12 3.5c.6 3.2 5 5 5 10a5 5 0 0 1-10 0c0-2.3 1-3.8 2.2-5 .3 1.7 1.2 2.7 2.3 2.8-.9-2.6-.3-5.5.5-7.8z"
+        {...duo}
+      />
+      <path d="M12 20.5a2.2 2.2 0 0 1-2.2-2.2c0-1.4 1.1-2.2 2.2-3.6 1.1 1.4 2.2 2.2 2.2 3.6a2.2 2.2 0 0 1-2.2 2.2z" />
+    </>
+  ),
+  target: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="5" {...duo} />
+      <circle cx="12" cy="12" r="1.5" {...dot} />
+    </>
+  ),
+  award: (
+    <>
+      <circle cx="12" cy="9" r="5.5" {...duo} />
+      <path d="M8.6 13.4 7.2 20.5l4.8-2.5 4.8 2.5-1.4-7.1" />
+    </>
+  ),
+  percent: (
+    <>
+      <path d="m18.5 5.5-13 13" />
+      <circle cx="7.5" cy="7.5" r="2.5" {...duo} />
+      <circle cx="16.5" cy="16.5" r="2.5" />
+    </>
+  ),
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8.5" {...duo} />
+      <path d="M12 7.5V12l3 2" />
+    </>
+  ),
+  chevronDown: <path d="m6 9.5 6 6 6-6" />,
+  edit: (
+    <>
+      <path d="M15.5 4.5 19.5 8.5 9 19H5v-4z" {...duo} />
+      <path d="m13.5 6.5 4 4" />
+    </>
+  ),
+} satisfies Record<string, ReactNode>;
+
+export type IconName = keyof typeof glyphs;
+
+export const ICON_NAMES = Object.keys(glyphs) as IconName[];
+
+export function Icon({
+  name,
+  size = 18,
+  className,
+}: {
+  name: IconName;
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <svg
+      className={`icon ${className ?? ''}`}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {glyphs[name]}
+    </svg>
+  );
+}
