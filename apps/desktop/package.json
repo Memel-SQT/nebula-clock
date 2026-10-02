@@ -21,6 +21,7 @@
     "test": "echo \"Electron shell is covered by the manual test plan in docs/manual-testing-electron.md\" && exit 0"
   },
   "dependencies": {
+    "@nebula/link": "https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz",
     "electron-updater": "^6.3.9"
   },
   "devDependencies": {
@@ -28,8 +29,8 @@
     "@types/node": "^22.9.0",
     "concurrently": "^9.1.0",
     "cross-env": "^7.0.3",
-    "electron": "^33.2.0",
-    "electron-builder": "^25.1.8",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
     "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "wait-on": "^8.0.1"
@@ -117,7 +118,13 @@
         "libxtst6",
         "libnss3"
       ]
-    }
+    },
+    "extraResources": [
+      {
+        "from": "nebula.app.json",
+        "to": "nebula.app.json"
+      }
+    ]
   },
   "homepage": "https://github.com/Memel-SQT/nebula-clock",
   "repository": {

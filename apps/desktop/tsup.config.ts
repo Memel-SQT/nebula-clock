@@ -18,7 +18,8 @@ export default defineConfig({
   // Electron is provided by the runtime; electron-updater is resolved from
   // node_modules inside the packaged app, which is how it expects to load.
   external: ['electron', 'electron-updater'],
-  noExternal: [/@nebula-clock\//],
+  // @nebula/link (zero dependency) is bundled too: one module less to resolve once packaged.
+  noExternal: [/@nebula-clock\//, /@nebula\/link/],
   clean: true,
   sourcemap: true,
   minify: false,
