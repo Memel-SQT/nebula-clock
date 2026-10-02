@@ -17,6 +17,13 @@ export const CHANNELS = {
   closeMiniMode: 'nebula:close-mini-mode',
   setFullscreen: 'nebula:set-fullscreen',
   checkForUpdates: 'nebula:check-for-updates',
+  hubState: 'nebula:hub-state',
+  setUpdatesByHub: 'nebula:set-updates-by-hub',
+  openHub: 'nebula:open-hub',
+  detachFromHub: 'nebula:detach-from-hub',
+
+  // renderer -> main (synchronous, read once by the preload)
+  appInfo: 'nebula:app-info',
 
   // renderer -> main (fire and forget)
   publishTimer: 'nebula:publish-timer',
@@ -25,11 +32,15 @@ export const CHANNELS = {
   /** A freshly opened mirror asking for the current state right away. */
   requestSnapshot: 'nebula:request-snapshot',
   quitAndInstall: 'nebula:quit-and-install',
+  /** Today's focus for the Nebula Hub widget (the renderer owns sessions and translations). */
+  publishFocus: 'nebula:publish-focus',
 
   // main -> renderer
   command: 'nebula:command',
   timerSnapshot: 'nebula:timer-snapshot',
   updateEvent: 'nebula:update-event',
+  hubStateChanged: 'nebula:state',
+  hubAppearance: 'nebula:appearance',
 } as const;
 
 export type Phase = 'focus' | 'shortBreak' | 'longBreak';

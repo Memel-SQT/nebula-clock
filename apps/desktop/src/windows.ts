@@ -31,9 +31,12 @@ function preloadPath(): string {
   return join(__dirname, 'preload.cjs');
 }
 
+/** The main window's Nebula Hub mode: docked (frameless, placed by the Hub) or recreated after it. */
+let windowMode: 'docked' | 'restored' | null = null;
+
 /** Renderer entry point for a window; `mini` picks the compact layout. */
 function rendererUrl(mini: boolean): { url?: string; file?: string; query: string } {
-  const query = mini ? 'mini=1' : '';
+  const query = mini ? 'mini=1' : windowMode ? `mode=${windowMode}` : '';
   if (isDev) {
     return { url: `${DEV_SERVER_URL}${query ? `?${query}` : ''}#/timer`, query };
   }
@@ -65,14 +68,34 @@ export function allWindows(): BrowserWindow[] {
   return [mainWindow, miniWindow].filter((w): w is BrowserWindow => w !== null && !w.isDestroyed());
 }
 
-export async function createMainWindow(): Promise<BrowserWindow> {
+type Bounds = { x: number; y: number; width: number; height: number };
+
+export async function createMainWindow(
+  options: { docked?: boolean; bounds?: Bounds } = {},
+): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) return mainWindow;
+  const docked = options.docked === true;
 
   mainWindow = new BrowserWindow({
-    width: 1120,
-    height: 780,
-    minWidth: 380,
-    minHeight: 560,
+    width: options.bounds?.width ?? 1120,
+    height: options.bounds?.height ?? 780,
+    ...(options.bounds ? { x: options.bounds.x, y: options.bounds.y } : {}),
+    minWidth: docked ? 240 : 380,
+    minHeight: docked ? 240 : 560,
+    // Docked in Nebula Hub: exactly the Hub's area, no frame, no invisible resize border, off the
+    // taskbar, and only the Hub moves or sizes it.
+    ...(docked
+      ? {
+          frame: false,
+          thickFrame: false,
+          skipTaskbar: true,
+          resizable: false,
+          movable: false,
+          minimizable: false,
+          maximizable: false,
+          fullscreenable: false,
+        }
+      : {}),
     backgroundColor: BACKGROUND,
     // Painted only once the renderer is ready, avoiding a white flash.
     show: false,
@@ -82,7 +105,8 @@ export async function createMainWindow(): Promise<BrowserWindow> {
       preload: preloadPath(),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false,
+      // The preload only uses contextBridge and ipcRenderer (the version comes over IPC).
+      sandbox: true,
       spellcheck: false,
       // This window owns the timer. Chromium throttles timers in hidden
       // windows, and this one is hidden whenever the app is in the tray or
@@ -92,18 +116,19 @@ export async function createMainWindow(): Promise<BrowserWindow> {
     },
   });
 
-  mainWindow.once('ready-to-show', () => mainWindow?.show());
+  const created = mainWindow;
+  created.once('ready-to-show', () => (docked ? created.showInactive() : created.show()));
 
   // Closing the window keeps the timer running in the tray unless the user
   // actually asked to quit or turned the behaviour off.
-  mainWindow.on('close', (event) => {
+  created.on('close', (event) => {
     if (quitting || !minimizeToTray) return;
     event.preventDefault();
-    mainWindow?.hide();
+    created.hide();
   });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null;
+  created.on('closed', () => {
+    if (mainWindow === created) mainWindow = null;
   });
 
   // External links belong in the user's browser, never in an app window.
@@ -112,8 +137,84 @@ export async function createMainWindow(): Promise<BrowserWindow> {
     return { action: 'deny' };
   });
 
-  await load(mainWindow, false);
-  return mainWindow;
+  await load(created, false);
+  return created;
+}
+
+/**
+ * The Nebula Hub mode. Electron cannot remove the frame of an open window, so the main window is
+ * recreated (the new one first, then the old one is destroyed: the renderer reloads its own state
+ * from storage, the timer being timestamp-based). Any `released`, loss of the Hub or "Detach"
+ * brings the normal window back where it was.
+ */
+const dock: { docked: boolean; normalBounds: Bounds | null; busy: Promise<void> } = {
+  docked: false,
+  normalBounds: null,
+  busy: Promise.resolve(),
+};
+
+type DockPayload =
+  { state: 'released' } | { state: 'docked'; visible: boolean; raise: boolean; bounds: Bounds };
+
+function isDockPayload(value: unknown): value is DockPayload {
+  const record = value as Record<string, unknown> | null;
+  if (!record || typeof record !== 'object') return false;
+  if (record.state === 'released') return true;
+  const bounds = record.bounds as Record<string, unknown> | undefined;
+  return (
+    record.state === 'docked' &&
+    typeof record.visible === 'boolean' &&
+    typeof record.raise === 'boolean' &&
+    Boolean(bounds) &&
+    ['x', 'y', 'width', 'height'].every((key) => Number.isInteger(bounds?.[key]))
+  );
+}
+
+export function isDocked(): boolean {
+  return dock.docked;
+}
+
+async function replaceMainWindow(options: { docked: boolean; bounds?: Bounds }): Promise<void> {
+  const previous = mainWindow;
+  mainWindow = null;
+  windowMode = options.docked ? 'docked' : 'restored';
+  await createMainWindow(options);
+  if (previous && !previous.isDestroyed()) previous.destroy();
+}
+
+export function applyDock(payload: unknown): Promise<void> {
+  if (!isDockPayload(payload)) return dock.busy;
+  dock.busy = dock.busy
+    .then(async () => {
+      if (payload.state === 'released') {
+        await undock();
+        return;
+      }
+      if (!dock.docked) {
+        dock.normalBounds = mainWindow && !mainWindow.isDestroyed() ? mainWindow.getBounds() : null;
+        dock.docked = true;
+        closeMiniWindow();
+        await replaceMainWindow({ docked: true, bounds: payload.bounds });
+      }
+      const window = mainWindow;
+      if (!window || window.isDestroyed()) return;
+      if (!payload.visible) {
+        window.hide();
+        return;
+      }
+      window.setBounds(payload.bounds);
+      if (!window.isVisible()) window.showInactive();
+      if (payload.raise) window.moveTop();
+    })
+    .catch(() => undefined);
+  return dock.busy;
+}
+
+export async function undock(): Promise<void> {
+  if (!dock.docked) return;
+  dock.docked = false;
+  await replaceMainWindow({ docked: false, bounds: dock.normalBounds ?? undefined });
+  focusMainWindow();
 }
 
 export async function openMiniWindow(alwaysOnTop: boolean): Promise<BrowserWindow> {
@@ -178,6 +279,11 @@ export function focusMainWindow(): void {
   const window = mainWindow;
   if (!window || window.isDestroyed()) {
     void createMainWindow();
+    return;
+  }
+  if (dock.docked) {
+    // The Hub places the docked window; it only comes to the front.
+    window.moveTop();
     return;
   }
   if (window.isMinimized()) window.restore();

@@ -6,7 +6,10 @@
  * All business logic stays in the renderer: this process only knows how to
  * display a countdown someone else computed.
  */
-import { BrowserWindow, Notification, app, ipcMain, powerSaveBlocker } from 'electron';
+import { BrowserWindow, Notification, app, ipcMain, powerSaveBlocker, shell } from 'electron';
+import { join } from 'node:path';
+import type { FocusTodayPublication } from '@nebula-clock/core';
+import { NebulaIntegration } from './nebula.js';
 import { CHANNELS } from './ipc.js';
 import type {
   BlockerConfig,
@@ -18,9 +21,16 @@ import type {
 import { applyBlocker, teardownBlocker } from './blocker.js';
 import { applyGlobalShortcuts, unregisterGlobalShortcuts } from './shortcuts.js';
 import { createTray, destroyTray, updateBadge, updateTray } from './tray.js';
-import { checkForUpdates, disposeUpdater, initUpdater, quitAndInstall } from './updater.js';
+import {
+  checkForUpdates,
+  disposeUpdater,
+  initUpdater,
+  quitAndInstall,
+  setUpdatesDeferred,
+} from './updater.js';
 import {
   allWindows,
+  applyDock,
   closeMiniWindow,
   createMainWindow,
   focusMainWindow,
@@ -30,7 +40,34 @@ import {
   setMiniAlwaysOnTop,
   setMinimizeToTray,
   setQuitting,
+  undock,
 } from './windows.js';
+
+/** Nebula Hub, through Nebula Link: optional, and silent when the Hub is absent. */
+const nebula = new NebulaIntegration({
+  appVersion: app.getVersion(),
+  // Packaged: copied to resources\ by electron-builder, where Nebula Hub reads it too.
+  manifestPath: app.isPackaged
+    ? join(process.resourcesPath, 'nebula.app.json')
+    : join(__dirname, '../nebula.app.json'),
+  settingsPath: join(app.getPath('userData'), 'nebula-hub.json'),
+  send: (channel, payload) => getMainWindow()?.webContents.send(channel, payload),
+  focus: () => focusMainWindow(),
+  startTimer: () => getMainWindow()?.webContents.send(CHANNELS.command, 'start'),
+  onDock: (payload) => void applyDock(payload),
+  onUpdatesDeferred: (deferred) => void setUpdatesDeferred(deferred),
+});
+
+function isFocusPublication(value: unknown): value is FocusTodayPublication {
+  const record = value as Record<string, unknown> | null;
+  return (
+    Boolean(record) &&
+    typeof record === 'object' &&
+    typeof record?.date === 'string' &&
+    ['done', 'goal', 'streak'].every((key) => Number.isInteger(record?.[key])) &&
+    ['title', 'value', 'caption'].every((key) => typeof record?.[key] === 'string')
+  );
+}
 
 /**
  * Do Not Disturb.
@@ -95,6 +132,36 @@ function showNotification(payload: NotificationPayload): void {
 function registerIpc(): void {
   ipcMain.handle(CHANNELS.notify, (_event, payload: NotificationPayload) => {
     showNotification(payload);
+    nebula.notify(String(payload?.title ?? ''), String(payload?.body ?? ''));
+  });
+
+  ipcMain.on(CHANNELS.appInfo, (event) => {
+    event.returnValue = { version: app.getVersion(), platform: process.platform };
+  });
+
+  ipcMain.on(CHANNELS.publishFocus, (_event, focus: unknown) => {
+    if (isFocusPublication(focus)) nebula.publishFocus(focus);
+  });
+
+  ipcMain.handle(CHANNELS.hubState, () => nebula.state());
+  ipcMain.handle(CHANNELS.setUpdatesByHub, (_event, enabled: unknown) =>
+    nebula.setUpdatesByHub(enabled === true),
+  );
+  ipcMain.handle(CHANNELS.openHub, async () => {
+    // nebula:// is registered by an installed Nebula Hub; without it, its download page.
+    if (app.getApplicationNameForProtocol('nebula://')) {
+      await shell.openExternal('nebula://hub/');
+      return 'opened';
+    }
+    await shell.openExternal('https://github.com/Memel-SQT/Nebula-Hub/releases');
+    return 'not-installed';
+  });
+  ipcMain.handle(CHANNELS.detachFromHub, async () => {
+    // Leave the Hub mode from the app: stop listening (the Hub forgets the app), normal window,
+    // then listen again so the mode can be chosen later from the Hub.
+    nebula.pauseDock();
+    await undock();
+    setTimeout(() => nebula.resumeDock(), 1500);
   });
 
   // The main window is the source of truth; the mini window mirrors it.
@@ -103,6 +170,11 @@ function registerIpc(): void {
     if (sender && sender === getMiniWindow()) return;
 
     lastSnapshot = snapshot;
+    nebula.publishPhase({
+      phase: snapshot.phase,
+      status: snapshot.status,
+      remainingSeconds: snapshot.remainingSeconds,
+    });
     updateTray(snapshot);
     updateBadge(snapshot.completedToday);
     getMiniWindow()?.webContents.send(CHANNELS.timerSnapshot, snapshot);
@@ -119,7 +191,8 @@ function registerIpc(): void {
   });
 
   ipcMain.handle(CHANNELS.setLaunchAtLogin, (_event, enabled: boolean) => {
-    app.setLoginItemSettings({ openAtLogin: enabled, openAsHidden: true });
+    // (openAsHidden, macOS only, is gone from Electron 44.)
+    app.setLoginItemSettings({ openAtLogin: enabled });
     return app.getLoginItemSettings().openAtLogin;
   });
 
@@ -179,11 +252,11 @@ function quit(): void {
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', () => focusMainWindow());
+  app.on('second-instance', (_event, argv) => {
+    if (!nebula.routeArgv(argv)) focusMainWindow();
+  });
 
   void app.whenReady().then(async () => {
-    // Read back by the preload script to show the version in Settings.
-    process.env.NEBULA_APP_VERSION = app.getVersion();
     app.setAppUserModelId('clock.nebula.desktop');
 
     registerIpc();
@@ -196,6 +269,8 @@ if (!app.requestSingleInstanceLock()) {
     });
 
     applyGlobalShortcuts(true, broadcastCommand);
+    await nebula.start().catch(() => undefined);
+    nebula.routeArgv(process.argv);
     await initUpdater(broadcastUpdate);
 
     app.on('activate', () => {
@@ -219,6 +294,7 @@ if (!app.requestSingleInstanceLock()) {
 
   app.on('before-quit', () => {
     setQuitting(true);
+    nebula.dispose();
     unregisterGlobalShortcuts();
     disposeUpdater();
     destroyTray();

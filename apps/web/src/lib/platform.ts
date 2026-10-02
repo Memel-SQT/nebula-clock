@@ -45,6 +45,24 @@ export type UpdateEvent =
   | { type: 'downloaded'; version: string }
   | { type: 'error'; message: string };
 
+/** Nebula Hub as the desktop shell sees it (Nebula Link, optional). */
+export interface HubState {
+  connected: boolean;
+  hubVersion: string | null;
+  updatesByHub: boolean;
+}
+
+/** Today's focus, published for the Hub's widget (texts already translated). */
+export interface FocusPublication {
+  date: string;
+  done: number;
+  goal: number;
+  streak: number;
+  title: string;
+  value: string;
+  caption: string;
+}
+
 export interface DesktopBridge {
   readonly isDesktop: true;
   /** `process.platform`; the three named values are the supported targets. */
@@ -86,6 +104,19 @@ export interface DesktopBridge {
   checkForUpdates(): Promise<void>;
   onUpdateEvent(handler: (event: UpdateEvent) => void): () => void;
   quitAndInstall(): void;
+
+  /**
+   * Nebula Hub (optional: missing in older shells, every caller checks). `hubMode` is set when
+   * the main window was recreated for the Hub mode ("docked") or after it ("restored").
+   */
+  readonly hubMode?: 'docked' | 'restored' | null;
+  publishFocus?(focus: FocusPublication): void;
+  getHubState?(): Promise<HubState>;
+  onHubState?(handler: (state: HubState) => void): () => void;
+  onNebulaAppearance?(handler: (appearance: unknown) => void): () => void;
+  setUpdatesByHub?(enabled: boolean): Promise<HubState>;
+  openHub?(): Promise<'opened' | 'not-installed'>;
+  detachFromHub?(): Promise<void>;
 }
 
 declare global {

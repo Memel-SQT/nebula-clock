@@ -89,5 +89,11 @@
     "deleteTag": "Ce tag sera retiré de toutes les tâches.",
     "clearData": "Supprime définitivement toutes les tâches, tags et sessions de cet appareil.",
     "importReplace": "L'import remplace toutes les données actuelles de cet appareil."
+  },
+  "nebula": {
+    "apps": "Apps Nebula",
+    "notInstalled": "Nebula Hub n’est pas installé : sa page de téléchargement vient de s’ouvrir.",
+    "docked": "Affichée dans Nebula Hub",
+    "detach": "Détacher"
   }
 }

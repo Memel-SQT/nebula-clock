@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "appId": "nebula.clock",
+  "provides": [
+    {
+      "id": "clock.focus.today",
+      "kind": "widget",
+      "sensitivity": "public",
+      "title": { "fr": "Focus du jour", "en": "Today's focus" },
+      "description": {
+        "fr": "Pomodoros réalisés aujourd'hui par rapport à l'objectif, et la série en cours.",
+        "en": "Pomodoros done today against the goal, and the current streak."
+      },
+      "resultSchema": "WidgetV1",
+      "refreshSeconds": 120
+    },
+    {
+      "id": "clock.break.started",
+      "kind": "event",
+      "sensitivity": "public",
+      "title": { "fr": "Début de pause", "en": "Break started" },
+      "description": {
+        "fr": "Une pause commence, avec sa durée.",
+        "en": "A break starts, with its length."
+      },
+      "payloadSchema": "BreakStartedV1"
+    }
+  ],
+  "consumes": [
+    { "id": "nebula.appearance.changed", "kind": "event" },
+    { "id": "nebula.hub.present", "kind": "event" },
+    { "id": "nebula.hub.dock", "kind": "event" }
+  ],
+  "deepLinks": [
+    { "path": "/", "params": {} },
+    { "path": "/start", "params": {} }
+  ]
+}

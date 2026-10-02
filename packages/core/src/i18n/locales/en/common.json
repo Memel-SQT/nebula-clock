@@ -89,5 +89,11 @@
     "deleteTag": "This tag will be removed from every task.",
     "clearData": "This permanently deletes every task, tag and session on this device.",
     "importReplace": "Importing replaces all current data on this device."
+  },
+  "nebula": {
+    "apps": "Nebula apps",
+    "notInstalled": "Nebula Hub is not installed: its download page just opened.",
+    "docked": "Shown inside Nebula Hub",
+    "detach": "Detach"
   }
 }

@@ -156,6 +156,16 @@ focus mode that silences the app's notifications and keeps the display awake,
 optional distraction blocking, and auto-updates from GitHub Releases. See
 [Known limitations](#known-limitations) for what the last two do and do not do.
 
+**Nebula Hub (optional)** — when [Nebula Hub](https://github.com/Memel-SQT/Nebula-Hub)
+is installed, the desktop app shows today's focus (pomodoros against the goal,
+streak) on the Hub's Home, sends the timer's notifications to its activity
+centre, announces the start of each break (the Hub can then offer the Nebula
+News briefing during a long one), can follow the Nebula appearance (theme,
+accent, language), can open inside the Hub's window instead of its own
+("Detach" brings it back), and can leave its updates to the Hub. A "Nebula
+apps" button opens the Hub. Without the Hub nothing changes: the link is
+optional and silent.
+
 **Motion** — a launch animation that draws the mark, transitions between
 screens, staggered entrances for lists and cards, a sliding navigation
 indicator and a flourish on the ring at every phase change. All of it is
@@ -177,7 +187,10 @@ fetched from Google Fonts, so the app renders correctly with the network
 unplugged. Export and import are manual, local, and file-based.
 
 The desktop build additionally contacts GitHub Releases, and only to check
-for an update.
+for an update. Its optional link with Nebula Hub (Nebula Link) is a local
+named pipe between apps on the same computer, never a network call, and only
+carries public figures: today's pomodoro count, the goal, the streak and the
+start of a break — no task, no session detail.
 
 ---
 

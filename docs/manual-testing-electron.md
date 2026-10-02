@@ -126,3 +126,20 @@ Needs two builds and a published GitHub Release.
 | 10.5 | Enable reduced motion                             | The ambient glow stops drifting; transitions are instant                  |
 | 10.6 | Tab through the whole window                      | Every control is reachable and its focus ring is visible                  |
 | 10.7 | Switch to French                                  | Every string changes, including the tray menu's countdown label           |
+
+## 11. Nebula Hub (optional)
+
+Run against Nebula Hub's Link server in test mode (repository Nebula-Hub,
+`tests/link-harness/e2e-app.ts`) with this app's `apps/desktop/nebula.app.json`, then
+launch the shell with `NEBULA_LINK_SESSION_FILE=<the driver's session file>` and a
+throwaway `--user-data-dir`.
+
+| #    | Step                                           | Expected                                                               |
+| ---- | ---------------------------------------------- | ---------------------------------------------------------------------- |
+| 11.1 | Start the app with no Hub running              | Starts and behaves exactly as before                                   |
+| 11.2 | Query the widget `clock.focus.today`           | Today's count, the goal and the streak, in the app's language          |
+| 11.3 | Let a phase end                                | The notification also reaches the Hub's activity centre                |
+| 11.4 | Send the Hub mode with bounds                  | Frameless window exactly at those bounds, off the taskbar              |
+| 11.5 | Click "Détacher", or stop the Hub while docked | The normal window comes back where it was                              |
+| 11.6 | Settings → Nebula Hub                          | State, "Follow the Nebula appearance", "Updates handled by Nebula Hub" |
+| 11.7 | Click the "Nebula apps" button                 | Opens the Hub, or its download page when it is not installed           |

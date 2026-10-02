@@ -20,6 +20,16 @@ type Emit = (event: UpdateEvent) => void;
 
 let timer: NodeJS.Timeout | null = null;
 let initialised = false;
+/** Nebula Hub installs the updates (the user's choice, only while the Hub runs). */
+let deferred = false;
+
+/** The automatic checks stand aside while Nebula Hub handles the updates; a manual check still works. */
+export async function setUpdatesDeferred(value: boolean): Promise<void> {
+  deferred = value;
+  if (!initialised) return;
+  const autoUpdater = await getUpdater();
+  if (autoUpdater) autoUpdater.autoDownload = !value;
+}
 
 /**
  * Lazily loaded: pulling it in during development is pointless noise.
@@ -47,7 +57,7 @@ export async function initUpdater(emit: Emit): Promise<void> {
     emit({ type: 'error', message: 'updater-unavailable' });
     return;
   }
-  autoUpdater.autoDownload = true;
+  autoUpdater.autoDownload = !deferred;
   autoUpdater.autoInstallOnAppQuit = true;
 
   // NsisUpdater-only, and set here rather than in the electron-builder config
@@ -69,8 +79,8 @@ export async function initUpdater(emit: Emit): Promise<void> {
   );
   autoUpdater.on('error', (error: Error) => emit({ type: 'error', message: error.message }));
 
-  setTimeout(() => void checkForUpdates(emit), FIRST_CHECK_DELAY_MS);
-  timer = setInterval(() => void checkForUpdates(emit), CHECK_INTERVAL_MS);
+  setTimeout(() => void (deferred || checkForUpdates(emit)), FIRST_CHECK_DELAY_MS);
+  timer = setInterval(() => void (deferred || checkForUpdates(emit)), CHECK_INTERVAL_MS);
 }
 
 export async function checkForUpdates(emit: Emit): Promise<void> {

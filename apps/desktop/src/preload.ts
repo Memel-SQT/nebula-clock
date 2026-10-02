@@ -17,7 +17,14 @@ import type {
 } from './ipc.js';
 
 /** The mini window is told which it is by its query string. */
-const isMiniWindow = new URLSearchParams(window.location.search).get('mini') === '1';
+const query = new URLSearchParams(window.location.search);
+const isMiniWindow = query.get('mini') === '1';
+/** A main window recreated for (or after) the Nebula Hub mode. */
+const hubMode =
+  query.get('mode') === 'docked' ? 'docked' : query.get('mode') === 'restored' ? 'restored' : null;
+
+// Asked once, synchronously: the sandboxed preload has no access to the main process' env.
+const info = ipcRenderer.sendSync(CHANNELS.appInfo) as { version: string; platform: string };
 
 function subscribe<T>(channel: string, handler: (payload: T) => void): () => void {
   const listener = (_event: Electron.IpcRendererEvent, payload: T) => handler(payload);
@@ -29,9 +36,10 @@ function subscribe<T>(channel: string, handler: (payload: T) => void): () => voi
 
 const bridge = {
   isDesktop: true as const,
-  platform: process.platform,
-  appVersion: process.env.NEBULA_APP_VERSION ?? '0.0.0',
+  platform: info.platform,
+  appVersion: info.version,
   isMiniWindow,
+  hubMode,
 
   notify: (payload: NotificationPayload): Promise<void> =>
     ipcRenderer.invoke(CHANNELS.notify, payload) as Promise<void>,
@@ -90,6 +98,21 @@ const bridge = {
   quitAndInstall: (): void => {
     ipcRenderer.send(CHANNELS.quitAndInstall);
   },
+
+  // Nebula Hub (optional).
+  publishFocus: (focus: unknown): void => {
+    ipcRenderer.send(CHANNELS.publishFocus, focus);
+  },
+  getHubState: (): Promise<unknown> => ipcRenderer.invoke(CHANNELS.hubState),
+  onHubState: (handler: (state: unknown) => void): (() => void) =>
+    subscribe<unknown>(CHANNELS.hubStateChanged, handler),
+  onNebulaAppearance: (handler: (appearance: unknown) => void): (() => void) =>
+    subscribe<unknown>(CHANNELS.hubAppearance, handler),
+  setUpdatesByHub: (enabled: boolean): Promise<unknown> =>
+    ipcRenderer.invoke(CHANNELS.setUpdatesByHub, enabled),
+  openHub: (): Promise<'opened' | 'not-installed'> =>
+    ipcRenderer.invoke(CHANNELS.openHub) as Promise<'opened' | 'not-installed'>,
+  detachFromHub: (): Promise<void> => ipcRenderer.invoke(CHANNELS.detachFromHub) as Promise<void>,
 };
 
 contextBridge.exposeInMainWorld('nebula', bridge);

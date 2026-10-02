@@ -11,7 +11,8 @@
     "language": "Language",
     "desktop": "Desktop",
     "data": "Your data",
-    "about": "About"
+    "about": "About",
+    "nebula": "Nebula Hub"
   },
   "timer": {
     "focus": "Focus duration",
@@ -145,5 +146,20 @@
     "upToDate": "You are up to date",
     "source": "Source code",
     "license": "MIT licence"
+  },
+  "nebula": {
+    "privacy": "With Nebula Hub (optional), Nebula Clock only shares public data: today's pomodoros, your streak and the start of your breaks. No task, no session detail.",
+    "connected": "Connected to Nebula Hub {{version}}.",
+    "offline": "Nebula Hub is not open: Nebula Clock works on its own, as always.",
+    "follow": "Follow the Nebula appearance",
+    "followHint": "Light or dark theme, accent colour and language set in Nebula Hub apply here.",
+    "updatesByHub": "Updates handled by Nebula Hub",
+    "updatesByHubHint": "While the Hub is open, it installs the updates. Without the Hub, Nebula Clock updates itself.",
+    "widget": {
+      "title": "Today's focus",
+      "value": "{{done}} / {{goal}}",
+      "caption_one": "Streak: {{count}} day",
+      "caption_other": "Streak: {{count}} days"
+    }
   }
 }

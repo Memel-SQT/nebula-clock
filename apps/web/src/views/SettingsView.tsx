@@ -39,6 +39,7 @@ import {
 import { revealDelay } from '../lib/reveal.js';
 import { getSoundEngine } from '../lib/sound.js';
 import { getDesktop, type UpdateEvent } from '../lib/platform.js';
+import { useNebulaHub } from '../hooks/useNebulaHub.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
 import { useTimerStore } from '../store/timerStore.js';
@@ -66,6 +67,7 @@ export function SettingsView() {
   const data = useDataStore();
   const configure = useTimerStore((state) => state.configure);
   const desktop = getDesktop();
+  const hub = useNebulaHub();
 
   const [permission, setPermission] = useState<NotificationPermissionState>('default');
   const [status, setStatus] = useState<string | null>(null);
@@ -601,6 +603,31 @@ export function SettingsView() {
           <p className="mt-1 text-xs text-warning">{t('settings:desktop.blocker.permission')}</p>
         </div>
       </Card>
+
+      {/* ------------------------------------------------------- Nebula Hub */}
+      {desktop?.getHubState ? (
+        <Card title={t('settings:sections.nebula')} description={t('settings:nebula.privacy')}>
+          <p className="mb-2 text-sm text-text-secondary" role="status">
+            {hub.state?.connected
+              ? t('settings:nebula.connected', { version: hub.state.hubVersion ?? '' })
+              : t('settings:nebula.offline')}
+          </p>
+          <div className="divide-y divide-border">
+            <Toggle
+              checked={hub.follow}
+              onChange={hub.setFollow}
+              label={t('settings:nebula.follow')}
+              description={t('settings:nebula.followHint')}
+            />
+            <Toggle
+              checked={Boolean(hub.state?.updatesByHub)}
+              onChange={hub.setUpdatesByHub}
+              label={t('settings:nebula.updatesByHub')}
+              description={t('settings:nebula.updatesByHubHint')}
+            />
+          </div>
+        </Card>
+      ) : null}
 
       {/* ------------------------------------------------------------- data */}
       <Card title={t('settings:sections.data')} description={t('settings:data.privacy')}>

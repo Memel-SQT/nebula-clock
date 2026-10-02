@@ -11,7 +11,8 @@
     "language": "Langue",
     "desktop": "Application desktop",
     "data": "Tes données",
-    "about": "À propos"
+    "about": "À propos",
+    "nebula": "Nebula Hub"
   },
   "timer": {
     "focus": "Durée de concentration",
@@ -145,5 +146,20 @@
     "upToDate": "Tu es à jour",
     "source": "Code source",
     "license": "Licence MIT"
+  },
+  "nebula": {
+    "privacy": "Avec Nebula Hub (facultatif), Nebula Clock partage seulement des données publiques : tes pomodoros du jour, ta série et le début de tes pauses. Aucune tâche, aucun détail de session.",
+    "connected": "Connectée à Nebula Hub {{version}}.",
+    "offline": "Nebula Hub n’est pas ouvert : Nebula Clock fonctionne seule, comme toujours.",
+    "follow": "Suivre l’apparence Nebula",
+    "followHint": "Thème clair ou sombre, couleur d’accent et langue réglés dans Nebula Hub s’appliquent ici.",
+    "updatesByHub": "Mises à jour gérées par Nebula Hub",
+    "updatesByHubHint": "Quand le Hub est ouvert, c’est lui qui installe les mises à jour. Sans le Hub, Nebula Clock se met à jour seule.",
+    "widget": {
+      "title": "Focus du jour",
+      "value": "{{done}} / {{goal}}",
+      "caption_one": "Série : {{count}} jour",
+      "caption_other": "Série : {{count}} jours"
+    }
   }
 }

@@ -5,6 +5,8 @@ import { BreakReminder } from './components/BreakReminder.js';
 import { FullscreenTimer } from './components/FullscreenTimer.js';
 import { SplashScreen } from './components/SplashScreen.js';
 import { useDesktopSync } from './hooks/useDesktopSync.js';
+import { useNebulaHubSync } from './hooks/useNebulaHub.js';
+import { getDesktop } from './lib/platform.js';
 import { useDocumentTitle } from './hooks/useDocumentTitle.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
@@ -41,13 +43,17 @@ export function App() {
 
   // Someone who has asked for less motion should not be shown a launch
   // animation at all, so the splash starts out already dismissed for them.
-  const [splashDone, setSplashDone] = useState(() => reduceMotion);
+  // A window recreated for (or after) the Nebula Hub mode is not a launch: no splash either.
+  const [splashDone, setSplashDone] = useState(
+    () => reduceMotion || Boolean(getDesktop()?.hubMode),
+  );
   const dismissSplash = useCallback(() => setSplashDone(true), []);
 
   useTheme();
   useTicker();
   useDocumentTitle();
   useDesktopSync();
+  useNebulaHubSync();
 
   const enterFullscreen = useCallback(() => setFullscreen(true), []);
   const exitFullscreen = useCallback(() => setFullscreen(false), []);
