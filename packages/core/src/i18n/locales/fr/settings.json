@@ -189,6 +189,8 @@
     "followHint": "Le thème, les couleurs d’accent, l’arrière-plan, les animations, les sons et la langue réglés dans Nebula Hub s’appliquent ici.",
     "updatesByHub": "Mises à jour gérées par Nebula Hub",
     "updatesByHubHint": "Quand le Hub est ouvert, c’est lui qui installe les mises à jour. Sans le Hub, Nebula Clock se met à jour seule.",
+    "breakReading": "Suggestions de lecture pendant les pauses",
+    "breakReadingHint": "Pendant une pause, trois articles de développement personnel de Nebula News (si elle est installée et ouverte). Rien de Nebula Clock n’est envoyé.",
     "widget": {
       "title": "Focus du jour",
       "value": "{{done}} / {{goal}}",

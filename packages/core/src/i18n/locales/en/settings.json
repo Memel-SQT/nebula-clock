@@ -189,6 +189,8 @@
     "followHint": "The theme, accent colors, background, motion, sounds and language set in Nebula Hub apply here.",
     "updatesByHub": "Updates handled by Nebula Hub",
     "updatesByHubHint": "While the Hub is open, it installs the updates. Without the Hub, Nebula Clock updates itself.",
+    "breakReading": "Reading suggestions during breaks",
+    "breakReadingHint": "During a break, three personal growth articles from Nebula News (if it is installed and open). Nothing from Nebula Clock is sent.",
     "widget": {
       "title": "Today's focus",
       "value": "{{done}} / {{goal}}",

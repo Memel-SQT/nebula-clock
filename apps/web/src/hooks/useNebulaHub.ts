@@ -12,10 +12,10 @@ import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
 
 /**
- * Nebula Hub, renderer side (optional, desktop only). Its two preferences are kept out of the
+ * Nebula Hub, renderer side (optional, desktop only). Its preferences are kept out of the
  * persisted settings on purpose: adding fields there would reset them for existing installs (the
  * store replaces the whole object on load). "Follow the Nebula appearance" lives in localStorage,
- * "updates by the Hub" in the main process.
+ * "updates by the Hub" and "reading suggestions during breaks" in the main process.
  */
 const FOLLOW_KEY = 'nebula-clock-follow-nebula';
 
@@ -71,12 +71,13 @@ export function useNebulaHubSync(): void {
   }, [updateAppearance, setLanguage]);
 }
 
-/** For Settings: the Hub's state and the two preferences. */
+/** For Settings: the Hub's state and its preferences. */
 export function useNebulaHub(): {
   state: HubState | null;
   follow: boolean;
   setFollow: (follow: boolean) => void;
   setUpdatesByHub: (enabled: boolean) => void;
+  setBreakReading: (enabled: boolean) => void;
 } {
   const [state, setState] = useState<HubState | null>(null);
   const [follow, setFollowState] = useState(readFollow);
@@ -103,5 +104,11 @@ export function useNebulaHub(): {
       .then(setState, () => undefined);
   }, []);
 
-  return { state, follow, setFollow, setUpdatesByHub };
+  const setBreakReading = useCallback((enabled: boolean) => {
+    void getDesktop()
+      ?.setBreakReading?.(enabled)
+      .then(setState, () => undefined);
+  }, []);
+
+  return { state, follow, setFollow, setUpdatesByHub, setBreakReading };
 }

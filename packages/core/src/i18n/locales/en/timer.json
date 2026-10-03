@@ -82,5 +82,11 @@
     "keySpace": "Space"
   },
   "progressAria": "{{remaining}} left in the {{phase}} phase",
-  "paused": "paused"
+  "paused": "paused",
+  "breakReading": {
+    "eyebrow": "Nebula News",
+    "title": "Read during your break",
+    "loading": "Loading reads…",
+    "open": "Open in Nebula News"
+  }
 }

@@ -879,6 +879,14 @@ export function SettingsView() {
                   label={t('settings:nebula.updatesByHub')}
                   description={t('settings:nebula.updatesByHubHint')}
                 />
+                {desktop.setBreakReading ? (
+                  <Toggle
+                    checked={hub.state?.breakReading !== false}
+                    onChange={hub.setBreakReading}
+                    label={t('settings:nebula.breakReading')}
+                    description={t('settings:nebula.breakReadingHint')}
+                  />
+                ) : null}
               </div>
             </Section>
           ) : null}

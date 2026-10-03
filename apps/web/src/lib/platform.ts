@@ -50,6 +50,8 @@ export interface HubState {
   connected: boolean;
   hubVersion: string | null;
   updatesByHub: boolean;
+  /** "Reading suggestions during breaks" (missing in older shells). */
+  breakReading?: boolean;
 }
 
 /** Today's focus, published for the Hub's widget (texts already translated). */
@@ -117,6 +119,13 @@ export interface DesktopBridge {
   setUpdatesByHub?(enabled: boolean): Promise<HubState>;
   openHub?(): Promise<'opened' | 'not-installed'>;
   detachFromHub?(): Promise<void>;
+  /**
+   * Nebula News during breaks: the theme as the main process validated it (`null` when there is
+   * nothing to show), opening it in News, and the preference.
+   */
+  getBreakReading?(): Promise<unknown>;
+  openBreakReading?(): Promise<boolean>;
+  setBreakReading?(enabled: boolean): Promise<HubState>;
 
   /** Page and ink colours of the theme, for the native window controls (frameless window). */
   setWindowTheme?(chrome: { page: string; ink: string }): Promise<void>;

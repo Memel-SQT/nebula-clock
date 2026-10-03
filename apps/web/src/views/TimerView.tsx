@@ -10,6 +10,8 @@ import {
 } from '@nebula-clock/core';
 import { ActiveTaskPicker } from '../components/ActiveTaskPicker.js';
 import { AmbientMixer } from '../components/AmbientMixer.js';
+import { BreakReadingCard } from '../components/BreakReadingCard.js';
+import { useBreakReading } from '../hooks/useBreakReading.js';
 import { PresetPicker } from '../components/PresetPicker.js';
 import { TimerControls } from '../components/TimerControls.js';
 import { TimerDisplay } from '../components/TimerDisplay.js';
@@ -39,6 +41,7 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
 
   const { t } = useTranslation(['timer', 'stats', 'common']);
   const view = useTimerView();
+  const breakReading = useBreakReading(view.phase);
   const announcement = useTimerStore((state) => state.announcement);
   const sessions = useDataStore((state) => state.sessions);
   const goals = useSettingsStore((state) => state.settings.goals);
@@ -102,6 +105,8 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
         </section>
 
         <div className="timer-side motion-stagger">
+          <BreakReadingCard state={breakReading.state} onOpen={breakReading.open} />
+
           <Card
             title={t('stats:range.today')}
             count={t('stats:goals.progress', {

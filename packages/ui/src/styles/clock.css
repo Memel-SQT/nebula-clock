@@ -103,6 +103,32 @@
   display: grid;
   gap: 1rem;
 }
+/* Nebula News during breaks: plain lines, title then source. */
+.break-reading-list {
+  display: grid;
+  margin: 0 0 0.9rem;
+  padding: 0;
+  list-style: none;
+}
+.break-reading-item {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.break-reading-item:last-child {
+  border-bottom: 0;
+}
+.break-reading-label {
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.break-reading-source {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
 @media (max-width: 1240px) and (min-width: 721px) {
   .timer-side {
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
