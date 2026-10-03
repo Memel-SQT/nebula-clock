@@ -1,3 +1,8 @@
+## 1.4.0 (2026-10-03)
+
+* feat(core): name the Pomodoro menu Work a Clock ([ea780e0](https://github.com/Memel-SQT/nebula-clock/commit/ea780e0))
+* docs(macos): add macOS build and test bug report ([22399c9](https://github.com/Memel-SQT/nebula-clock/commit/22399c9))
+
 ## 1.3.0 (2026-10-02)
 
 * docs: describe the family appearance and refresh the screenshots ([b1d95cd](https://github.com/Memel-SQT/nebula-clock/commit/b1d95cd))
