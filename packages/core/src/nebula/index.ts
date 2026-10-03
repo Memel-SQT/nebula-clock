@@ -86,3 +86,71 @@ export function clockAppearanceFromHub(payload: unknown): {
     record.language === 'fr' || record.language === 'en' ? record.language : undefined;
   return { appearance: familyAppearancePatch(record), ...(language ? { language } : {}) };
 }
+
+/** What Nebula Link answered to a query (the SDK's `LinkResult`, without depending on it). */
+export type LinkAnswer = { ok: true; value: unknown } | { ok: false; error: string };
+
+/** A Nebula News theme, ready to show during a break: plain texts, a link into News. */
+export interface BreakReading {
+  title: string;
+  caption?: string;
+  /** One line per article: its title and its source. */
+  items: { label: string; value: string }[];
+  /** `nebula://news/…` (the theme), opened by the main process only. */
+  deepLink: string;
+  updatedAt: string;
+}
+
+const MAX_TEXT = 80;
+const MAX_ITEMS = 3;
+// Control characters, and anything that looks like markup: the card is plain text only.
+// eslint-disable-next-line no-control-regex
+const UNSAFE_TEXT = /[\u0000-\u001f\u007f]|<\s*[a-z!/?]/i;
+const NEWS_LINK = /^nebula:\/\/news\/[a-z0-9/-]{0,60}$/;
+
+function plainText(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    value.trim().length > 0 &&
+    value.length <= MAX_TEXT &&
+    !UNSAFE_TEXT.test(value)
+  );
+}
+
+/**
+ * `news.focus.today` (`WidgetV1`), checked before anything reaches the renderer. Any failure —
+ * no Hub, no News, consent refused, timeout, an empty theme (`null`) or a payload that breaks a
+ * rule — gives null, and the card simply does not show.
+ */
+export function breakReadingFromLink(answer: LinkAnswer): BreakReading | null {
+  if (!answer.ok) return null;
+  const value = answer.value;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const widget = value as Record<string, unknown>;
+
+  if (!plainText(widget.title)) return null;
+  if (widget.caption !== undefined && !plainText(widget.caption)) return null;
+  // No dot, query or fragment can pass: only a News path the Hub will check again.
+  if (typeof widget.deepLink !== 'string' || !NEWS_LINK.test(widget.deepLink)) return null;
+  if (typeof widget.updatedAt !== 'string' || Number.isNaN(Date.parse(widget.updatedAt))) {
+    return null;
+  }
+
+  const items = widget.items;
+  if (!Array.isArray(items) || items.length === 0 || items.length > MAX_ITEMS) return null;
+  const lines: BreakReading['items'] = [];
+  for (const item of items) {
+    if (!item || typeof item !== 'object') return null;
+    const { label, value: source } = item as Record<string, unknown>;
+    if (!plainText(label) || !plainText(source)) return null;
+    lines.push({ label, value: source });
+  }
+
+  return {
+    title: widget.title,
+    ...(widget.caption !== undefined ? { caption: widget.caption } : {}),
+    items: lines,
+    deepLink: widget.deepLink,
+    updatedAt: widget.updatedAt,
+  };
+}

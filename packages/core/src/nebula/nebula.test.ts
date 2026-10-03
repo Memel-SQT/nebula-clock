@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { breakStarted, clockAppearanceFromHub, focusTodayWidget } from './index.js';
+import {
+  breakReadingFromLink,
+  breakStarted,
+  clockAppearanceFromHub,
+  focusTodayWidget,
+} from './index.js';
 
 const focus = {
   date: '2026-10-02',
@@ -102,5 +107,91 @@ describe('clockAppearanceFromHub', () => {
 
   it('clamps the volume instead of dropping it', () => {
     expect(clockAppearanceFromHub({ soundVolume: 140 }).appearance).toEqual({ soundVolume: 100 });
+  });
+});
+
+describe('breakReadingFromLink', () => {
+  const widget = {
+    title: 'Développement personnel du jour',
+    caption: 'Trois lectures pour la pause',
+    items: [
+      { label: 'Planifier sa semaine en 20 minutes', value: 'Zen Habits' },
+      { label: 'La règle des deux minutes', value: 'James Clear' },
+      { label: 'Dire non sans culpabiliser', value: 'Psychologies' },
+    ],
+    deepLink: 'nebula://news/theme/focus',
+    updatedAt: '2026-10-03T08:00:00.000Z',
+  };
+  const read = (value: unknown) => breakReadingFromLink({ ok: true, value });
+
+  it('keeps a valid theme as is', () => {
+    expect(read(widget)).toEqual(widget);
+    const { caption: _caption, ...withoutCaption } = widget;
+    expect(read(withoutCaption)).toEqual(withoutCaption);
+  });
+
+  it('shows nothing without the Hub, without News or without consent', () => {
+    for (const error of [
+      'offline',
+      'provider-offline',
+      'unknown-capability',
+      'consent-denied',
+      'consent-required',
+      'timeout',
+      'invalid-result',
+      'unknown',
+    ]) {
+      expect(breakReadingFromLink({ ok: false, error })).toBeNull();
+    }
+  });
+
+  it('shows nothing for an empty theme', () => {
+    expect(read(null)).toBeNull();
+    expect(read({ ...widget, items: [] })).toBeNull();
+    expect(read({ ...widget, items: undefined })).toBeNull();
+  });
+
+  it('refuses anything that is not a widget', () => {
+    expect(read('Tech du jour')).toBeNull();
+    expect(read([widget])).toBeNull();
+    expect(read({ ...widget, items: [null] })).toBeNull();
+    expect(read({ ...widget, items: ['La règle des deux minutes'] })).toBeNull();
+  });
+
+  it('refuses long, empty, markup or control-character texts', () => {
+    expect(read({ ...widget, title: 'x'.repeat(81) })).toBeNull();
+    expect(read({ ...widget, title: 'x'.repeat(80) })?.title).toHaveLength(80);
+    expect(read({ ...widget, title: '   ' })).toBeNull();
+    expect(read({ ...widget, caption: '<img src=x onerror=alert(1)>' })).toBeNull();
+    expect(read({ ...widget, caption: 42 })).toBeNull();
+    expect(read({ ...widget, items: [{ label: 'Lire </b>', value: 'Source' }] })).toBeNull();
+    expect(read({ ...widget, items: [{ label: 'Titre', value: 'Sour\nce' }] })).toBeNull();
+    // A plain comparison is not markup.
+    expect(read({ ...widget, title: 'Focus < 25 min' })?.title).toBe('Focus < 25 min');
+  });
+
+  it('keeps three articles at most', () => {
+    expect(read({ ...widget, items: [...widget.items, widget.items[0]] })).toBeNull();
+  });
+
+  it('only opens a screen of Nebula News', () => {
+    for (const deepLink of [
+      undefined,
+      'https://example.com/',
+      'nebula://finterest/accounts',
+      'nebula://hub/',
+      'nebula://news/../hub',
+      'nebula://news/theme/focus?ref=clock',
+      'nebula://news/theme/focus#top',
+      'javascript:alert(1)',
+    ]) {
+      expect(read({ ...widget, deepLink })).toBeNull();
+    }
+    expect(read({ ...widget, deepLink: 'nebula://news/' })?.deepLink).toBe('nebula://news/');
+  });
+
+  it('needs a valid update date', () => {
+    expect(read({ ...widget, updatedAt: 'hier' })).toBeNull();
+    expect(read({ ...widget, updatedAt: undefined })).toBeNull();
   });
 });
