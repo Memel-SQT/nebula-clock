@@ -21,6 +21,11 @@ export const CHANNELS = {
   setUpdatesByHub: 'nebula:set-updates-by-hub',
   openHub: 'nebula:open-hub',
   detachFromHub: 'nebula:detach-from-hub',
+  /** Nebula News' theme for the break card, validated in the main process (or null). */
+  breakReading: 'nebula:break-reading',
+  /** Opens the card's theme in Nebula News; the link never comes from the renderer. */
+  openBreakReading: 'nebula:open-break-reading',
+  setBreakReading: 'nebula:set-break-reading',
   /** Theme colours for the native window controls of the frameless window. */
   setWindowTheme: 'nebula:set-window-theme',
 

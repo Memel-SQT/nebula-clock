@@ -115,6 +115,11 @@ const bridge = {
   openHub: (): Promise<'opened' | 'not-installed'> =>
     ipcRenderer.invoke(CHANNELS.openHub) as Promise<'opened' | 'not-installed'>,
   detachFromHub: (): Promise<void> => ipcRenderer.invoke(CHANNELS.detachFromHub) as Promise<void>,
+  getBreakReading: (): Promise<unknown> => ipcRenderer.invoke(CHANNELS.breakReading),
+  openBreakReading: (): Promise<boolean> =>
+    ipcRenderer.invoke(CHANNELS.openBreakReading) as Promise<boolean>,
+  setBreakReading: (enabled: boolean): Promise<unknown> =>
+    ipcRenderer.invoke(CHANNELS.setBreakReading, enabled),
 
   // Window chrome and translated shell texts (validated in the main process).
   setWindowTheme: (chrome: WindowChrome): Promise<void> =>

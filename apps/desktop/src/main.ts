@@ -71,6 +71,10 @@ const nebula = new NebulaIntegration({
   settingsPath: join(app.getPath('userData'), 'nebula-hub.json'),
   send: (channel, payload) => getMainWindow()?.webContents.send(channel, payload),
   focus: () => focusMainWindow(),
+  isVisible: () => {
+    const win = getMainWindow();
+    return Boolean(win && win.isVisible() && !win.isMinimized());
+  },
   startTimer: () => getMainWindow()?.webContents.send(CHANNELS.command, 'start'),
   onDock: (payload) => void applyDock(payload),
   onUpdatesDeferred: (deferred) => void setUpdatesDeferred(deferred),
@@ -188,6 +192,22 @@ function registerIpc(): void {
     if (isSafeExternalUrl(page)) await shell.openExternal(page);
     return 'not-installed';
   });
+  // Nebula News during breaks: the main window only (never the mini window).
+  ipcMain.handle(CHANNELS.breakReading, (event) =>
+    BrowserWindow.fromWebContents(event.sender) === getMainWindow()
+      ? nebula.breakReadingNow()
+      : null,
+  );
+  ipcMain.handle(CHANNELS.openBreakReading, async () => {
+    // The link validated with the card; nebula:// is handled by an installed Nebula Hub.
+    const link = nebula.breakReadingLink();
+    if (!link || !app.getApplicationNameForProtocol('nebula://')) return false;
+    await shell.openExternal(link);
+    return true;
+  });
+  ipcMain.handle(CHANNELS.setBreakReading, (_event, enabled: unknown) =>
+    nebula.setBreakReading(enabled === true),
+  );
   ipcMain.handle(CHANNELS.detachFromHub, async () => {
     // Leave the Hub mode from the app: stop listening (the Hub forgets the app), normal window,
     // then listen again so the mode can be chosen later from the Hub.
