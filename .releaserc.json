@@ -99,23 +99,31 @@
         "assets": [
           {
             "path": "artifacts/**/*.exe",
-            "label": "Nebula Clock Setup (Windows)"
+            "label": "Windows — Nebula Clock Setup (x64)"
           },
           {
-            "path": "artifacts/**/*.dmg",
-            "label": "Nebula Clock (macOS)"
+            "path": "artifacts/**/*-arm64.dmg",
+            "label": "macOS — Nebula Clock (Apple Silicon M1/M2/M3/M4)"
+          },
+          {
+            "path": "artifacts/**/*-x64.dmg",
+            "label": "macOS — Nebula Clock (Intel)"
           },
           {
             "path": "artifacts/**/*.AppImage",
-            "label": "Nebula Clock (Linux AppImage)"
+            "label": "Linux — Nebula Clock (AppImage)"
           },
           {
-            "path": "artifacts/**/*.zip",
-            "label": "Nebula Clock (macOS, auto-update archive)"
+            "path": "artifacts/**/*-arm64.zip",
+            "label": "macOS — auto-update archive (Apple Silicon)"
+          },
+          {
+            "path": "artifacts/**/*-x64.zip",
+            "label": "macOS — auto-update archive (Intel)"
           },
           {
             "path": "artifacts/**/*.deb",
-            "label": "Nebula Clock (Debian/Ubuntu)"
+            "label": "Linux — Nebula Clock (Debian/Ubuntu)"
           },
           {
             "path": "artifacts/**/*.blockmap"
