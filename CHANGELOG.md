@@ -1,3 +1,11 @@
+## 1.5.0 (2026-10-03)
+
+* docs: describe the break reading card and how to test it ([d52eedb](https://github.com/Memel-SQT/nebula-clock/commit/d52eedb))
+* feat(core): validate the Nebula News theme shown during breaks ([2cf0bf3](https://github.com/Memel-SQT/nebula-clock/commit/2cf0bf3))
+* feat(desktop): read Nebula News during breaks through the Hub ([8b6c8c2](https://github.com/Memel-SQT/nebula-clock/commit/8b6c8c2))
+* feat(web): "Read during your break" card and its setting ([a5246cd](https://github.com/Memel-SQT/nebula-clock/commit/a5246cd))
+* ci(release): label each installer by platform and Mac architecture ([c400882](https://github.com/Memel-SQT/nebula-clock/commit/c400882))
+
 ## 1.4.0 (2026-10-03)
 
 * feat(core): name the Pomodoro menu Work a Clock ([ea780e0](https://github.com/Memel-SQT/nebula-clock/commit/ea780e0))
