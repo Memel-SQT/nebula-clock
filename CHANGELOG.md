@@ -1,3 +1,7 @@
+## <small>1.5.1 (2026-10-04)</small>
+
+* fix(desktop): raise the window docked in Nebula Hub above the Hub ([d8b1aa3](https://github.com/Memel-SQT/nebula-clock/commit/d8b1aa3))
+
 ## 1.5.0 (2026-10-03)
 
 * docs: describe the break reading card and how to test it ([d52eedb](https://github.com/Memel-SQT/nebula-clock/commit/d52eedb))
