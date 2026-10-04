@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  dockedWindowSteps,
   breakReadingFromLink,
   breakStarted,
   clockAppearanceFromHub,
@@ -193,5 +194,14 @@ describe('breakReadingFromLink', () => {
   it('needs a valid update date', () => {
     expect(read({ ...widget, updatedAt: 'hier' })).toBeNull();
     expect(read({ ...widget, updatedAt: undefined })).toBeNull();
+  });
+});
+
+describe('Hub mode: showing and raising the docked window (Nebula Hub ADR-032)', () => {
+  it('shows and raises a hidden window, raises a visible one only when the Hub asks', () => {
+    expect(dockedWindowSteps(false, false)).toEqual({ show: true, raise: true });
+    expect(dockedWindowSteps(false, true)).toEqual({ show: true, raise: true });
+    expect(dockedWindowSteps(true, true)).toEqual({ show: false, raise: true });
+    expect(dockedWindowSteps(true, false)).toEqual({ show: false, raise: false });
   });
 });

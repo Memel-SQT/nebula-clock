@@ -7,6 +7,7 @@ import { BrowserWindow, shell } from 'electron';
 import { join } from 'node:path';
 import type { WindowChrome } from './ipc.js';
 import { isSafeExternalUrl } from './validate.js';
+import { DOCK_LOAD_TIMEOUT_MS, dockedWindowSteps } from '@nebula-clock/core';
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 const isDev = Boolean(DEV_SERVER_URL);
@@ -166,7 +167,14 @@ export async function createMainWindow(
   });
 
   const created = mainWindow;
-  created.once('ready-to-show', () => (docked ? created.showInactive() : created.show()));
+  created.once('ready-to-show', () => {
+    if (docked) {
+      created.showInactive();
+      raiseDockedWindow(created);
+    } else {
+      created.show();
+    }
+  });
 
   // Closing the window keeps the timer running in the tray unless the user
   // actually asked to quit or turned the behaviour off.
@@ -239,7 +247,11 @@ export function applyDock(payload: unknown): Promise<void> {
         dock.normalBounds = mainWindow && !mainWindow.isDestroyed() ? mainWindow.getBounds() : null;
         dock.docked = true;
         closeMiniWindow();
-        await replaceMainWindow({ docked: true, bounds: payload.bounds });
+        // A page that never finishes loading must not hold back the next messages of the Hub.
+        await Promise.race([
+          replaceMainWindow({ docked: true, bounds: payload.bounds }),
+          new Promise((resolve) => setTimeout(resolve, DOCK_LOAD_TIMEOUT_MS)),
+        ]);
       }
       const window = mainWindow;
       if (!window || window.isDestroyed()) return;
@@ -247,12 +259,24 @@ export function applyDock(payload: unknown): Promise<void> {
         window.hide();
         return;
       }
+      const steps = dockedWindowSteps(window.isVisible(), payload.raise);
       window.setBounds(payload.bounds);
-      if (!window.isVisible()) window.showInactive();
-      if (payload.raise) window.moveTop();
+      if (steps.show) window.showInactive();
+      if (steps.raise) raiseDockedWindow(window);
     })
     .catch(() => undefined);
   return dock.busy;
+}
+
+/**
+ * Brings the docked window above the Hub without taking the focus. Windows ignores moveTop() from
+ * an app without the foreground right, which is the case as soon as the Hub is active; a brief
+ * always-on-top is allowed and leaves the window just above the Hub (Nebula Hub ADR-032).
+ */
+function raiseDockedWindow(window: BrowserWindow): void {
+  window.setAlwaysOnTop(true);
+  window.moveTop();
+  window.setAlwaysOnTop(false);
 }
 
 export async function undock(): Promise<void> {

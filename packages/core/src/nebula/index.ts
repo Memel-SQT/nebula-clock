@@ -154,3 +154,18 @@ export function breakReadingFromLink(answer: LinkAnswer): BreakReading | null {
     updatedAt: widget.updatedAt,
   };
 }
+
+/**
+ * Hub mode (Nebula Hub ADR-032): what the docked window does for a visible `nebula.hub.dock`
+ * message. It is shown again if it was hidden, and raised above the Hub when it reappears or when
+ * the Hub asks for it.
+ */
+export function dockedWindowSteps(
+  wasVisible: boolean,
+  raise: boolean,
+): { show: boolean; raise: boolean } {
+  return { show: !wasVisible, raise: raise || !wasVisible };
+}
+
+/** Longest wait for the docked window's page before the next Hub messages are handled. */
+export const DOCK_LOAD_TIMEOUT_MS = 8000;

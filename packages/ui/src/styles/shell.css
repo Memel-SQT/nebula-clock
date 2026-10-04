@@ -35,7 +35,6 @@
 }
 
 .workspace {
-  --content-max: 1480px;
   width: 100%;
   min-width: 0;
   padding: clamp(1.5rem, 4vw, 4rem) clamp(1rem, 5vw, 5rem) 5rem;
@@ -43,25 +42,10 @@
 :root[data-desktop] .workspace {
   padding-top: max(2.6rem, clamp(1.5rem, 4vw, 4rem));
 }
+/* The content fills the width next to the sidebar, docked in Nebula Hub as on an ultrawide
+   screen (Nebula Hub ADR-032); long texts keep their own reading width. */
 .workspace-inner {
   width: 100%;
-  max-width: var(--content-max);
-  margin-inline: auto;
-}
-@media (min-width: 1900px) {
-  .workspace {
-    --content-max: 1680px;
-  }
-}
-@media (min-width: 2400px) {
-  .workspace {
-    --content-max: 1960px;
-  }
-}
-@media (min-width: 3000px) {
-  .workspace {
-    --content-max: 2280px;
-  }
 }
 
 /* Page header: overline, title, intro, actions that never shrink. */
