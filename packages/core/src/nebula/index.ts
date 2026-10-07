@@ -6,6 +6,7 @@
  * the start of a break. No task, no session detail, no history.
  */
 import { familyAppearancePatch, type AppearanceSettings } from '../appearance/index.js';
+import type { TimerStatus } from '../timer/types.js';
 import type { Phase } from '../types.js';
 
 /** What the renderer publishes for the Hub's "Today's focus" widget (texts already translated). */
@@ -115,6 +116,24 @@ function plainText(value: unknown): value is string {
     value.length <= MAX_TEXT &&
     !UNSAFE_TEXT.test(value)
   );
+}
+
+/** `news.focus.today` refreshes every 900 s on News' side: an answer is kept that long. */
+export const READING_REFRESH_MS = 15 * 60 * 1000;
+/** No answer (Hub or News absent, News still starting, timeout): asked again this soon. */
+export const READING_RETRY_MS = 30 * 1000;
+
+/** How long an answer of News is kept before News is asked again. */
+export function readingKeptMs(answer: LinkAnswer): number {
+  return answer.ok ? READING_REFRESH_MS : READING_RETRY_MS;
+}
+
+/**
+ * Where the reading card shows: during a break, and while the timer is idle. Never during a focus
+ * session, running or paused: the card must not pull the user away from the work.
+ */
+export function readingShown(phase: Phase, status: TimerStatus): boolean {
+  return phase !== 'focus' || status === 'idle';
 }
 
 /**

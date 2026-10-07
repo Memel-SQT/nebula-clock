@@ -16,8 +16,10 @@ import {
   breakReadingFromLink,
   breakStarted,
   focusTodayWidget,
+  readingKeptMs,
   type BreakReading,
   type FocusTodayPublication,
+  type LinkAnswer,
   type PhaseState,
 } from '@nebula-clock/core';
 
@@ -28,9 +30,6 @@ export interface NebulaState {
   /** "Reading suggestions during breaks" (on by default). */
   breakReading: boolean;
 }
-
-/** `news.focus.today` refreshes every 900 s on News' side: never ask more often. */
-const READING_REFRESH_MS = 15 * 60 * 1000;
 
 export interface NebulaDeps {
   appVersion: string;
@@ -53,7 +52,8 @@ export class NebulaIntegration {
   private updatesByHub = false;
   private breakReading = true;
   private reading: BreakReading | null = null;
-  private readingAt = 0;
+  /** Until when the last answer is reused (15 min after an answer of News, 30 s after none). */
+  private readingUntil = 0;
   private readingRequest: Promise<BreakReading | null> | null = null;
   private focusToday: FocusTodayPublication | null = null;
   private lastPhase: PhaseState | null = null;
@@ -130,25 +130,24 @@ export class NebulaIntegration {
   }
 
   /**
-   * The break reading card: News' theme, validated here before the renderer sees it. Refreshed
-   * at most every 15 minutes, only while the main window is visible and the Hub is connected;
-   * null whenever anything is missing (no Hub, no News, consent refused, empty theme).
+   * The reading card: News' theme, validated here before the renderer sees it. Asked only while
+   * the main window is visible and the Hub is connected; again 15 minutes after an answer, 30 s
+   * after none (News absent or still starting), so the card appears on its own. null whenever
+   * anything is missing (no Hub, no News, consent refused, empty theme).
    */
   async breakReadingNow(): Promise<BreakReading | null> {
     if (!this.breakReading) return null;
-    const fresh = this.readingAt > 0 && Date.now() - this.readingAt < READING_REFRESH_MS;
+    const fresh = Date.now() < this.readingUntil;
     if (fresh || !this.deps.isVisible() || this.link.status !== 'connected') return this.reading;
     this.readingRequest ??= this.link
       .query('news.focus.today')
+      .catch((): LinkAnswer => ({ ok: false, error: 'internal' }))
       .then((answer) => {
-        const reading = breakReadingFromLink(answer);
+        const found = breakReadingFromLink(answer);
         // Defence in depth: the SDK must read the link the same way.
-        return reading && parseDeepLink(reading.deepLink) ? reading : null;
-      })
-      .catch(() => null)
-      .then((reading) => {
+        const reading = found && parseDeepLink(found.deepLink) ? found : null;
         this.reading = this.breakReading ? reading : null;
-        this.readingAt = Date.now();
+        this.readingUntil = Date.now() + readingKeptMs(answer);
         return this.reading;
       })
       .finally(() => {
@@ -211,7 +210,7 @@ export class NebulaIntegration {
 
   private forgetReading(): void {
     this.reading = null;
-    this.readingAt = 0;
+    this.readingUntil = 0;
   }
 
   private changed(): void {

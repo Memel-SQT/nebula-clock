@@ -5,6 +5,10 @@ import {
   breakStarted,
   clockAppearanceFromHub,
   focusTodayWidget,
+  readingKeptMs,
+  readingShown,
+  READING_REFRESH_MS,
+  READING_RETRY_MS,
 } from './index.js';
 
 const focus = {
@@ -203,5 +207,22 @@ describe('Hub mode: showing and raising the docked window (Nebula Hub ADR-032)',
     expect(dockedWindowSteps(false, true)).toEqual({ show: true, raise: true });
     expect(dockedWindowSteps(true, true)).toEqual({ show: false, raise: true });
     expect(dockedWindowSteps(true, false)).toEqual({ show: false, raise: false });
+  });
+});
+
+describe('reading card rules (Nebula News, appears on its own)', () => {
+  it('shows during a break and while the timer is idle, never during a focus session', () => {
+    expect(readingShown('focus', 'idle')).toBe(true);
+    expect(readingShown('shortBreak', 'running')).toBe(true);
+    expect(readingShown('longBreak', 'paused')).toBe(true);
+    expect(readingShown('focus', 'running')).toBe(false);
+    expect(readingShown('focus', 'paused')).toBe(false);
+  });
+
+  it('keeps an answer of News 15 minutes, and asks again 30 s after no answer', () => {
+    expect(readingKeptMs({ ok: true, value: null })).toBe(READING_REFRESH_MS);
+    expect(readingKeptMs({ ok: false, error: 'provider-offline' })).toBe(READING_RETRY_MS);
+    expect(READING_REFRESH_MS).toBe(15 * 60 * 1000);
+    expect(READING_RETRY_MS).toBe(30 * 1000);
   });
 });

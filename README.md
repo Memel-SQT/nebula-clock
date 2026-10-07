@@ -165,11 +165,12 @@ centre, announces the start of each break (the Hub can then offer the Nebula
 News briefing during a long one), can follow the Nebula appearance 1 for 1 (theme,
 accents, background, motion, sounds, language), can open inside the Hub's window instead of its own
 ("Detach" brings it back), and can leave its updates to the Hub. A "Nebula
-apps" button opens the Hub. During breaks only, a "Read during your break" card
-shows three personal growth articles from [Nebula News](https://github.com/Memel-SQT/Nebula-News)
-(0.4.0 or later, installed and open); a click opens the theme in News without
-touching the timer. It can be turned off ("Reading suggestions during breaks")
-and never shows during focus, in the mini window or on the web. Without the Hub
+apps" button opens the Hub. While the timer is idle and during breaks, a "Read
+between sessions" card shows three personal growth articles from [Nebula News](https://github.com/Memel-SQT/Nebula-News)
+(0.4.0 or later, installed; the Hub keeps it running). It appears on its own as
+soon as News answers; a click opens the theme in News without touching the
+timer. It can be turned off ("Reading suggestions when idle and during breaks")
+and never shows during a focus session, in the mini window or on the web. Without the Hub
 nothing changes: the link is optional and silent.
 
 **Appearance** — the Nebula family model, with the same values and labels as
@@ -205,8 +206,9 @@ carries public figures: today's pomodoro count, the goal, the streak and the
 start of a break — no task, no session detail. The break reading card asks the
 Hub for Nebula News' theme without any parameter, so nothing from Nebula Clock
 goes out with it; the answer is checked in the main process (shape, lengths, a
-`nebula://news/` link) and shown as plain text, refreshed at most every 15
-minutes and only while the window is visible.
+`nebula://news/` link) and shown as plain text. News is asked only while the
+window is visible: again 15 minutes after an answer, 30 seconds after none (News
+absent or still starting).
 
 ---
 

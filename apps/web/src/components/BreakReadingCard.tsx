@@ -7,7 +7,7 @@ export interface BreakReadingCardProps {
   onOpen: () => void;
 }
 
-/** "Read during your break": Nebula News' personal growth theme, as plain text. */
+/** "Read between sessions": Nebula News' personal growth theme, as plain text (idle timer or break). */
 export function BreakReadingCard({ state, onOpen }: BreakReadingCardProps) {
   const { t } = useTranslation(['timer']);
   if (state.status === 'hidden') return null;

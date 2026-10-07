@@ -41,7 +41,7 @@ export function TimerView({ onEnterFullscreen }: TimerViewProps) {
 
   const { t } = useTranslation(['timer', 'stats', 'common']);
   const view = useTimerView();
-  const breakReading = useBreakReading(view.phase);
+  const breakReading = useBreakReading(view.phase, view.status);
   const announcement = useTimerStore((state) => state.announcement);
   const sessions = useDataStore((state) => state.sessions);
   const goals = useSettingsStore((state) => state.settings.goals);
