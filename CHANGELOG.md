@@ -1,3 +1,8 @@
+## 1.7.0 (2026-10-09)
+
+* feat(nebula): add a Nebula News view with the latest personal growth articles ([2a4f71e](https://github.com/Memel-SQT/nebula-clock/commit/2a4f71e))
+* test(e2e): expect the reading card while the timer is idle ([fdda3cb](https://github.com/Memel-SQT/nebula-clock/commit/fdda3cb))
+
 ## 1.6.0 (2026-10-09)
 
 * feat(nebula): show news articles on their own, also while the timer is idle ([93e1bc1](https://github.com/Memel-SQT/nebula-clock/commit/93e1bc1))
