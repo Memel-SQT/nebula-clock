@@ -16,6 +16,8 @@ const GROUPS: { id: 'focus' | 'progress'; sections: Section[] }[] = [
     sections: [
       { route: 'timer', icon: 'timer' },
       { route: 'tasks', icon: 'tasks' },
+      // Nebula News' personal growth articles (Nebula Hub ADR-036): offered while Nebula Hub is there.
+      { route: 'news', icon: 'newspaper' },
     ],
   },
   {
@@ -88,7 +90,7 @@ export function Sidebar({ route, onNavigate, hub }: SidebarProps) {
             <p className="nav-group-title" id={`nav-group-${group.id}`}>
               {t(`common:nav.groups.${group.id}`)}
             </p>
-            {group.sections.map(navItem)}
+            {group.sections.filter((section) => section.route !== 'news' || connected).map(navItem)}
           </div>
         ))}
 

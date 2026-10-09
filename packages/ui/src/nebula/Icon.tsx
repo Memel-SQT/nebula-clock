@@ -433,6 +433,17 @@ const glyphs = {
       <path d="M18.5 3.5v3M17 5h3" />
     </>
   ),
+  // Nebula News (the "Nebula News" view), drawn like Nebula Hub's `newspaper` (@nebula/design).
+  newspaper: (
+    <>
+      <path
+        d="M5.5 4.5h10a1.5 1.5 0 0 1 1.5 1.5v12.5a2 2 0 0 0 2 2H6.5a2 2 0 0 1-2-2V5.5a1 1 0 0 1 1-1z"
+        {...duo}
+      />
+      <path d="M17 9h2.5v9.5a2 2 0 0 1-2 2" />
+      <path d="M8 8.5h5.5M8 12h5.5M8 15.5h3.5" />
+    </>
+  ),
   compass: (
     <>
       <circle cx="12" cy="12" r="8.5" />

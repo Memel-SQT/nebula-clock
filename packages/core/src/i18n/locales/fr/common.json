@@ -6,6 +6,7 @@
   "nav": {
     "timer": "Work a Clock",
     "tasks": "Tâches",
+    "news": "Nebula News",
     "stats": "Statistiques",
     "calendar": "Calendrier",
     "settings": "Réglages",
@@ -113,6 +114,9 @@
     "tasks": {
       "eyebrow": "Focus"
     },
+    "news": {
+      "eyebrow": "Nebula News"
+    },
     "stats": {
       "eyebrow": "Progrès"
     },
@@ -149,5 +153,19 @@
     "today_other": "{{count}} pomodoros aujourd’hui",
     "blockedTitle": "Bloquée pendant la concentration",
     "blockedBody": "{{name}} est dans ta liste de blocage."
+  },
+  "news": {
+    "title": "Développement personnel",
+    "intro": "Les derniers articles d’organisation, d’habitudes et de concentration, choisis par Nebula News. Un clic ouvre l’article dans Nebula News, sans toucher au minuteur.",
+    "loading": "Chargement des articles…",
+    "open": "Lire dans Nebula News",
+    "unavailable": {
+      "title": "Nebula News se prépare",
+      "body": "Les articles apparaîtront ici dès que Nebula News répond. Nebula Clock réessaie toute seule."
+    },
+    "empty": {
+      "title": "Pas encore d’article",
+      "body": "Nebula News n’a encore rien trouvé pour ce thème aujourd’hui. La liste se met à jour toute seule."
+    }
   }
 }

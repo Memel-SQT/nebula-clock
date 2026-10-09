@@ -8,7 +8,7 @@
  */
 import { BrowserWindow, Notification, app, ipcMain, powerSaveBlocker, shell } from 'electron';
 import { join } from 'node:path';
-import type { FocusTodayPublication } from '@nebula-clock/core';
+import { isNewsArticleLink, type FocusTodayPublication } from '@nebula-clock/core';
 import { NebulaIntegration } from './nebula.js';
 import { CHANNELS } from './ipc.js';
 import type {
@@ -202,6 +202,19 @@ function registerIpc(): void {
     // The link validated with the card; nebula:// is handled by an installed Nebula Hub.
     const link = nebula.breakReadingLink();
     if (!link || !app.getApplicationNameForProtocol('nebula://')) return false;
+    await shell.openExternal(link);
+    return true;
+  });
+  // The "Nebula News" tab: the main window only, like the break card.
+  ipcMain.handle(CHANNELS.newsArticles, (event) =>
+    BrowserWindow.fromWebContents(event.sender) === getMainWindow()
+      ? nebula.newsTabNow()
+      : { state: 'unavailable' },
+  );
+  ipcMain.handle(CHANNELS.openNewsArticle, async (_event, link: unknown) => {
+    // One article the tab shows (validated with it); nebula:// is handled by an installed Nebula Hub.
+    if (!isNewsArticleLink(link) || !nebula.isShownArticle(link)) return false;
+    if (!app.getApplicationNameForProtocol('nebula://')) return false;
     await shell.openExternal(link);
     return true;
   });

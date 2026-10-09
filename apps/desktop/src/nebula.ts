@@ -17,6 +17,10 @@ import {
   breakStarted,
   focusTodayWidget,
   readingKeptMs,
+  newsTabFromLink,
+  newsTabKeptMs,
+  NEWS_ARTICLES_CAPABILITY,
+  type NewsTab,
   type BreakReading,
   type FocusTodayPublication,
   type LinkAnswer,
@@ -55,6 +59,10 @@ export class NebulaIntegration {
   /** Until when the last answer is reused (15 min after an answer of News, 30 s after none). */
   private readingUntil = 0;
   private readingRequest: Promise<BreakReading | null> | null = null;
+  /** The "Nebula News" tab: last answer and until when it is reused (5 min after an answer, 30 s after none). */
+  private newsTab: NewsTab | null = null;
+  private newsTabUntil = 0;
+  private newsTabRequest: Promise<NewsTab> | null = null;
   private focusToday: FocusTodayPublication | null = null;
   private lastPhase: PhaseState | null = null;
   private stopDock: (() => void) | null = null;
@@ -154,6 +162,38 @@ export class NebulaIntegration {
         this.readingRequest = null;
       });
     return this.readingRequest;
+  }
+
+  /**
+   * The "Nebula News" tab (Nebula Hub ADR-036): News' latest personal growth articles, validated
+   * here before the renderer sees them. Asked only while the main window is visible and the Hub is
+   * connected; again 5 minutes after an answer, 30 s after none, so the list appears on its own.
+   */
+  async newsTabNow(): Promise<NewsTab> {
+    if (!this.deps.isVisible() || this.link.status !== 'connected')
+      return this.newsTab ?? { state: 'unavailable' };
+    if (this.newsTab && Date.now() < this.newsTabUntil) return this.newsTab;
+    this.newsTabRequest ??= this.link
+      .query(NEWS_ARTICLES_CAPABILITY)
+      .catch((): LinkAnswer => ({ ok: false, error: 'internal' }))
+      .then((answer) => {
+        const tab = newsTabFromLink(answer);
+        this.newsTab = tab;
+        this.newsTabUntil = Date.now() + newsTabKeptMs(tab);
+        return tab;
+      })
+      .finally(() => {
+        this.newsTabRequest = null;
+      });
+    return this.newsTabRequest;
+  }
+
+  /** Only an article the tab is showing can be opened, never any link the renderer makes up. */
+  isShownArticle(link: string): boolean {
+    return (
+      this.newsTab?.state === 'ready' &&
+      this.newsTab.articles.items.some((item) => item.deepLink === link)
+    );
   }
 
   /** The link of the card being shown, never one sent by the renderer. */

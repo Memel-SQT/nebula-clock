@@ -25,6 +25,8 @@ export const CHANNELS = {
   breakReading: 'nebula:break-reading',
   /** Opens the card's theme in Nebula News; the link never comes from the renderer. */
   openBreakReading: 'nebula:open-break-reading',
+  newsArticles: 'nebula:news-articles',
+  openNewsArticle: 'nebula:open-news-article',
   setBreakReading: 'nebula:set-break-reading',
   /** Theme colours for the native window controls of the frameless window. */
   setWindowTheme: 'nebula:set-window-theme',

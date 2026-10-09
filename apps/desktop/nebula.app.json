@@ -30,7 +30,8 @@
     { "id": "nebula.appearance.changed", "kind": "event" },
     { "id": "nebula.hub.present", "kind": "event" },
     { "id": "nebula.hub.dock", "kind": "event" },
-    { "id": "news.focus.today", "kind": "widget" }
+    { "id": "news.focus.today", "kind": "widget" },
+    { "id": "news.focus.articles", "kind": "query" }
   ],
   "deepLinks": [
     { "path": "/", "params": {} },

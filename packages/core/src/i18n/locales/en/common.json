@@ -6,6 +6,7 @@
   "nav": {
     "timer": "Work a Clock",
     "tasks": "Tasks",
+    "news": "Nebula News",
     "stats": "Statistics",
     "calendar": "Calendar",
     "settings": "Settings",
@@ -113,6 +114,9 @@
     "tasks": {
       "eyebrow": "Focus"
     },
+    "news": {
+      "eyebrow": "Nebula News"
+    },
     "stats": {
       "eyebrow": "Progress"
     },
@@ -149,5 +153,19 @@
     "today_other": "{{count}} pomodoros today",
     "blockedTitle": "Blocked during focus",
     "blockedBody": "{{name}} is on your block list."
+  },
+  "news": {
+    "title": "Personal growth",
+    "intro": "The latest articles on organization, habits and focus, picked by Nebula News. A click opens the article in Nebula News without touching the timer.",
+    "loading": "Loading the articles…",
+    "open": "Read in Nebula News",
+    "unavailable": {
+      "title": "Nebula News is getting ready",
+      "body": "The articles show up here as soon as Nebula News answers. Nebula Clock keeps trying on its own."
+    },
+    "empty": {
+      "title": "No article yet",
+      "body": "Nebula News has not found anything for this theme today. The list updates on its own."
+    }
   }
 }

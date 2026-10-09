@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export const ROUTES = ['timer', 'tasks', 'stats', 'calendar', 'settings'] as const;
+export const ROUTES = ['timer', 'tasks', 'news', 'stats', 'calendar', 'settings'] as const;
 export type Route = (typeof ROUTES)[number];
 
 function currentRoute(): Route {

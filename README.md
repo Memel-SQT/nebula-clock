@@ -170,7 +170,9 @@ between sessions" card shows three personal growth articles from [Nebula News](h
 (0.4.0 or later, installed; the Hub keeps it running). It appears on its own as
 soon as News answers; a click opens the theme in News without touching the
 timer. It can be turned off ("Reading suggestions when idle and during breaks")
-and never shows during a focus session, in the mini window or on the web. Without the Hub
+and never shows during a focus session, in the mini window or on the web. With the Hub,
+a "Nebula News" view lists the latest 20 personal growth articles of News
+(title, source, date, short summary); a click opens the article in News. Without the Hub
 nothing changes: the link is optional and silent.
 
 **Appearance** — the Nebula family model, with the same values and labels as

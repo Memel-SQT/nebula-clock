@@ -120,6 +120,9 @@ const bridge = {
     ipcRenderer.invoke(CHANNELS.openBreakReading) as Promise<boolean>,
   setBreakReading: (enabled: boolean): Promise<unknown> =>
     ipcRenderer.invoke(CHANNELS.setBreakReading, enabled),
+  getNewsArticles: (): Promise<unknown> => ipcRenderer.invoke(CHANNELS.newsArticles),
+  openNewsArticle: (link: string): Promise<boolean> =>
+    ipcRenderer.invoke(CHANNELS.openNewsArticle, link) as Promise<boolean>,
 
   // Window chrome and translated shell texts (validated in the main process).
   setWindowTheme: (chrome: WindowChrome): Promise<void> =>

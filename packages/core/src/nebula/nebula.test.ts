@@ -9,7 +9,72 @@ import {
   readingShown,
   READING_REFRESH_MS,
   READING_RETRY_MS,
+  isNewsArticleLink,
+  newsTabFromLink,
+  newsTabKeptMs,
+  NEWS_ARTICLES_MAX,
+  NEWS_TAB_REFRESH_MS,
 } from './index.js';
+
+describe('"Nebula News" view (news.focus.articles)', () => {
+  const article = {
+    title: 'La règle des deux minutes',
+    source: 'Habitudes Zen',
+    publishedAt: '2026-10-09T06:00:00.000Z',
+    summary: 'Un résumé court.',
+    deepLink: 'nebula://news/article?id=clx0abc123def456',
+  };
+  const list = (items: unknown[]) => ({
+    title: 'Développement personnel',
+    updatedAt: '2026-10-09T08:00:00.000Z',
+    items,
+  });
+
+  it('keeps a valid list as plain data', () => {
+    const tab = newsTabFromLink({
+      ok: true,
+      value: list([article, { ...article, summary: undefined }]),
+    });
+    expect(tab.state).toBe('ready');
+    if (tab.state === 'ready') {
+      expect(tab.articles.items[0]).toEqual(article);
+      expect(tab.articles.items[1]).not.toHaveProperty('summary');
+    }
+  });
+
+  it.each([
+    ['markup in a title', list([{ ...article, title: '<img src=x onerror=alert(1)>' }])],
+    [
+      'a link to a theme instead of an article',
+      list([{ ...article, deepLink: 'nebula://news/theme/focus' }]),
+    ],
+    ['a web link', list([{ ...article, deepLink: 'https://example.com/a' }])],
+    ['a title too long', list([{ ...article, title: 't'.repeat(201) }])],
+    ['a summary too long', list([{ ...article, summary: 's'.repeat(401) }])],
+    ['an invalid date', list([{ ...article, publishedAt: 'hier' }])],
+    ['too many articles', list(Array.from({ length: NEWS_ARTICLES_MAX + 1 }, () => article))],
+    ['no article', list([])],
+    ['nothing', null],
+  ])('shows nothing for %s', (_label, value) => {
+    expect(newsTabFromLink({ ok: true, value })).toEqual({ state: 'empty' });
+  });
+
+  it('is unavailable without an answer, asked again 30 s later; an answer is kept 5 minutes', () => {
+    const none = newsTabFromLink({ ok: false, error: 'provider-offline' });
+    expect(none).toEqual({ state: 'unavailable' });
+    expect(newsTabKeptMs(none)).toBe(READING_RETRY_MS);
+    expect(newsTabKeptMs({ state: 'empty' })).toBe(NEWS_TAB_REFRESH_MS);
+    expect(NEWS_TAB_REFRESH_MS).toBe(5 * 60 * 1000);
+  });
+
+  it('opens only links to one article in Nebula News', () => {
+    expect(isNewsArticleLink('nebula://news/article?id=clx0abc123def456')).toBe(true);
+    expect(isNewsArticleLink('nebula://news/article?id=../../x')).toBe(false);
+    expect(isNewsArticleLink('nebula://news/briefing')).toBe(false);
+    expect(isNewsArticleLink('https://example.com')).toBe(false);
+    expect(isNewsArticleLink(42)).toBe(false);
+  });
+});
 
 const focus = {
   date: '2026-10-02',

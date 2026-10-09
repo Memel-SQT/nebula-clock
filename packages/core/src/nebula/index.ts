@@ -188,3 +188,88 @@ export function dockedWindowSteps(
 
 /** Longest wait for the docked window's page before the next Hub messages are handled. */
 export const DOCK_LOAD_TIMEOUT_MS = 8000;
+
+/** One article of the "Nebula News" tab (Nebula Hub ADR-036, `ArticlesV1`): plain texts only. */
+export interface NewsArticle {
+  title: string;
+  source: string;
+  publishedAt: string;
+  summary?: string;
+  /** `nebula://news/article?id=…`, opened by the main process only. */
+  deepLink: string;
+}
+
+export interface NewsArticles {
+  title: string;
+  updatedAt: string;
+  items: NewsArticle[];
+}
+
+/** `unavailable`: News did not answer (yet), `empty`: it has no article for the theme. */
+export type NewsTab =
+  { state: 'ready'; articles: NewsArticles } | { state: 'empty' | 'unavailable' };
+
+export const NEWS_ARTICLES_CAPABILITY = 'news.focus.articles';
+export const NEWS_ARTICLES_MAX = 20;
+/** The tab keeps an answer of News this long, and no answer only `READING_RETRY_MS`. */
+export const NEWS_TAB_REFRESH_MS = 5 * 60 * 1000;
+const ARTICLE_LINK = /^nebula:\/\/news\/article\?id=[a-z0-9]{6,40}$/i;
+
+function boundedText(value: unknown, max: number): value is string {
+  return (
+    typeof value === 'string' &&
+    value.trim().length > 0 &&
+    value.length <= max &&
+    !UNSAFE_TEXT.test(value)
+  );
+}
+
+/**
+ * What Nebula News answered to `news.focus.articles`, checked before the renderer sees it: plain
+ * bounded texts, valid dates, a link to one article in News, at most 20. Anything unexpected
+ * rejects the whole list ("empty"); no answer at all is "unavailable" (asked again soon).
+ */
+export function newsTabFromLink(answer: LinkAnswer): NewsTab {
+  if (!answer.ok) return { state: 'unavailable' };
+  const value = answer.value;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return { state: 'empty' };
+  const list = value as Record<string, unknown>;
+  if (!boundedText(list.title, 80)) return { state: 'empty' };
+  if (typeof list.updatedAt !== 'string' || Number.isNaN(Date.parse(list.updatedAt)))
+    return { state: 'empty' };
+  if (
+    !Array.isArray(list.items) ||
+    list.items.length === 0 ||
+    list.items.length > NEWS_ARTICLES_MAX
+  )
+    return { state: 'empty' };
+  const items: NewsArticle[] = [];
+  for (const raw of list.items) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { state: 'empty' };
+    const item = raw as Record<string, unknown>;
+    if (!boundedText(item.title, 200) || !boundedText(item.source, 80)) return { state: 'empty' };
+    if (item.summary !== undefined && !boundedText(item.summary, 400)) return { state: 'empty' };
+    if (typeof item.publishedAt !== 'string' || Number.isNaN(Date.parse(item.publishedAt)))
+      return { state: 'empty' };
+    if (typeof item.deepLink !== 'string' || !ARTICLE_LINK.test(item.deepLink))
+      return { state: 'empty' };
+    items.push({
+      title: item.title,
+      source: item.source,
+      publishedAt: item.publishedAt,
+      ...(item.summary !== undefined ? { summary: item.summary } : {}),
+      deepLink: item.deepLink,
+    });
+  }
+  return { state: 'ready', articles: { title: list.title, updatedAt: list.updatedAt, items } };
+}
+
+/** How long the tab keeps what News answered. */
+export function newsTabKeptMs(tab: NewsTab): number {
+  return tab.state === 'unavailable' ? READING_RETRY_MS : NEWS_TAB_REFRESH_MS;
+}
+
+/** The only links the main process opens from the tab: one article in Nebula News. */
+export function isNewsArticleLink(value: unknown): value is string {
+  return typeof value === 'string' && ARTICLE_LINK.test(value);
+}

@@ -126,6 +126,9 @@ export interface DesktopBridge {
   getBreakReading?(): Promise<unknown>;
   openBreakReading?(): Promise<boolean>;
   setBreakReading?(enabled: boolean): Promise<HubState>;
+  /** The "Nebula News" tab: News' articles as the main process validated them, and opening one in News. */
+  getNewsArticles?(): Promise<unknown>;
+  openNewsArticle?(link: string): Promise<boolean>;
 
   /** Page and ink colours of the theme, for the native window controls (frameless window). */
   setWindowTheme?(chrome: { page: string; ink: string }): Promise<void>;

@@ -12,6 +12,7 @@ import { useShellLabels } from './hooks/useShellLabels.js';
 import { getDesktop } from './lib/platform.js';
 import { useDocumentTitle } from './hooks/useDocumentTitle.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
+import { NewsView } from './views/NewsView.js';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
 import { useTicker } from './hooks/useTicker.js';
 import { changeLanguage } from './lib/i18n.js';
@@ -100,6 +101,7 @@ export function App() {
           <Suspense fallback={<span className="skeleton skeleton-line" />}>
             {route === 'timer' ? <TimerView onEnterFullscreen={enterFullscreen} /> : null}
             {route === 'tasks' ? <TasksView /> : null}
+            {route === 'news' ? <NewsView /> : null}
             {route === 'stats' ? <StatsView /> : null}
             {route === 'calendar' ? <CalendarView /> : null}
             {route === 'settings' ? <SettingsView /> : null}
