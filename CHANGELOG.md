@@ -1,3 +1,7 @@
+## 1.6.0 (2026-10-09)
+
+* feat(nebula): show news articles on their own, also while the timer is idle ([93e1bc1](https://github.com/Memel-SQT/nebula-clock/commit/93e1bc1))
+
 ## <small>1.5.1 (2026-10-04)</small>
 
 * fix(desktop): raise the window docked in Nebula Hub above the Hub ([d8b1aa3](https://github.com/Memel-SQT/nebula-clock/commit/d8b1aa3))
