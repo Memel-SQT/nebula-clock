@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Nebula News during breaks. The card belongs to the desktop shell, so these tests stand in for
+ * Nebula News while the timer is idle and during breaks. The card belongs to the desktop shell, so these tests stand in for
  * the Electron preload with a fake bridge: every method is a no-op except the three the card
  * uses, whose calls are recorded on `window.__breakReading`.
  */
@@ -66,16 +66,25 @@ async function ready(page: Page) {
   await expect(page.getByRole('heading', { level: 1 })).toBeAttached();
 }
 
-const card = (page: Page) => page.getByRole('region', { name: 'Read during your break' });
+const card = (page: Page) => page.getByRole('region', { name: 'Read between sessions' });
 const skip = (page: Page) => page.getByRole('button', { name: /skip to the next phase/i });
 
-test('the card shows during a break and never during focus', async ({ page }) => {
+test('the card shows while idle and during a break, never during a focus session', async ({
+  page,
+}) => {
   await withDesktop(page, THEME);
   await page.goto('/');
   await ready(page);
 
+  // Idle timer: the card appears on its own.
+  await expect(card(page)).toBeVisible();
+  expect(await page.evaluate(() => window.__breakReading?.asked)).toBeGreaterThan(0);
+
+  // A focus session starts: the card goes away, also while it is paused.
+  await page.getByRole('button', { name: /start the .* phase/i }).click();
   await expect(card(page)).toHaveCount(0);
-  expect(await page.evaluate(() => window.__breakReading?.asked)).toBe(0);
+  await page.getByRole('button', { name: /pause the timer/i }).click();
+  await expect(card(page)).toHaveCount(0);
 
   await skip(page).click();
   await expect(card(page)).toBeVisible();
@@ -84,10 +93,6 @@ test('the card shows during a break and never during focus', async ({ page }) =>
     await expect(card(page).getByText(item.value)).toBeVisible();
   }
   await expect(card(page).getByText(THEME.caption)).toBeVisible();
-
-  // Back to focus: the card goes away.
-  await skip(page).click();
-  await expect(card(page)).toHaveCount(0);
 });
 
 test('opening the theme leaves the timer alone', async ({ page }) => {
