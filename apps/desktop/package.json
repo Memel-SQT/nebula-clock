@@ -21,7 +21,7 @@
     "test": "echo \"Electron shell is covered by the manual test plan in docs/manual-testing-electron.md\" && exit 0"
   },
   "dependencies": {
-    "@nebula/link": "https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz",
+    "@nebula/link": "https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.2.0/nebula-link-1.2.0.tgz",
     "electron-updater": "^6.3.9"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   clockAppearanceFromHub,
+  findPackTheme,
   computeStreak,
   filterByRange,
   getRange,
@@ -10,6 +11,7 @@ import {
 import { getDesktop, type HubState } from '../lib/platform.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
+import { usePackStore } from '../store/packStore.js';
 
 /**
  * Nebula Hub, renderer side (optional, desktop only). Its preferences are kept out of the
@@ -65,6 +67,12 @@ export function useNebulaHubSync(): void {
     return desktop.onNebulaAppearance((payload) => {
       if (!readFollow()) return;
       const { appearance, language } = clockAppearanceFromHub(payload);
+      // A theme of an appearance pack installed here is drawn over the built-in one, which stays
+      // as it is; a built-in theme from the Hub leaves the pack theme (NEBULA_LINK.md § 18).
+      const theme = (payload as { theme?: unknown } | null)?.theme;
+      const { packs, setChoice } = usePackStore.getState();
+      if (typeof theme === 'string' && findPackTheme(packs, theme)) setChoice(theme);
+      else if (appearance.theme) setChoice(null);
       if (Object.keys(appearance).length > 0) updateAppearance(appearance);
       if (language) setLanguage(language);
     });

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Icon, Logo, type IconName } from '@nebula-clock/ui';
 import type { Route } from '../hooks/useHashRoute.js';
 import type { HubState } from '../lib/platform.js';
+import { usePackBrand } from '../store/packStore.js';
 
 const APP_VERSION = __APP_VERSION__;
 
@@ -44,6 +45,8 @@ export interface SidebarProps {
  */
 export function Sidebar({ route, onNavigate, hub }: SidebarProps) {
   const { t } = useTranslation(['common']);
+  // The name and logo an installed appearance pack gives this app (Nebula Hub NEBULA_LINK.md § 18).
+  const brand = usePackBrand();
 
   const navItem = ({ route: target, icon }: Section) => {
     const current = target === route;
@@ -72,9 +75,13 @@ export function Sidebar({ route, onNavigate, hub }: SidebarProps) {
   return (
     <aside className="sidebar nebula-surface nebula-sidebar app-no-drag">
       <div className="brand-lockup">
-        <Logo size={40} title={t('common:app.name')} className="hub-mark" />
+        {brand.markUrl ? (
+          <img src={brand.markUrl} alt="" width={40} height={40} className="hub-mark" />
+        ) : (
+          <Logo size={40} title={t('common:app.name')} className="hub-mark" />
+        )}
         <div>
-          <strong>{t('common:app.name')}</strong>
+          <strong>{brand.name ?? t('common:app.name')}</strong>
           <span>{t('common:app.tagline')}</span>
         </div>
       </div>

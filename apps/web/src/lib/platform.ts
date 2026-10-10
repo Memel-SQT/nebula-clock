@@ -132,6 +132,9 @@ export interface DesktopBridge {
 
   /** Page and ink colours of the theme, for the native window controls (frameless window). */
   setWindowTheme?(chrome: { page: string; ink: string }): Promise<void>;
+  /** Appearance packs of installed Nebula apps (Nebula Hub NEBULA_LINK.md § 18), checked by the shell. */
+  getAppearancePacks?(): Promise<unknown>;
+  onAppearancePacks?(handler: (packs: unknown) => void): () => void;
   /** Translated labels for the tray menu and the main process notifications. */
   setShellLabels?(labels: ShellLabels): void;
 }

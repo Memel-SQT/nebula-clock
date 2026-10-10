@@ -12,6 +12,9 @@ import {
   NOTIFICATION_SOUNDS,
   THEMES,
   buildExportBundle,
+  findPackTheme,
+  isTheme,
+  packLabel,
   getNotificationAdapter,
   isGlassTheme,
   normalizeAppName,
@@ -54,6 +57,7 @@ import { getDesktop, type UpdateEvent } from '../lib/platform.js';
 import { useNebulaHub } from '../hooks/useNebulaHub.js';
 import { useDataStore } from '../store/dataStore.js';
 import { useSettingsStore } from '../store/settingsStore.js';
+import { useActivePack, usePackStore } from '../store/packStore.js';
 import { useTimerStore } from '../store/timerStore.js';
 
 const APP_VERSION = __APP_VERSION__;
@@ -143,6 +147,9 @@ export function SettingsView() {
   }, [status]);
 
   const appearance = settings.appearance;
+  const packs = usePackStore((state) => state.packs);
+  const setPackChoice = usePackStore((state) => state.setChoice);
+  const activePack = useActivePack();
   const resolved = resolveTheme(appearance.theme, prefersDark);
   const language = resolveLanguage(settings.language, [i18n.language]);
   const notify = (text: string, tone: 'accent' | 'warning' = 'accent') => setStatus({ text, tone });
@@ -284,14 +291,30 @@ export function SettingsView() {
             <p className="settings-label" id="settings-theme-label">
               {t('settings:appearance.theme')}
             </p>
-            <SegmentedControl
+            <SegmentedControl<string>
               labelledBy="settings-theme-label"
-              value={appearance.theme}
-              onChange={(theme) => updateAppearance({ theme })}
-              options={THEMES.map((theme) => ({
-                value: theme,
-                label: t(`settings:appearance.themes.${theme}`),
-              }))}
+              value={activePack?.theme.id ?? appearance.theme}
+              onChange={(value) => {
+                // A theme of an installed appearance pack (NEBULA_LINK.md § 18), or a built-in one.
+                if (findPackTheme(packs, value)) {
+                  setPackChoice(value);
+                  return;
+                }
+                setPackChoice(null);
+                if (isTheme(value)) updateAppearance({ theme: value });
+              }}
+              options={[
+                ...THEMES.map((theme) => ({
+                  value: theme,
+                  label: t(`settings:appearance.themes.${theme}`),
+                })),
+                ...packs
+                  .flatMap((pack) => pack.themes)
+                  .map((theme) => ({
+                    value: theme.id,
+                    label: packLabel(theme.label, i18n.language),
+                  })),
+              ]}
             />
             {isGlassTheme(resolved) && appearance.background !== 'aurora' ? (
               <small className="path-note settings-hint">
@@ -317,6 +340,12 @@ export function SettingsView() {
             <p className="settings-label" id="settings-accent-label">
               {t('settings:appearance.accent')}
             </p>
+            {activePack ? (
+              <small className="path-note settings-hint">
+                <Icon name="info" size={14} />
+                {t('settings:appearance.packAccentHint')}
+              </small>
+            ) : null}
             <div className="swatch-row" role="radiogroup" aria-labelledby="settings-accent-label">
               {[...ACCENT_PRESETS, null].map((preset) => {
                 const id = preset?.id ?? 'custom';

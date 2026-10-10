@@ -13,6 +13,7 @@ import { getDesktop } from './lib/platform.js';
 import { useDocumentTitle } from './hooks/useDocumentTitle.js';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { NewsView } from './views/NewsView.js';
+import { startPackSync } from './store/packStore.js';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
 import { useTicker } from './hooks/useTicker.js';
 import { changeLanguage } from './lib/i18n.js';
@@ -56,6 +57,8 @@ export function App() {
   useDocumentTitle();
   useDesktopSync();
   useNebulaHubSync();
+  // Appearance packs of installed Nebula apps (desktop only).
+  useEffect(() => startPackSync(), []);
   useAmbientSync();
   useShellLabels();
 

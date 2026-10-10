@@ -2,13 +2,16 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import {
   ACCENT_VARIABLES,
   appearanceVariables,
+  packBaseTheme,
   resolveTheme,
+  type ActivePack,
   type AppearanceSettings,
   type ResolvedTheme,
 } from '@nebula-clock/core';
 import { THEME_CHROME, configureSounds } from '@nebula-clock/ui';
 import { getDesktop } from '../lib/platform.js';
 import { useSettingsStore } from '../store/settingsStore.js';
+import { useActivePack } from '../store/packStore.js';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
@@ -68,26 +71,58 @@ export function applyAppearanceToDocument(
 }
 
 /**
+ * Draws a pack theme over the built-in one: `data-pack-theme`, `color-scheme` and its tokens as
+ * inline custom properties (they win over the token blocks and the accent colours). Returns the
+ * undo, which puts back what was there before (the accent colours are inline too).
+ */
+function applyPackTheme(active: ActivePack): () => void {
+  const root = document.documentElement;
+  const names = Object.keys(active.theme.tokens).filter((name) => name.startsWith('--'));
+  const previous = names.map((name) => [name, root.style.getPropertyValue(name)] as const);
+  root.dataset.packTheme = active.theme.id;
+  root.style.setProperty('color-scheme', active.theme.scheme);
+  for (const name of names) root.style.setProperty(name, active.theme.tokens[name] ?? '');
+  return () => {
+    for (const [name, value] of previous) {
+      if (value) root.style.setProperty(name, value);
+      else root.style.removeProperty(name);
+    }
+    root.style.removeProperty('color-scheme');
+    delete root.dataset.packTheme;
+  };
+}
+
+/**
  * Applies the Nebula appearance: the resolved theme, accents, background, motion level,
  * contrast and text size on `<html>` (in a layout effect, before the browser paints), the
  * interface sounds, and the native window controls on desktop.
  */
-export function useAppearance(): { appearance: AppearanceSettings; resolved: ResolvedTheme } {
+export function useAppearance(): {
+  appearance: AppearanceSettings;
+  resolved: ResolvedTheme;
+  active: ActivePack | null;
+} {
   const appearance = useSettingsStore((state) => state.settings.appearance);
   const prefersDark = usePrefersDark();
-  const resolved = resolveTheme(appearance.theme, prefersDark);
+  const active = useActivePack();
+  // A pack theme is drawn over the built-in theme of its scheme (Nebula Hub NEBULA_LINK.md § 18).
+  const resolved = active
+    ? packBaseTheme(active.theme.scheme)
+    : resolveTheme(appearance.theme, prefersDark);
 
   useLayoutEffect(() => {
     applyAppearanceToDocument(appearance, resolved);
-  }, [appearance, resolved]);
+    if (!active) return undefined;
+    return applyPackTheme(active);
+  }, [appearance, resolved, active]);
 
   useEffect(() => {
-    void getDesktop()?.setWindowTheme?.(THEME_CHROME[resolved]);
-  }, [resolved]);
+    void getDesktop()?.setWindowTheme?.(active ? active.theme.chrome : THEME_CHROME[resolved]);
+  }, [resolved, active]);
 
   useEffect(() => {
     configureSounds({ enabled: appearance.soundEnabled, volume: appearance.soundVolume });
   }, [appearance.soundEnabled, appearance.soundVolume]);
 
-  return { appearance, resolved };
+  return { appearance, resolved, active };
 }

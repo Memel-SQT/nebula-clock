@@ -172,7 +172,10 @@ soon as News answers; a click opens the theme in News without touching the
 timer. It can be turned off ("Reading suggestions when idle and during breaks")
 and never shows during a focus session, in the mini window or on the web. With the Hub,
 a "Nebula News" view lists the latest 20 personal growth articles of News
-(title, source, date, short summary); a click opens the article in News. Without the Hub
+(title, source, date, short summary); a click opens the article in News. Themes shared
+by an installed Nebula app (appearance packs) appear in Settings after the
+family themes, with the name and logo that app gives Nebula Clock; without it,
+nothing changes. Without the Hub
 nothing changes: the link is optional and silent.
 
 **Appearance** — the Nebula family model, with the same values and labels as

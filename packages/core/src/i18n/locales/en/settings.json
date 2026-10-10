@@ -87,6 +87,7 @@
       "system": "System"
     },
     "glassHint": "Tip: liquid glass looks its best with the “Aurora” background.",
+    "packAccentHint": "This theme has its own colors: accent colors do not apply to it.",
     "accentPrimary": "Main color",
     "accentSecondary": "Secondary color",
     "background": "Animated background",

@@ -52,6 +52,9 @@ export const CHANNELS = {
   updateEvent: 'nebula:update-event',
   hubStateChanged: 'nebula:state',
   hubAppearance: 'nebula:appearance',
+  /** Appearance packs of installed Nebula apps (Nebula Hub NEBULA_LINK.md § 18). */
+  packs: 'nebula:appearance-packs',
+  packsChanged: 'nebula:appearance-packs-changed',
 } as const;
 
 export type Phase = 'focus' | 'shortBreak' | 'longBreak';

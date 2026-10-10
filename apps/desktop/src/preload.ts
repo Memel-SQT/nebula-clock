@@ -110,6 +110,9 @@ const bridge = {
     subscribe<unknown>(CHANNELS.hubStateChanged, handler),
   onNebulaAppearance: (handler: (appearance: unknown) => void): (() => void) =>
     subscribe<unknown>(CHANNELS.hubAppearance, handler),
+  getAppearancePacks: (): Promise<unknown> => ipcRenderer.invoke(CHANNELS.packs),
+  onAppearancePacks: (handler: (packs: unknown) => void): (() => void) =>
+    subscribe<unknown>(CHANNELS.packsChanged, handler),
   setUpdatesByHub: (enabled: boolean): Promise<unknown> =>
     ipcRenderer.invoke(CHANNELS.setUpdatesByHub, enabled),
   openHub: (): Promise<'opened' | 'not-installed'> =>

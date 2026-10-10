@@ -72,8 +72,8 @@ importers:
   apps/desktop:
     dependencies:
       '@nebula/link':
-        specifier: https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz
-        version: https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz
+        specifier: https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.2.0/nebula-link-1.2.0.tgz
+        version: https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.2.0/nebula-link-1.2.0.tgz
       electron-updater:
         specifier: ^6.3.9
         version: 6.8.9
@@ -1419,9 +1419,9 @@ packages:
     os: [linux]
     libc: [glibc]
 
-  '@nebula/link@https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz':
-    resolution: {integrity: sha512-znuCpO40R6WoEseJhQRXLvhTXnhktfcIfyWq1wTWeoMN/D/76orfAMDIBs57bHEVjiXR0hO+CWN/oFBsDGtIJw==, tarball: https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz}
-    version: 1.0.0
+  '@nebula/link@https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.2.0/nebula-link-1.2.0.tgz':
+    resolution: {integrity: sha512-Lb9USeQm02teQZllLnWVFjp2PIPWz4tgrrMJMtwSm/WLOMVNWJ8+1vW2GnKkbWLvWB0f7xYcujrOTLXJ3aLY4g==, tarball: https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.2.0/nebula-link-1.2.0.tgz}
+    version: 1.2.0
     engines: {node: '>=18'}
 
   '@noble/hashes@1.8.0':
@@ -6998,7 +6998,7 @@ snapshots:
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
 
-  '@nebula/link@https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.0.0/nebula-link-1.0.0.tgz': {}
+  '@nebula/link@https://github.com/Memel-SQT/Nebula-Hub/releases/download/link-v1.2.0/nebula-link-1.2.0.tgz': {}
 
   '@noble/hashes@1.8.0': {}
 

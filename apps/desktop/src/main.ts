@@ -8,8 +8,9 @@
  */
 import { BrowserWindow, Notification, app, ipcMain, powerSaveBlocker, shell } from 'electron';
 import { join } from 'node:path';
-import { isNewsArticleLink, type FocusTodayPublication } from '@nebula-clock/core';
+import { isNewsArticleLink, type FocusTodayPublication, type PackView } from '@nebula-clock/core';
 import { NebulaIntegration } from './nebula.js';
+import { readPackViews } from './packs.js';
 import { CHANNELS } from './ipc.js';
 import type {
   DesktopCommand,
@@ -151,7 +152,22 @@ function showNotification(payload: NotificationPayload): void {
   }).show();
 }
 
+/**
+ * Appearance packs of installed Nebula apps (Nebula Hub NEBULA_LINK.md § 18): read at startup and
+ * whenever a window comes back, sent to the windows when they change.
+ */
+let packs: PackView[] = [];
+
+function refreshPacks(): void {
+  const next = readPackViews(process.env);
+  if (JSON.stringify(next) === JSON.stringify(packs)) return;
+  packs = next;
+  for (const window of allWindows()) window.webContents.send(CHANNELS.packsChanged, packs);
+}
+
 function registerIpc(): void {
+  ipcMain.handle(CHANNELS.packs, () => packs);
+
   // Every payload from the renderer is validated before use (validate.ts).
   ipcMain.handle(CHANNELS.notify, (_event, value: unknown) => {
     const payload = asNotification(value);
@@ -333,6 +349,8 @@ if (!app.requestSingleInstanceLock()) {
 
     registerIpc();
     cleanupStaleBlock();
+    refreshPacks();
+    app.on('browser-window-focus', () => refreshPacks());
     await createMainWindow();
 
     createTray({
