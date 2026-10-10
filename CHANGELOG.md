@@ -1,3 +1,7 @@
+## 1.8.0 (2026-10-10)
+
+* feat(appearance): follow appearance packs shared by installed Nebula apps ([5c5a1cc](https://github.com/Memel-SQT/nebula-clock/commit/5c5a1cc))
+
 ## 1.7.0 (2026-10-09)
 
 * feat(nebula): add a Nebula News view with the latest personal growth articles ([2a4f71e](https://github.com/Memel-SQT/nebula-clock/commit/2a4f71e))
