@@ -1,3 +1,7 @@
+## 1.9.0 (2026-10-11)
+
+* feat(data): seal the desktop JSON backup with the Nebula family save key ([6bca5ac](https://github.com/Memel-SQT/nebula-clock/commit/6bca5ac))
+
 ## 1.8.0 (2026-10-10)
 
 * feat(appearance): follow appearance packs shared by installed Nebula apps ([5c5a1cc](https://github.com/Memel-SQT/nebula-clock/commit/5c5a1cc))
