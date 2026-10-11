@@ -5,6 +5,8 @@ import {
   EXPORT_FORMAT_VERSION,
   ImportError,
   buildExportBundle,
+  isBackupFileName,
+  isSealedSave,
   mergeSettings,
   parseImportBundle,
   serializeJson,
@@ -317,5 +319,23 @@ describe('parseImportBundle', () => {
       wrap({ sessions: [{ id: 's', phase: 'nap', startedAt: 1, endedAt: 2 }] }),
     );
     expect(parsed.sessions).toEqual([]);
+  });
+});
+
+describe('sealed saves (Nebula Hub ADR-040)', () => {
+  const bytes = (text: string) => new TextEncoder().encode(text);
+
+  it('recognises a sealed save by its first line only', () => {
+    expect(isSealedSave(bytes('NEBULA-SAVE/1\n{"app":"nebula.clock"}\n…'))).toBe(true);
+    expect(isSealedSave(bytes('{"format":"nebula-clock"}'))).toBe(false);
+    expect(isSealedSave(bytes('NEBULA-SAVE/1'))).toBe(false);
+    expect(isSealedSave(new Uint8Array())).toBe(false);
+  });
+
+  it('knows the JSON backup names the desktop app seals in place', () => {
+    expect(isBackupFileName('nebula-clock-backup-2026-09-01.json')).toBe(true);
+    expect(isBackupFileName('nebula-clock-backup-2026-09-01 (2).json')).toBe(true);
+    expect(isBackupFileName('nebula-clock-sessions-2026-09-01.csv')).toBe(false);
+    expect(isBackupFileName('my-backup.json')).toBe(false);
   });
 });

@@ -30,6 +30,11 @@ export const CHANNELS = {
   setBreakReading: 'nebula:set-break-reading',
   /** Theme colours for the native window controls of the frameless window. */
   setWindowTheme: 'nebula:set-window-theme',
+  /** Sealed saves (Nebula Hub ADR-040): the JSON backup sealed, an import opened, the save key. */
+  sealExport: 'nebula:seal-export',
+  openSave: 'nebula:open-save',
+  saveRecoveryCode: 'nebula:save-recovery-code',
+  addSaveRecoveryCode: 'nebula:add-save-recovery-code',
 
   // renderer -> main (synchronous, read once by the preload)
   appInfo: 'nebula:app-info',

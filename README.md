@@ -202,7 +202,13 @@ complete offline support.
 There is no backend. No analytics, no crash reporting, no account, and no
 third-party request of any kind — the Inter webfont is bundled rather than
 fetched from Google Fonts, so the app renders correctly with the network
-unplugged. Export and import are manual, local, and file-based.
+unplugged. Export and import are manual, local, and file-based. In the
+desktop app the JSON backup is encrypted (AES-256) with the Nebula apps' backup
+key, which Windows protects for your account; older plain backups left in
+Downloads are encrypted in place by the update, and stay importable. Settings →
+Data shows the recovery key, to open your backups on another computer. The web
+app cannot reach that key, so its JSON backup stays plain; CSV exports are
+meant for spreadsheets and stay plain too.
 
 The desktop build additionally contacts GitHub Releases, and only to check
 for an update. Its optional link with Nebula Hub (Nebula Link) is a local

@@ -130,6 +130,15 @@ export interface DesktopBridge {
   getNewsArticles?(): Promise<unknown>;
   openNewsArticle?(link: string): Promise<boolean>;
 
+  /**
+   * Sealed saves (Nebula Hub ADR-040): the JSON backup sealed with the family's save key, a backup
+   * opened for import (sealed or older plain), and the recovery key. Missing in older shells.
+   */
+  sealExport?(text: string): Promise<Uint8Array>;
+  openSave?(bytes: Uint8Array): Promise<unknown>;
+  getSaveRecoveryCode?(): Promise<string | null>;
+  addSaveRecoveryCode?(code: string): Promise<boolean>;
+
   /** Page and ink colours of the theme, for the native window controls (frameless window). */
   setWindowTheme?(chrome: { page: string; ink: string }): Promise<void>;
   /** Appearance packs of installed Nebula apps (Nebula Hub NEBULA_LINK.md § 18), checked by the shell. */

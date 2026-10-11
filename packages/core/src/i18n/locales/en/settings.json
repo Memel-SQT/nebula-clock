@@ -160,14 +160,30 @@
     "reasons": {
       "invalidJson": "the file is not valid JSON",
       "notNebulaClock": "this is not a Nebula Clock export",
-      "unknown": "unexpected file contents"
+      "unknown": "unexpected file contents",
+      "sealedElsewhere": "this backup was encrypted on another computer; add its recovery key first",
+      "sealedDesktop": "this backup is encrypted; import it in the Nebula Clock desktop app",
+      "damaged": "the encrypted backup is damaged or incomplete"
     },
     "warnings": {
       "newerFormat": "This backup comes from a newer version; some fields were ignored."
     },
     "clear": "Delete all my data",
     "cleared": "All local data deleted",
-    "privacy": "Nebula Clock never sends anything to a server. Everything you see lives in this device's local storage."
+    "privacy": "Nebula Clock never sends anything to a server. Everything you see lives in this device's local storage.",
+    "exportFailed": "The backup could not be encrypted: nothing was saved.",
+    "plainInBrowser": "In the browser, the JSON backup is not encrypted: keep it somewhere safe. The desktop app encrypts its own.",
+    "saveKey": {
+      "title": "Backup key",
+      "hint": "Your JSON backups are encrypted with the Nebula apps’ backup key, protected by Windows for your account. To open them on another computer, write down the recovery key.",
+      "show": "Show the recovery key",
+      "hide": "Hide the key",
+      "warning": "Keep it somewhere safe: it opens all your Nebula backups.",
+      "import": "Add another computer’s key",
+      "add": "Add",
+      "added": "Key added: that computer’s backups now open here.",
+      "invalid": "This is not a valid recovery key (64 characters 0-9 and A-F)."
+    }
   },
   "about": {
     "version": "Version {{version}}",

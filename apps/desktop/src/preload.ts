@@ -127,6 +127,15 @@ const bridge = {
   openNewsArticle: (link: string): Promise<boolean> =>
     ipcRenderer.invoke(CHANNELS.openNewsArticle, link) as Promise<boolean>,
 
+  // Sealed saves (Nebula Hub ADR-040).
+  sealExport: (text: string): Promise<Uint8Array> =>
+    ipcRenderer.invoke(CHANNELS.sealExport, text) as Promise<Uint8Array>,
+  openSave: (bytes: Uint8Array): Promise<unknown> => ipcRenderer.invoke(CHANNELS.openSave, bytes),
+  getSaveRecoveryCode: (): Promise<string | null> =>
+    ipcRenderer.invoke(CHANNELS.saveRecoveryCode) as Promise<string | null>,
+  addSaveRecoveryCode: (code: string): Promise<boolean> =>
+    ipcRenderer.invoke(CHANNELS.addSaveRecoveryCode, code) as Promise<boolean>,
+
   // Window chrome and translated shell texts (validated in the main process).
   setWindowTheme: (chrome: WindowChrome): Promise<void> =>
     ipcRenderer.invoke(CHANNELS.setWindowTheme, chrome) as Promise<void>,

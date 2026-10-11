@@ -66,6 +66,30 @@ export function pickTextFile(accept: string): Promise<{ name: string; text: stri
   });
 }
 
+/** Prompt for a file and resolve with its bytes (backups, which may be sealed). */
+export function pickFileBytes(accept: string): Promise<{ name: string; bytes: Uint8Array } | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      file
+        .arrayBuffer()
+        .then((buffer) => resolve({ name: file.name, bytes: new Uint8Array(buffer) }))
+        .catch(() => resolve(null));
+    });
+    input.style.display = 'none';
+    document.body.append(input);
+    input.click();
+    setTimeout(() => input.remove(), 0);
+  });
+}
+
 /** Prompt for a file and resolve with a data URL (used for custom sounds). */
 export function pickDataUrl(accept: string): Promise<{ name: string; dataUrl: string } | null> {
   return new Promise((resolve) => {

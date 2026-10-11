@@ -48,6 +48,27 @@ export function serializeJson(bundle: ExportBundle): string {
   return JSON.stringify(bundle, null, 2);
 }
 
+/* ----------------------------------------------------------- sealed saves */
+
+/**
+ * Every sealed save of the Nebula family starts with this line (Nebula Hub ADR-040, NEBULA_LINK.md
+ * § 19). The desktop app seals its JSON backup; the browser cannot open one.
+ */
+export const SEALED_SAVE_MAGIC = 'NEBULA-SAVE/1\n';
+
+export function isSealedSave(bytes: Uint8Array): boolean {
+  if (bytes.length < SEALED_SAVE_MAGIC.length) return false;
+  for (let index = 0; index < SEALED_SAVE_MAGIC.length; index += 1) {
+    if (bytes[index] !== SEALED_SAVE_MAGIC.charCodeAt(index)) return false;
+  }
+  return true;
+}
+
+/** `nebula-clock-backup-2026-09-01.json` and the browser's ` (1)` copies: the JSON backups. */
+export function isBackupFileName(name: string): boolean {
+  return /^nebula-clock-backup-\d{4}-\d{2}-\d{2}( ?\(\d+\))?\.json$/i.test(name);
+}
+
 /* -------------------------------------------------------------------- CSV */
 
 /** RFC 4180 quoting: wrap in quotes and double any embedded quote. */

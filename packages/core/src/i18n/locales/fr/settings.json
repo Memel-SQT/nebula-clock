@@ -160,14 +160,30 @@
     "reasons": {
       "invalidJson": "le fichier n'est pas un JSON valide",
       "notNebulaClock": "ce n'est pas un export Nebula Clock",
-      "unknown": "contenu de fichier inattendu"
+      "unknown": "contenu de fichier inattendu",
+      "sealedElsewhere": "cette sauvegarde a été chiffrée sur un autre ordinateur ; ajoute d’abord sa clé de récupération",
+      "sealedDesktop": "cette sauvegarde est chiffrée ; importe-la dans l’app de bureau Nebula Clock",
+      "damaged": "la sauvegarde chiffrée est abîmée ou incomplète"
     },
     "warnings": {
       "newerFormat": "Cette sauvegarde vient d'une version plus récente ; certains champs ont été ignorés."
     },
     "clear": "Supprimer toutes mes données",
     "cleared": "Toutes les données locales ont été supprimées",
-    "privacy": "Nebula Clock n'envoie jamais rien à un serveur. Tout ce que tu vois vit dans le stockage local de cet appareil."
+    "privacy": "Nebula Clock n'envoie jamais rien à un serveur. Tout ce que tu vois vit dans le stockage local de cet appareil.",
+    "exportFailed": "La sauvegarde n’a pas pu être chiffrée : rien n’a été enregistré.",
+    "plainInBrowser": "Dans le navigateur, la sauvegarde JSON n’est pas chiffrée : garde-la dans un endroit sûr. L’app de bureau chiffre la sienne.",
+    "saveKey": {
+      "title": "Clé de sauvegarde",
+      "hint": "Tes sauvegardes JSON sont chiffrées avec la clé de sauvegarde des apps Nebula, protégée par Windows pour ton compte. Pour les rouvrir sur un autre ordinateur, note la clé de récupération.",
+      "show": "Afficher la clé de récupération",
+      "hide": "Masquer la clé",
+      "warning": "Garde-la en lieu sûr : elle ouvre toutes tes sauvegardes Nebula.",
+      "import": "Ajouter la clé d’un autre ordinateur",
+      "add": "Ajouter",
+      "added": "Clé ajoutée : les sauvegardes de cet ordinateur s’ouvrent maintenant ici.",
+      "invalid": "Ce n’est pas une clé de récupération valide (64 caractères 0-9 et A-F)."
+    }
   },
   "about": {
     "version": "Version {{version}}",

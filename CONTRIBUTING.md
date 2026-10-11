@@ -51,6 +51,13 @@ These are the constraints that keep the codebase workable — please respect the
 5. **No `any` without a comment justifying it.** ESLint fails the build.
 6. **The timer must stay timestamp-based.** Never accumulate elapsed time from
    tick counts; derive it from the wall clock.
+7. **Saves are never written in clear text by the desktop app** (Nebula Hub
+   ADR-040). The JSON backup is sealed in the main process with the Nebula
+   family's save key (`apps/desktop/src/saves.ts`, `@nebula/link`), and
+   nothing is saved if sealing fails. Every import accepts sealed and older
+   plain backups; older plain ones in Downloads are sealed in place at startup.
+   The web app (PWA) has no access to the key: its backup stays plain and the
+   Settings say so. CSV exports are spreadsheets, not saves, and stay plain.
 
 ## Quality gates
 

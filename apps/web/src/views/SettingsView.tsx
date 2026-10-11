@@ -22,6 +22,7 @@ import {
   parseImportBundle,
   resolveLanguage,
   resolveTheme,
+  isSealedSave,
   serializeJson,
   sessionsToCsv,
   tasksToCsv,
@@ -46,12 +47,14 @@ import {
   type IconName,
 } from '@nebula-clock/ui';
 import {
+  downloadBlob,
   downloadCsv,
   downloadJson,
   pickDataUrl,
-  pickTextFile,
+  pickFileBytes,
   timestampedFilename,
 } from '../lib/download.js';
+import { SaveKeyPanel } from '../components/SaveKeyPanel.js';
 import { getSoundEngine } from '../lib/sound.js';
 import { getDesktop, type UpdateEvent } from '../lib/platform.js';
 import { useNebulaHub } from '../hooks/useNebulaHub.js';
@@ -156,7 +159,9 @@ export function SettingsView() {
 
   /* --------------------------------------------------------- data export */
 
-  const exportJson = () => {
+  // On the desktop the backup is sealed with the family's save key (Nebula Hub ADR-040); the
+  // browser has no access to it, so the web app's backup stays plain (and says so).
+  const exportJson = async () => {
     const bundle = buildExportBundle({
       appVersion: APP_VERSION,
       settings,
@@ -165,15 +170,47 @@ export function SettingsView() {
       sessions: data.sessions,
       presets: data.customPresets,
     });
-    downloadJson(serializeJson(bundle), timestampedFilename('backup', 'json'));
+    const filename = timestampedFilename('backup', 'json');
+    if (!desktop?.sealExport) {
+      downloadJson(serializeJson(bundle), filename);
+      return;
+    }
+    try {
+      const sealed = await desktop.sealExport(serializeJson(bundle));
+      // A copy into a plain ArrayBuffer: what came over IPC may sit on a shared buffer.
+      downloadBlob(
+        new Blob([new Uint8Array(sealed)], { type: 'application/octet-stream' }),
+        filename,
+      );
+    } catch {
+      // Never a plain backup instead: nothing is saved.
+      notify(t('settings:data.exportFailed'), 'warning');
+    }
+  };
+
+  /** The text of a backup: opened by the desktop shell (sealed or older plain), plain in the browser. */
+  const backupText = async (bytes: Uint8Array): Promise<string> => {
+    if (desktop?.openSave) {
+      const opened = (await desktop.openSave(bytes)) as {
+        ok: boolean;
+        text?: string;
+        reason?: string;
+      };
+      if (!opened?.ok || typeof opened.text !== 'string') {
+        throw new ImportError(opened?.reason ?? 'unknown');
+      }
+      return opened.text;
+    }
+    if (isSealedSave(bytes)) throw new ImportError('sealedDesktop');
+    return new TextDecoder().decode(bytes);
   };
 
   // The file is read and checked first, then the replacement is confirmed with its contents.
   const importBackup = async () => {
-    const file = await pickTextFile('application/json,.json');
+    const file = await pickFileBytes('application/json,.json');
     if (!file) return;
     try {
-      setConfirmation({ kind: 'import', parsed: parseImportBundle(file.text) });
+      setConfirmation({ kind: 'import', parsed: parseImportBundle(await backupText(file.bytes)) });
     } catch (error) {
       const reason =
         error instanceof ImportError
@@ -926,7 +963,7 @@ export function SettingsView() {
           <Section icon="folderSync" title={t('settings:sections.data')}>
             <p className="settings-copy">{t('settings:data.privacy')}</p>
             <div className="settings-actions settings-reset">
-              <Button size="sm" variant="ghost" icon="download" onClick={exportJson}>
+              <Button size="sm" variant="ghost" icon="download" onClick={() => void exportJson()}>
                 {t('settings:data.exportJson')}
               </Button>
               <Button
@@ -959,6 +996,14 @@ export function SettingsView() {
                 {t('settings:data.import')}
               </Button>
             </div>
+            {desktop?.getSaveRecoveryCode && desktop.addSaveRecoveryCode ? (
+              <SaveKeyPanel
+                onReveal={() => desktop.getSaveRecoveryCode!()}
+                onAdd={(code) => desktop.addSaveRecoveryCode!(code)}
+              />
+            ) : (
+              <p className="settings-copy">{t('settings:data.plainInBrowser')}</p>
+            )}
             <div className="settings-actions settings-reset">
               <Button
                 size="sm"

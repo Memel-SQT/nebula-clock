@@ -901,3 +901,43 @@
   width: 100%;
   height: 100%;
 }
+
+/* The Nebula family's save key, desktop only (Nebula Hub ADR-040). */
+.save-key {
+  margin: 0.4rem 0 0.8rem;
+}
+.save-key-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0.3rem;
+  font-size: 0.8rem;
+}
+.save-key-code {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.7rem;
+}
+.save-key-code code {
+  word-break: break-all;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+}
+.save-key-import {
+  align-items: flex-end;
+}
+.save-key-input {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+.save-key-input input {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+.save-key-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--warning);
+  font-size: 0.78rem;
+}

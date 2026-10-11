@@ -11,6 +11,14 @@ import { join } from 'node:path';
 import { isNewsArticleLink, type FocusTodayPublication, type PackView } from '@nebula-clock/core';
 import { NebulaIntegration } from './nebula.js';
 import { readPackViews } from './packs.js';
+import {
+  MAX_SAVE_BYTES,
+  addSaveRecoveryCode,
+  openBackup,
+  saveRecoveryCode,
+  sealExport,
+  sealOldBackups,
+} from './saves.js';
 import { CHANNELS } from './ipc.js';
 import type {
   DesktopCommand,
@@ -175,6 +183,30 @@ function registerIpc(): void {
     showNotification(payload);
     nebula.notify(payload.title, payload.body);
   });
+
+  // Sealed saves (Nebula Hub ADR-040): the main window only, bounded payloads.
+  const fromMain = (event: Electron.IpcMainInvokeEvent) =>
+    BrowserWindow.fromWebContents(event.sender) === getMainWindow();
+  ipcMain.handle(CHANNELS.sealExport, (event, text: unknown) => {
+    if (!fromMain(event) || typeof text !== 'string' || text.length > MAX_SAVE_BYTES) {
+      throw new Error('ERR_SAVE');
+    }
+    return sealExport(text);
+  });
+  ipcMain.handle(CHANNELS.openSave, (event, bytes: unknown) => {
+    if (!fromMain(event) || !(bytes instanceof Uint8Array) || bytes.length > MAX_SAVE_BYTES) {
+      return { ok: false, reason: 'damaged' };
+    }
+    return openBackup(bytes);
+  });
+  ipcMain.handle(CHANNELS.saveRecoveryCode, (event) =>
+    fromMain(event) ? saveRecoveryCode().catch(() => null) : null,
+  );
+  ipcMain.handle(CHANNELS.addSaveRecoveryCode, (event, code: unknown) =>
+    fromMain(event) && typeof code === 'string' && code.length <= 200
+      ? addSaveRecoveryCode(code).catch(() => false)
+      : false,
+  );
 
   ipcMain.handle(CHANNELS.setWindowTheme, (_event, value: unknown) => {
     const chrome = asWindowChrome(value);
@@ -349,6 +381,8 @@ if (!app.requestSingleInstanceLock()) {
 
     registerIpc();
     cleanupStaleBlock();
+    // Retroactive (ADR-040): the plain JSON backups exported to Downloads are sealed in place.
+    void sealOldBackups(app.getPath('downloads'));
     refreshPacks();
     app.on('browser-window-focus', () => refreshPacks());
     await createMainWindow();
