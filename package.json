@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Nebula Clock - a privacy-first Pomodoro time manager for web (PWA) and desktop (Electron).",
-  "license": "MIT",
+  "license": "PolyForm-Strict-1.0.0",
   "packageManager": "pnpm@11.7.0",
   "engines": {
     "node": ">=20.11.0"

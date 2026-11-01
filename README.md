@@ -251,4 +251,8 @@ These are deliberate, and the UI never claims otherwise:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Nebula Clock is released under the [PolyForm Strict License 1.0.0](LICENSE).
+
+- You may download and use the app, and read the code, for any **noncommercial** purpose (personal use, study, charities, schools…).
+- You may **not modify or redistribute** the software, nor make new works based on it.
+- The source is public for transparency: this is not an open source project in the OSI sense.
